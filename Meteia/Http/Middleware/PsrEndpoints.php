@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Meteia\Http\Middleware;
+
+use Meteia\Classy\BestMatchingClass;
+use Meteia\DependencyInjection\Container;
+use Meteia\Http\Endpoint;
+use Meteia\Http\EndpointMap;
+use Meteia\Http\HomepageEndpoint;
+use Meteia\Performance\Timings;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+class PsrEndpoints implements MiddlewareInterface
+{
+    public function __construct(
+        private Container $container,
+        private EndpointMap $endpointMap,
+        private BestMatchingClass $bestMatchingClass,
+        private Timings $timings,
+    ) {
+    }
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $endpoint = $this->timings->measure('endpoint.lookup', function () use ($request) {
+            return $this->endpoint($request);
+        });
+
+        return $this->timings->measure('endpoint.response', function () use ($endpoint, $request) {
+            return $endpoint->response($request);
+        });
+    }
+
+    private function endpoint(ServerRequestInterface $request): Endpoint
+    {
+        $path = $request->getUri()->getPath();
+        if ($path === '/') {
+            // FIXME: This feels hackish
+            return $this->container->get(HomepageEndpoint::class);
+        }
+
+        $className = $this->endpointMap->classNameFor($path);
+        $bestMatchingClass = $this->bestMatchingClass->in($className, Endpoint::class, ['\\Index']);
+
+        return $this->container->get($bestMatchingClass);
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "name": "meteia/dulce",
+    "require": {
+      "meteia/logging": "*"
+    },
+    "autoload": {
+      "files": [
+        "Functions/dd.php"
+      ],
+      "psr-4": {
+            "Meteia\\Dulce\\": "."
+        }
+    }
+}

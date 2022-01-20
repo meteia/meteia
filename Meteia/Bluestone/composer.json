@@ -1,0 +1,10 @@
+{
+    "name": "meteia/bluestone",
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Meteia\\Bluestone\\": "."
+        }
+    }
+}

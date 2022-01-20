@@ -1,0 +1,36 @@
+#!/usr/bin/env php
+<?php
+
+use Meteia\Application\ApplicationNamespace;
+use Meteia\Application\ApplicationPath;
+use Meteia\CommandLine\Commands;
+use Meteia\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Console\Application;
+
+require $_composer_autoload_path ?? implode(DIRECTORY_SEPARATOR, [__DIR__, 'vendor', 'autoload.php']);
+
+$composeJson = file_get_contents(implode(DIRECTORY_SEPARATOR, ['composer.json']));
+$composer = json_decode($composeJson, false, 64, JSON_THROW_ON_ERROR);
+$options = $composer->autoload->{"psr-4"};
+
+foreach ($options as $namespace => $directory) {
+    $initDefs = [
+            ApplicationNamespace::class => new ApplicationNamespace(trim($namespace, '\\')),
+            ApplicationPath::class => (new ApplicationPath('.'))->realpath(),
+    ];
+    $container = ContainerBuilder::build($initDefs[ApplicationPath::class], $initDefs[ApplicationNamespace::class], $initDefs);
+
+    $appCommands = new Commands($container, $initDefs[ApplicationNamespace::class], $initDefs[ApplicationPath::class]);
+    $meteiaCommands = new Commands($container, new ApplicationNamespace('Meteia'), new ApplicationPath(__DIR__, '..'));
+
+    $app = new Application();
+    foreach ($appCommands as $command) {
+        $app->add($command);
+    }
+    foreach ($meteiaCommands as $command) {
+        $app->add($command);
+    }
+    $app->run();
+
+    return;
+}

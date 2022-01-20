@@ -1,0 +1,13 @@
+{
+  "runner.bootstrap": "vendor/autoload.php",
+  "runner.iterations": 25,
+  "runner.revs": 25,
+  "runner.timeout": 10,
+  "runner.output_mode": "throughput",
+  "runner.time_unit": "milliseconds",
+  "report.generators": {
+    "default": {
+      "extends": "aggregate"
+    }
+  }
+}

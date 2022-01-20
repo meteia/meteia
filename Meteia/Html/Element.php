@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Meteia\Html;
+
+trait Element
+{
+    public function __toString()
+    {
+        $tagName = explode('\\', get_called_class());
+        $tagName = array_pop($tagName);
+        $tagName = strtolower($tagName);
+
+        $attrs = get_object_vars($this);
+        $attrs = array_filter($attrs);
+        $attrs = array_map(
+            function ($k, $v) {
+                if (is_bool($v) && $v) {
+                    return $k;
+                }
+
+                return sprintf('%s="%s"', $k, $v);
+            },
+            array_keys($attrs),
+            $attrs,
+        );
+        $attrs = implode(' ', $attrs);
+
+        return sprintf('<%s %s /></%s>' . PHP_EOL, $tagName, $attrs, $tagName);
+    }
+}

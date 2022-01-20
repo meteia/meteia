@@ -1,0 +1,10 @@
+{
+    "name": "meteia/configuration",
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Meteia\\Configuration\\": "."
+        }
+    }
+}
