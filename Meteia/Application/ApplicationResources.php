@@ -16,6 +16,7 @@ class ApplicationResources
     private readonly string $prefix;
 
     public function __construct(
+        private readonly ApplicationResourcesBaseUri $applicationResourcesBaseUri,
         ApplicationPublicDir $publicDir,
         FilesystemPath $manifest,
     ) {
@@ -48,6 +49,6 @@ class ApplicationResources
 
             return;
         }
-        $head->scripts->module('/' . $path);
+        $head->scripts->module((string) $this->applicationResourcesBaseUri->withPath($path));
     }
 }
