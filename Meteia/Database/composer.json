@@ -1,0 +1,18 @@
+{
+  "name": "meteia/database",
+  "require": {
+    "aura/sql": "dev-psr-log-v3",
+    "ext-pdo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Meteia\\Database\\": "."
+    }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/jasonrm/Aura.Sql"
+    }
+  ]
+}
