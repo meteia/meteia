@@ -7,7 +7,6 @@ namespace Meteia\Dulce\Templates;
 use Meteia\Application\RepositoryPath;
 use Meteia\Bluestone\Contracts\Renderable;
 use Meteia\Bluestone\PhpTemplate;
-
 use function Meteia\Polyfills\without_prefix;
 
 class StackTrace implements Renderable

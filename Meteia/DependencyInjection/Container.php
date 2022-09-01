@@ -9,4 +9,6 @@ use Psr\Container\ContainerInterface;
 interface Container extends ContainerInterface
 {
     public function call($callable, array $parameters = []): mixed;
+
+    public function set(string $id, mixed $value): void;
 }

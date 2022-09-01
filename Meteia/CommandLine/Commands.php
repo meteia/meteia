@@ -4,29 +4,28 @@ declare(strict_types=1);
 
 namespace Meteia\CommandLine;
 
-use DI\Container;
-use Invoker\InvokerInterface;
+use Exception;
+use Generator;
+use IteratorAggregate;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Application\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\Classy\PsrClasses;
+use Meteia\DependencyInjection\Container;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Commands implements \IteratorAggregate
+class Commands implements IteratorAggregate
 {
-    /**
-     * @param Container|InvokerInterface $container
-     */
     public function __construct(
-        private Container $container,
-        private ApplicationNamespace $applicationNamespace,
-        private ApplicationPath $applicationPath,
+        private readonly Container $container,
+        private readonly ApplicationNamespace $applicationNamespace,
+        private readonly ApplicationPath $applicationPath,
     ) {
     }
 
-    public function getIterator(): \Generator
+    public function getIterator(): Generator
     {
         $glob = ['*', 'CommandLine', '*.php'];
         $classes = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, $glob);
@@ -35,13 +34,14 @@ class Commands implements \IteratorAggregate
             $commandName = $this->commandName($commandClassname);
             $command = new \Symfony\Component\Console\Command\Command($commandName);
             $command->setDefinition($this->inputDefinition($commandClassname));
+            $command->setDescription($commandClassname::description());
             $command->setCode(
                 function (InputInterface $input, OutputInterface $output) use ($commandClassname) {
                     $this->container->set(InputInterface::class, $input);
                     $this->container->set(OutputInterface::class, $output);
                     $command = $this->container->get($commandClassname);
                     if (!method_exists($command, 'execute')) {
-                        throw new \Exception('Command is missing required execute() method');
+                        throw new Exception('Command is missing required execute() method');
                     }
                     $this->container->call([$command, 'execute']);
                 },
