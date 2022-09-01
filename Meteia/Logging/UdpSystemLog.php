@@ -9,8 +9,8 @@ use function strlen;
 
 class UdpSystemLog extends AbstractLogger
 {
-    //private const FACILITY_MAX = 23;
-    //private const FACILITY_MIN = 0;
+    // private const FACILITY_MAX = 23;
+    // private const FACILITY_MIN = 0;
 
     /**
      * @var resource
@@ -19,7 +19,7 @@ class UdpSystemLog extends AbstractLogger
 
     public function __construct(private string $hostname = '127.0.0.1', private int $port = 10514, $facility = 23)
     {
-        //Assertion::between($facility, self::FACILITY_MIN, self::FACILITY_MAX);
+        // Assertion::between($facility, self::FACILITY_MIN, self::FACILITY_MAX);
         $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
     }
 

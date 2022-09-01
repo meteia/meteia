@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Meteia\Application\Instance;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Application\ApplicationPath;
 use Meteia\Application\ApplicationPublicDir;
+use Meteia\Application\Instance;
 use Meteia\Http\Middleware\ParseBody;
 
 (function () {

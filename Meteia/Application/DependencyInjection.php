@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Meteia\Application\ApplicationResourcesBaseUri;
 use Meteia\Application\ApplicationPublicDir;
 use Meteia\Application\ApplicationResources;
+use Meteia\Application\ApplicationResourcesBaseUri;
 use Meteia\Configuration\Configuration;
 
 return [

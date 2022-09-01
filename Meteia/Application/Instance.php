@@ -11,7 +11,6 @@ use Meteia\Dulce\Dulce;
 use Meteia\Dulce\Endpoints\ErrorEndpoint;
 use Meteia\Http\Middleware\PsrEndpoints;
 use Meteia\Http\Middleware\ServerTimingHeader;
-use Meteia\Logging\UdpSystemLog;
 use Meteia\Performance\Timings;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -48,7 +47,7 @@ class Instance
         );
         $container = new TimedContainer($timings, $container);
 
-         Dulce::onFatalError(
+        Dulce::onFatalError(
             $container,
             function (\Throwable $throwable) use ($applicationDefinitions) {
                 // A fresh container is needed to clear out any previous state, layout rendering in particular
@@ -60,8 +59,8 @@ class Instance
                 $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
                 $response = $freshContainer->call([$errorEndpoint, 'response'], [$throwable]);
                 send($response);
-            }
-         );
+            },
+        );
 
         /** @var RequestHandlerInterface $requestHandler */
         $requestHandler = $container->get(RequestHandlerInterface::class);

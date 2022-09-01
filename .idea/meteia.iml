@@ -17,6 +17,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Html/." isTestSource="false" packagePrefix="Meteia\Html\" />
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Logging/." isTestSource="false" packagePrefix="Meteia\Logging\" />
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Database/." isTestSource="false" packagePrefix="Meteia\Database\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/CommandLine/." isTestSource="false" packagePrefix="Meteia\CommandLine\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/stephank/composer-plugin-nixify" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
@@ -61,6 +62,14 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/inflector" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/aura/sql" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-intl-grapheme" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-intl-normalizer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/deprecation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/string" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/console" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/service-contracts" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Meteia\Application\RepositoryPath;
 use Meteia\Logging\DecoratedLog;
-use Meteia\Logging\Logfmt;
 use Meteia\Logging\StandardError;
 use Meteia\Logging\UdpSystemLog;
 use Psr\Log\LoggerInterface;

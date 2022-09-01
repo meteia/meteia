@@ -37,6 +37,7 @@ function send(ResponseInterface $response)
         echo $stream->read(1024 * 8);
     }
 
-    if (function_exists('fastcgi_finish_request'))
+    if (function_exists('fastcgi_finish_request')) {
         fastcgi_finish_request();
+    }
 }
