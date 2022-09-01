@@ -8,7 +8,7 @@ use Exception;
 use Meteia\ValueObjects\Contracts\HasPrefix;
 use Tuupola\Base62;
 
-abstract class UniqueId implements HasPrefix
+abstract class UniqueId implements HasPrefix, \Stringable
 {
     protected const EPOCH = 1577836800;
     protected const LEN_ENCODED = 27;
@@ -18,7 +18,7 @@ abstract class UniqueId implements HasPrefix
 
     protected string $token;
 
-    public function __construct(private string $bytes)
+    public function __construct(public readonly string $bytes)
     {
         assert(strlen($bytes) === static::LEN_TIMESTAMP + static::LEN_RANDOM);
     }
@@ -66,11 +66,6 @@ abstract class UniqueId implements HasPrefix
         return $this->token;
     }
 
-    public function bytes(): string
-    {
-        return $this->bytes;
-    }
-
     public function randomBytes(int $len): string
     {
         if (static::LEN_RANDOM < $len) {
@@ -85,7 +80,7 @@ abstract class UniqueId implements HasPrefix
         return bin2hex($this->bytes);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->token();
     }

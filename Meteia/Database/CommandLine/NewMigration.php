@@ -30,7 +30,7 @@ class NewMigration implements Command
         return 'Create a new migration';
     }
 
-    public function execute(): int
+    public function execute(): void
     {
         $id = date('YmdHis');
 

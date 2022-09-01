@@ -18,6 +18,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Logging/." isTestSource="false" packagePrefix="Meteia\Logging\" />
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Database/." isTestSource="false" packagePrefix="Meteia\Database\" />
       <sourceFolder url="file://$MODULE_DIR$/Meteia/CommandLine/." isTestSource="false" packagePrefix="Meteia\CommandLine\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Cryptography/." isTestSource="false" packagePrefix="Meteia\Cryptography\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/stephank/composer-plugin-nixify" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
@@ -70,6 +71,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/string" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/console" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/service-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/tuupola/base58" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

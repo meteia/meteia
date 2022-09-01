@@ -9,10 +9,7 @@ use Meteia\Cryptography\SecretKey\XChaCha20Poly1305;
 
 class OpenedCookie extends Cookie
 {
-    /**
-     * @var string
-     */
-    protected $associatedData = '';
+    protected string $associatedData = '';
 
     public function __construct(string $name, string $value, CookieAttributes $cookieAttributes = null, string $associatedData = '')
     {
@@ -29,13 +26,13 @@ class OpenedCookie extends Cookie
         $result = $XChaCha20Poly1305->encrypt($this->value, $ad, $secret);
 
         $sealedCookieValue = implode('_', array_filter([
-            $result->ciphertext(),
+            $result->ciphertext,
             $this->associatedData,
         ]));
 
         $cookie = new SealedCookie($this->name, $sealedCookieValue, $this->cookieAttributes);
 
-        return new SealCookieResult($cookie, $result->secret());
+        return new SealCookieResult($cookie, $result->secret);
     }
 
     public function withAssociatedData(string $associatedData): self

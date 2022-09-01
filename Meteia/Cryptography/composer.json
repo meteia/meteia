@@ -1,0 +1,11 @@
+{
+    "name": "meteia/cryptography",
+    "require": {
+      "ext-sodium": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Meteia\\Cryptography\\": "."
+        }
+    }
+}

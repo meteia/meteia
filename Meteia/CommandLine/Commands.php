@@ -33,7 +33,7 @@ class Commands implements IteratorAggregate
         foreach ($commandClassnames as $commandClassname) {
             $commandName = $this->commandName($commandClassname);
             $command = new \Symfony\Component\Console\Command\Command($commandName);
-            $command->setDefinition($this->inputDefinition($commandClassname));
+            $command->setDefinition($commandClassname::inputDefinition());
             $command->setDescription($commandClassname::description());
             $command->setCode(
                 function (InputInterface $input, OutputInterface $output) use ($commandClassname) {

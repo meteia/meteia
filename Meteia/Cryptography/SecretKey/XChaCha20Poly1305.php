@@ -6,17 +6,17 @@ namespace Meteia\Cryptography\SecretKey;
 
 use Meteia\Cryptography\Errors\DecryptionFailed;
 use Meteia\Cryptography\SecretKey;
-use StephenHill\Base58;
+use Tuupola\Base62;
 
 class XChaCha20Poly1305
 {
-    public function __construct(private Base58 $base58)
+    public function __construct(private readonly Base62 $codec)
     {
     }
 
     public function decrypt(string $ciphertext, string $associatedData, SecretKey $secret): XChaCha20Poly1305DecryptionResult
     {
-        $ciphertext = $this->base58->decode($ciphertext);
+        $ciphertext = $this->codec->decode($ciphertext);
 
         $nonce = mb_substr($ciphertext, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES, '8bit');
         $ciphertext = mb_substr($ciphertext, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES, null, '8bit');
@@ -48,7 +48,7 @@ class XChaCha20Poly1305
         );
         $ciphertext = $nonce . $ciphertext;
 
-        $ciphertext = $this->base58->encode($ciphertext);
+        $ciphertext = $this->codec->encode($ciphertext);
 
         return new XChaCha20Poly1305EncryptionResult($ciphertext, $secret);
     }

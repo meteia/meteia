@@ -23,9 +23,14 @@ class FilesystemPath extends StringLiteral
         return file_exists((string) $this);
     }
 
-    public function getContents(): string
+    public function read(): string
     {
         return file_get_contents((string) $this);
+    }
+
+    public function readJson(): mixed
+    {
+        return json_decode($this->read(), false, 512, JSON_THROW_ON_ERROR);
     }
 
     public function isReadable(): bool

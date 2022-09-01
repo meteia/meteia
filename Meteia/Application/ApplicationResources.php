@@ -24,7 +24,7 @@ class ApplicationResources
         $relativeManifest = substr((string) $manifest, $commonLen);
         $this->prefix = '/' . trim(dirname($relativeManifest), '/');
         if ($manifest->isReadable()) {
-            $this->knownFiles = json_decode($manifest->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            $this->knownFiles = json_decode($manifest->read(), true, 512, JSON_THROW_ON_ERROR);
         }
     }
 

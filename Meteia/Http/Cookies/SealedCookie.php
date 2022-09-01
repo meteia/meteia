@@ -19,7 +19,7 @@ class SealedCookie extends Cookie
 
         $result = $XChaCha20Poly1305->decrypt($ciphertext, $ad, $secret);
 
-        $cookie = new OpenedCookie($this->name, $result->plaintext(), $this->cookieAttributes);
+        $cookie = new OpenedCookie($this->name, $result->plaintext, $this->cookieAttributes);
 
         return $cookie->withAssociatedData($associatedData);
     }
