@@ -7,11 +7,16 @@ namespace Meteia\Database\CommandLine;
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Meteia\Database\Database;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrate implements Command
 {
+    public const ARG_DEV = 'dev';
+    public const ARG_RESET = 'reset';
+
     public function __construct(
         private readonly InputInterface $input,
         private readonly OutputInterface $output,
@@ -25,7 +30,7 @@ class Migrate implements Command
         return 'Apply any pending migrations';
     }
 
-    public function execute()
+    public function execute(): void
     {
         $this->db->exec('
             CREATE TABLE IF NOT EXISTS migrations (
@@ -35,7 +40,7 @@ class Migrate implements Command
                 UNIQUE INDEX id(id)
             )
         ');
-        if ($this->input->getOption(MigrateInputDefinition::RESET)) {
+        if ($this->input->getOption(self::ARG_RESET)) {
             $this->output->writeln('truncated migrations');
             $this->db->exec('TRUNCATE migrations;');
         }
@@ -70,7 +75,7 @@ class Migrate implements Command
                 }
             }
 
-            if (!$this->input->getOption(MigrateInputDefinition::DEV)) {
+            if (!$this->input->getOption(self::ARG_DEV)) {
                 $this->db->perform('INSERT INTO migrations (id, name) VALUES (:id, :name)', [
                     'id' => $id,
                     'name' => $name,
@@ -78,5 +83,13 @@ class Migrate implements Command
                 $this->output->writeln(sprintf('recorded : %s', $filename));
             }
         }
+    }
+
+    public static function inputDefinition(): InputDefinition
+    {
+        return new InputDefinition([
+            new InputOption(self::ARG_DEV, '', InputOption::VALUE_NONE, 'apply without marking as ran'),
+            new InputOption(self::ARG_RESET, '', InputOption::VALUE_NONE, 'reset migration table (dangerous option if all migrations are not idempotent)'),
+        ]);
     }
 }
