@@ -8,7 +8,7 @@ use Exception;
 use Meteia\ValueObjects\Contracts\HasPrefix;
 use Tuupola\Base62;
 
-abstract class UniqueId implements HasPrefix, \Stringable
+abstract class UniqueId implements HasPrefix, \Stringable, \JsonSerializable
 {
     protected const EPOCH = 1577836800;
     protected const LEN_ENCODED = 27;
@@ -16,11 +16,17 @@ abstract class UniqueId implements HasPrefix, \Stringable
     protected const LEN_TIMESTAMP = 4;
     protected const PREFIX = '!!!';
 
-    protected string $token;
+    public readonly string $token;
 
-    public function __construct(public readonly string $bytes)
+    public function __construct(readonly string $bytes)
     {
         assert(strlen($bytes) === static::LEN_TIMESTAMP + static::LEN_RANDOM);
+        $token = (new Base62())->encode($this->bytes);
+        if ($padding = static::LEN_ENCODED - strlen($token)) {
+            $token = str_repeat('0', $padding) . $token;
+        }
+        assert(strlen($token) === static::LEN_ENCODED, 'expected ' . static::LEN_ENCODED . ' got ' . strlen($token));
+        $this->token = implode('_', [static::prefix(), $token]);
     }
 
     public static function random(): static
@@ -52,20 +58,6 @@ abstract class UniqueId implements HasPrefix, \Stringable
         return hash_equals($this->bytes, $other->bytes);
     }
 
-    public function token(): string
-    {
-        if (!isset($this->token)) {
-            $token = (new Base62())->encode($this->bytes);
-            if ($padding = static::LEN_ENCODED - strlen($token)) {
-                $token = str_repeat('0', $padding) . $token;
-            }
-            assert(strlen($token) === static::LEN_ENCODED, 'expected ' . static::LEN_ENCODED . ' got ' . strlen($token));
-            $this->token = implode('_', [static::prefix(), $token]);
-        }
-
-        return $this->token;
-    }
-
     public function randomBytes(int $len): string
     {
         if (static::LEN_RANDOM < $len) {
@@ -82,29 +74,11 @@ abstract class UniqueId implements HasPrefix, \Stringable
 
     public function __toString(): string
     {
-        return $this->token();
+        return $this->token;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
-        return $this->token();
-    }
-
-    /**
-     * FIXME: This feels super hacky...
-     */
-    public function __sleep(): array
-    {
-        $this->token();
-
-        return ['token'];
-    }
-
-    /**
-     * FIXME: This feels super hacky...
-     */
-    public function __wakeup(): void
-    {
-        $this->bytes = (static::fromToken($this->token)->bytes);
+        return $this->token;
     }
 }

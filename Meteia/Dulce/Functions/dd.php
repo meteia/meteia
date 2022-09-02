@@ -10,6 +10,12 @@ if (!function_exists('dump_object_via_reflection')) {
     function dump_object_via_reflection($object)
     {
         if (!is_object($object)) {
+            if (is_string($object) && strlen($object) > 0 && !ctype_print($object)) {
+                return '0x' . bin2hex($object);
+            }
+            if (is_array($object)) {
+                return array_map(dump_object_via_reflection(...), $object);
+            }
             return $object;
         }
         if ($object instanceof JsonSerializable) {
@@ -26,6 +32,8 @@ if (!function_exists('dump_object_via_reflection')) {
             $value = $property->getValue($object);
             if (is_object($value)) {
                 $array[$property->getName()] = dump_object_via_reflection($value);
+            } elseif (is_string($value) && !ctype_print($value)) {
+                $array[$property->getName()] = bin2hex($value);
             } else {
                 $array[$property->getName()] = $value;
             }

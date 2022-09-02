@@ -37,4 +37,13 @@ class TimedContainer implements Container
             fn () => $this->container->has($id),
         );
     }
+
+
+    public function set(string $id, mixed $value): void
+    {
+        $this->timings->measure(
+            'di-set-' . $id,
+            fn () => $this->container->set($id, $value),
+        );
+    }
 }
