@@ -16,6 +16,7 @@ if (!function_exists('dump_object_via_reflection')) {
             if (is_array($object)) {
                 return array_map(dump_object_via_reflection(...), $object);
             }
+
             return $object;
         }
         if ($object instanceof JsonSerializable) {

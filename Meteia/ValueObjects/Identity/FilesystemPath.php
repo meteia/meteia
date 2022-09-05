@@ -50,8 +50,10 @@ class FilesystemPath extends StringLiteral
     {
         $file = new SplFileObject((string) $this);
         $file->seek($start);
-        while ($file->valid() && (!$end || $file->key() <= $end)) {
-            yield $file->key() => rtrim($file->getCurrentLine());
+        $lineNumber = $start;
+        while ($file->valid() && (!$end || $lineNumber <= $end)) {
+            $lineNumber++;
+            yield $lineNumber => rtrim($file->getCurrentLine());
             $file->next();
         }
     }

@@ -10,6 +10,8 @@ use Meteia\Dulce\Endpoints\DeveloperErrorEndpoint;
 use Meteia\Dulce\Endpoints\ErrorEndpoint;
 use Meteia\Dulce\ErrorClassifications\ErrorClassification;
 use Meteia\Dulce\ErrorClassifications\StrictErrorClassification;
+use Meteia\Dulce\StackTraces\FrameFilterMeteia;
+use Meteia\Dulce\StackTraces\FrameFilters;
 
 return [
     ErrorClassification::class => StrictErrorClassification::class,
@@ -31,10 +33,10 @@ return [
     EditorUri::class => function (Configuration $configuration): EditorUri {
         return new EditorUri($configuration->string('ERRORS_EDITOR_URI', 'phpstorm://open'));
     },
-    // FrameFilters::class => function (): FrameFilters {
-    //    // FIXME: This feels ugly, not sure how I want to handle this
-    //    return new FrameFilters([
-    //        //new FrameFilterMeteia(),
-    //    ]);
-    // },
+    FrameFilters::class => function (): FrameFilters {
+        // FIXME: This feels ugly, not sure how I want to handle this
+        return new FrameFilters([
+            new FrameFilterMeteia(),
+        ]);
+    },
 ];

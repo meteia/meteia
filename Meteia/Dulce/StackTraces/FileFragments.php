@@ -10,8 +10,8 @@ class FileFragments
 {
     public function fileFragment(FilesystemPath $path, int $focusedLine, int $contextLines): FileFragment
     {
-        $start = (int) max(0, $focusedLine - ceil($contextLines / 2));
-        $end = $start + $contextLines;
+        $start = $focusedLine - $contextLines;
+        $end = $focusedLine;
 
         $lines = iterator_to_array($path->lines($start, $end));
 

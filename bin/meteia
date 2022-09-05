@@ -7,6 +7,8 @@ use Meteia\CommandLine\Commands;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Console\Application;
 
+use function Meteia\Http\Functions\send;
+
 require $_composer_autoload_path ?? implode(DIRECTORY_SEPARATOR, [__DIR__, 'vendor', 'autoload.php']);
 
 $composeJson = file_get_contents(implode(DIRECTORY_SEPARATOR, ['composer.json']));

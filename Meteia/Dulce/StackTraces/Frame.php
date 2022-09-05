@@ -8,40 +8,10 @@ use Meteia\ValueObjects\Identity\FilesystemPath;
 
 class Frame
 {
-    /**
-     * @var FilesystemPath
-     */
-    private $path;
-
-    /**
-     * @var int
-     */
-    private $lineNumber;
-
-    /**
-     * @var FileFragment
-     */
-    private $fileFragment;
-
-    public function __construct(FilesystemPath $path, int $lineNumber, FileFragment $fileFragment)
-    {
-        $this->path = $path;
-        $this->lineNumber = $lineNumber;
-        $this->fileFragment = $fileFragment;
-    }
-
-    public function fileFragment(): FileFragment
-    {
-        return $this->fileFragment;
-    }
-
-    public function path(): FilesystemPath
-    {
-        return $this->path;
-    }
-
-    public function lineNumber(): int
-    {
-        return $this->lineNumber;
+    public function __construct(
+        public readonly FilesystemPath $path,
+        public readonly int $lineNumber,
+        public readonly FileFragment $fileFragment,
+    ) {
     }
 }

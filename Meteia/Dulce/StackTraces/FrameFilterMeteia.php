@@ -19,7 +19,7 @@ class FrameFilterMeteia implements FrameFilter
         ];
 
         foreach ($paths as $path) {
-            if (strpos($frame['file'], $path) !== false) {
+            if (str_contains($frame['file'], $path)) {
                 return false;
             }
         }

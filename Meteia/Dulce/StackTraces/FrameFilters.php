@@ -7,9 +7,9 @@ namespace Meteia\Dulce\StackTraces;
 class FrameFilters
 {
     /**
-     * @var array
+     * @var array<int, FrameFilter>
      */
-    private $filters;
+    private array $filters;
 
     /**
      * @param FrameFilter[] $filters
