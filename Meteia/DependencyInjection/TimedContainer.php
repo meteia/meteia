@@ -38,7 +38,6 @@ class TimedContainer implements Container
         );
     }
 
-
     public function set(string $id, mixed $value): void
     {
         $this->timings->measure(

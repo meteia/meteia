@@ -12,10 +12,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 class GenerateSecretKey implements Command
 {
     public function __construct(
-        private readonly OutputInterface $output)
+        private readonly OutputInterface $output,
+    )
     {
     }
-
 
     public function execute(): void
     {
@@ -23,12 +23,10 @@ class GenerateSecretKey implements Command
         $this->output->writeln($sk);
     }
 
-
     public static function description(): string
     {
         return 'Generate a secret key';
     }
-
 
     public static function inputDefinition(): InputDefinition
     {
