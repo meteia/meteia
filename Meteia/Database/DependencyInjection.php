@@ -15,6 +15,8 @@ return [
 
         $dsn = sprintf('mysql:dbname=%s;host=%s;port=%d;charset=utf8mb4', $database, $hostname, $port);
 
-        return new Database($dsn, $username, $password);
+        return new Database($dsn, $username, $password, [
+            \PDO::MYSQL_ATTR_FOUND_ROWS => true
+        ]);
     },
 ];
