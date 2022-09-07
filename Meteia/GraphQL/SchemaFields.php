@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
+use Generator;
 use Meteia\Classy\ClassesImplementing;
-use Meteia\GraphQL\Contracts\ObjectResolver;
+use Meteia\DependencyInjection\Container;
 use Meteia\GraphQL\Contracts\QueryField;
-use Meteia\GraphQL\Contracts\RequestContext;
-use Psr\Container\ContainerInterface;
 
 class SchemaFields
 {
     public function __construct(
-        private ContainerInterface $container,
-        private iterable $fieldClasses,
+        private readonly Container $container,
+        private readonly iterable $fieldClasses,
     ) {
     }
 
-    public function implementing(string $interface)
+    public function implementing(string $interface): Generator
     {
         $classes = new ClassesImplementing($this->fieldClasses, $interface);
         foreach ($classes as $queryFieldClassName) {
@@ -37,7 +36,7 @@ class SchemaFields
         }
     }
 
-    private function fieldName(string $queryFieldClassName)
+    private function fieldName(string $queryFieldClassName): string
     {
         $names = explode('\\', $queryFieldClassName);
 

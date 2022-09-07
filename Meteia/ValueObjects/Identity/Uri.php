@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Meteia\ValueObjects\Identity;
 
 use Psr\Http\Message\UriInterface;
-use function RingCentral\Psr7\build_query;
 
 class Uri extends \Laminas\Diactoros\Uri implements UriInterface
 {
@@ -28,7 +27,7 @@ class Uri extends \Laminas\Diactoros\Uri implements UriInterface
     {
         $kv = array_map('strval', $kv);
         ksort($kv);
-        $qs = build_query($kv);
+        $qs = http_build_query($kv);
 
         return $this->withQuery($qs);
     }

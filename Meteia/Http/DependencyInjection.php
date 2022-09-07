@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Meteia\Configuration\Configuration;
+use Meteia\Http\Csrf\CsrfSecretKey;
 use Meteia\Http\EndpointMap;
 use Meteia\Http\EndpointMaps\PsrEndpointMap;
 use Meteia\Http\Endpoints;
@@ -43,5 +44,13 @@ return [
         $host = $configuration->string('HTTP_HOST', $_SERVER['HTTP_HOST'] ?? 'example.com');
 
         return new Host($scheme . '://' . $host);
+    },
+    CsrfSecretKey::class => function (Configuration $configuration): CsrfSecretKey {
+        $value = $configuration->string('CSRF_SECRET_KEY', '');
+        if ($value === '') {
+            throw new \Exception('CSRF_SECRET_KEY not set');
+        }
+
+        return CsrfSecretKey::fromToken($value);
     },
 ];

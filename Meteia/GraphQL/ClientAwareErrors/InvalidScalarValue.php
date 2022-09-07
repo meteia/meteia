@@ -8,12 +8,12 @@ use GraphQL\Error\ClientAware;
 
 class InvalidScalarValue extends \Exception implements ClientAware
 {
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'values';
     }
 
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }

@@ -47,20 +47,20 @@ class Instance
         );
         $container = new TimedContainer($timings, $container);
 
-        Dulce::onFatalError(
-            $container,
-            function (\Throwable $throwable) use ($applicationDefinitions) {
-                // A fresh container is needed to clear out any previous state, layout rendering in particular
-                /** @var Container $freshContainer */
-                $freshContainer = ContainerBuilder::build($this->path, $this->namespace, [
-                    \Throwable::class => $throwable,
-                    ...$applicationDefinitions,
-                ]);
-                $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
-                $response = $freshContainer->call([$errorEndpoint, 'response'], [$throwable]);
-                send($response);
-            },
-        );
+        // Dulce::onFatalError(
+        //    $container,
+        //    function (\Throwable $throwable) use ($applicationDefinitions) {
+        //        // A fresh container is needed to clear out any previous state, layout rendering in particular
+        //        /** @var Container $freshContainer */
+        //        $freshContainer = ContainerBuilder::build($this->path, $this->namespace, [
+        //            \Throwable::class => $throwable,
+        //            ...$applicationDefinitions,
+        //        ]);
+        //        $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
+        //        $response = $freshContainer->call([$errorEndpoint, 'response'], [$throwable]);
+        //        send($response);
+        //    },
+        // );
 
         /** @var RequestHandlerInterface $requestHandler */
         $requestHandler = $container->get(RequestHandlerInterface::class);

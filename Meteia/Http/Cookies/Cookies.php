@@ -8,14 +8,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class Cookies
 {
-    /**
-     * @var ServerRequestInterface
-     */
-    private $serverRequest;
-
-    public function __construct(ServerRequestInterface $serverRequest)
-    {
-        $this->serverRequest = $serverRequest;
+    public function __construct(
+        private readonly ServerRequestInterface $serverRequest,
+    ) {
     }
 
     public function string(string $name, string $default): string

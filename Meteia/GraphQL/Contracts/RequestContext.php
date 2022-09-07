@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL\Contracts;
 
-class RequestContext
+interface RequestContext
 {
-    public function __construct(public RequestingUser $user)
-    {
-    }
 }

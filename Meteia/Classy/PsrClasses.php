@@ -11,23 +11,16 @@ use Meteia\ValueObjects\Identity\FilesystemPath;
 class PsrClasses implements IteratorAggregate
 {
     public function __construct(
-        private FilesystemPath $baseDirectory,
-        private string $namespacePrefix,
-        private readonly array $globParts = ['**', '*.php'],
+        private readonly FilesystemPath $baseDirectory,
+        private readonly string $namespacePrefix,
+        private readonly iterable $candidateFiles,
     ) {
-        $this->namespacePrefix = trim($namespacePrefix, '\\');
-    }
-
-    public function __toString(): string
-    {
-        return sprintf('path=%s/%s/%s', $this->baseDirectory, $this->namespacePrefix, implode(DIRECTORY_SEPARATOR, $this->globParts));
     }
 
     public function getIterator(): Generator
     {
         $searchRoot = $this->baseDirectory->join($this->namespacePrefix);
-        $glob = (string) $searchRoot->join(...$this->globParts);
-        foreach (glob($glob) as $file) {
+        foreach ($this->candidateFiles as $file) {
             $file = new FilesystemPath($file);
             $className = $this->fileToClassName((string) $file->withoutPrefix($searchRoot));
             if (!class_exists($className)) {
@@ -38,7 +31,7 @@ class PsrClasses implements IteratorAggregate
         }
     }
 
-    private function fileToClassName($file)
+    private function fileToClassName($file): string
     {
         $className = str_replace('.php', '', $file);
         $className = str_replace(DIRECTORY_SEPARATOR, '\\', $className);

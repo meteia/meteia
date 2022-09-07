@@ -32,7 +32,7 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         }
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
@@ -42,7 +42,7 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         }
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $data = [];
         foreach ($this->getIterator() as $key => $value) {
@@ -52,7 +52,7 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         return $data;
     }
 
-    private function with($key, $value)
+    private function with($key, $value): self
     {
         $copy = clone $this;
         $copy->$key = $value;

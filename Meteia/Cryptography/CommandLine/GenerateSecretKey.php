@@ -13,19 +13,18 @@ class GenerateSecretKey implements Command
 {
     public function __construct(
         private readonly OutputInterface $output,
-    )
-    {
-    }
-
-    public function execute(): void
-    {
-        $sk = new SecretKey(random_bytes(24));
-        $this->output->writeln($sk);
+    ) {
     }
 
     public static function description(): string
     {
         return 'Generate a secret key';
+    }
+
+    public function execute(): void
+    {
+        $sk = new SecretKey(random_bytes(32));
+        $this->output->writeln((string) $sk);
     }
 
     public static function inputDefinition(): InputDefinition

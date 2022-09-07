@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Meteia\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
-use function Polyfills\array_map_assoc;
+use function Meteia\Polyfills\array_map_assoc;
 
 abstract class ConnectionField extends ObjectType
 {

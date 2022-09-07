@@ -30,8 +30,8 @@ class Commands implements IteratorAggregate
 
     public function getIterator(): Generator
     {
-        $glob = ['*', 'CommandLine', '*.php'];
-        $classes = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, $glob);
+        $candidateFiles = $this->applicationPath->find('CommandLine', '.*\.php');
+        $classes = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, $candidateFiles);
         $commandClassnames = new ClassesImplementing($classes, Command::class);
         foreach ($commandClassnames as $commandClassname) {
             $commandName = $this->commandName($commandClassname);

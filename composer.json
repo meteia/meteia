@@ -17,6 +17,7 @@
         ],
         "psr-4": {
             "Meteia\\Application\\": "Meteia/Application/.",
+            "Meteia\\Authentication\\": "Meteia/Authentication/.",
             "Meteia\\Bluestone\\": "Meteia/Bluestone/.",
             "Meteia\\Classy\\": "Meteia/Classy/.",
             "Meteia\\CommandLine\\": "Meteia/CommandLine/.",
@@ -25,6 +26,7 @@
             "Meteia\\Database\\": "Meteia/Database/.",
             "Meteia\\DependencyInjection\\": "Meteia/DependencyInjection/.",
             "Meteia\\Dulce\\": "Meteia/Dulce/.",
+            "Meteia\\GraphQL\\": "Meteia/GraphQL/.",
             "Meteia\\Html\\": "Meteia/Html/.",
             "Meteia\\Http\\": "Meteia/Http/.",
             "Meteia\\Logging\\": "Meteia/Logging/.",
@@ -41,6 +43,7 @@
         "ext-pdo": "*",
         "ext-sodium": "*",
         "laminas/laminas-diactoros": "^2.15.0",
+        "nesbot/carbon": "^2.62.1",
         "nyholm/psr7": "^1.5.1",
         "nyholm/psr7-server": "^1.0.2",
         "php": "^8.1",
@@ -51,7 +54,8 @@
         "psr/http-server-middleware": "^1.0.1",
         "psr/log": "^3.0.0",
         "symfony/console": ">=v6.1.4",
-        "tuupola/base62": "^2.1.0"
+        "tuupola/base62": "^2.1.0",
+        "webonyx/graphql-php": "^14.11.6"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
@@ -74,6 +78,7 @@
     },
     "replace": {
         "meteia/application": "self.version",
+        "meteia/authentication": "self.version",
         "meteia/bluestone": "self.version",
         "meteia/classy": "self.version",
         "meteia/command-line": "self.version",
@@ -82,6 +87,7 @@
         "meteia/database": "self.version",
         "meteia/dependency-injection": "self.version",
         "meteia/dulce": "self.version",
+        "meteia/graphql": "self.version",
         "meteia/html": "self.version",
         "meteia/http": "self.version",
         "meteia/logging": "self.version",

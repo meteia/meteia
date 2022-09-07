@@ -6,6 +6,9 @@ namespace Meteia\ValueObjects\Identity;
 
 use Iterator;
 use Meteia\ValueObjects\Primitive\StringLiteral;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
 use SplFileObject;
 
 class FilesystemPath extends StringLiteral
@@ -23,14 +26,13 @@ class FilesystemPath extends StringLiteral
         return file_exists((string) $this);
     }
 
-    public function read(): string
+    public function find(string ...$regex): Iterator
     {
-        return file_get_contents((string) $this);
-    }
+        $regex = '#' . implode(DIRECTORY_SEPARATOR, $regex) . '#';
+        // jdd($regex);
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator((string) $this));
 
-    public function readJson(): mixed
-    {
-        return json_decode($this->read(), false, 512, JSON_THROW_ON_ERROR);
+        return new RegexIterator($iterator, $regex, RegexIterator::MATCH);
     }
 
     public function isReadable(): bool
@@ -40,7 +42,7 @@ class FilesystemPath extends StringLiteral
 
     public function join(...$paths): self
     {
-        return new static($this->value, ...$paths);
+        return new self($this->value, ...$paths);
     }
 
     /**
@@ -58,13 +60,23 @@ class FilesystemPath extends StringLiteral
         }
     }
 
-    public function realpath(): self
+    public function read(): string
+    {
+        return file_get_contents((string) $this);
+    }
+
+    public function readJson(): mixed
+    {
+        return json_decode($this->read(), false, 512, JSON_THROW_ON_ERROR);
+    }
+
+    public function realpath(): static
     {
         return new static(realpath((string) $this));
     }
 
     public function withoutPrefix(FilesystemPath $prefix): self
     {
-        return new static(trim(str_replace((string) $prefix, '', (string) $this), '\\'));
+        return new self(trim(str_replace((string) $prefix, '', (string) $this), '\\'));
     }
 }

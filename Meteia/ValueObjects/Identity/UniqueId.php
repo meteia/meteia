@@ -20,9 +20,11 @@ abstract class UniqueId implements HasPrefix, \Stringable, \JsonSerializable
 
     public function __construct(readonly string $bytes)
     {
-        assert(strlen($bytes) === static::LEN_TIMESTAMP + static::LEN_RANDOM);
+        assert(strlen($bytes) === static::LEN_TIMESTAMP + static::LEN_RANDOM,
+            'expected ' . static::LEN_TIMESTAMP + static::LEN_RANDOM . ' got ' . strlen($bytes));
         $token = (new Base62())->encode($this->bytes);
-        if ($padding = static::LEN_ENCODED - strlen($token)) {
+        $padding = static::LEN_ENCODED - strlen($token);
+        if ($padding > 0) {
             $token = str_repeat('0', $padding) . $token;
         }
         assert(strlen($token) === static::LEN_ENCODED, 'expected ' . static::LEN_ENCODED . ' got ' . strlen($token));

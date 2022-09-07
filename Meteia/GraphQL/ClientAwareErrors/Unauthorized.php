@@ -13,12 +13,12 @@ class Unauthorized extends \Exception implements ClientAware
         parent::__construct('Unauthorized');
     }
 
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'authorization';
     }
 
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }

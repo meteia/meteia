@@ -8,9 +8,9 @@ use JsonSerializable;
 
 abstract class PrimitiveValueObject implements JsonSerializable
 {
-    protected $value;
+    protected mixed $value;
 
-    public function toNative()
+    public function toNative(): mixed
     {
         return $this->value;
     }

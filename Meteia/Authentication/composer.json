@@ -1,0 +1,11 @@
+{
+    "name": "meteia/authentication",
+    "require": {
+      "nesbot/carbon": "^2.62.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Meteia\\Authentication\\": "."
+        }
+    }
+}

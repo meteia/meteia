@@ -17,7 +17,7 @@ class UniqueIdType extends ScalarType implements Resolver
     use ClassBasedName;
 
     public function __construct(
-        private string $uniqueIdClass,
+        private readonly string $uniqueIdClass,
     ) {
         assert(is_subclass_of($uniqueIdClass, UniqueId::class), $uniqueIdClass . ' does not implement ' . UniqueId::class);
         parent::__construct([

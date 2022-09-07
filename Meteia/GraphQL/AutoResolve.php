@@ -9,21 +9,16 @@ use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\WrappingType;
-use Invoker\InvokerInterface;
+use Meteia\DependencyInjection\Container;
 use Meteia\GraphQL\Contracts\Field;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\GraphQL\Contracts\ResolvesAttr;
-use ProxyManager\Proxy\ValueHolderInterface;
-use Psr\Container\ContainerInterface;
 
 class AutoResolve
 {
-    /**
-     * @param ContainerInterface|InvokerInterface $container
-     */
     public function __construct(
-        private ContainerInterface $container,
+        private readonly Container $container,
     ) {
     }
 
@@ -37,9 +32,9 @@ class AutoResolve
         }
 
         // Unwrap return types that use the @Injectable(lazy=true) annotation to allow for circular references
-        if ($returnType instanceof ValueHolderInterface) {
-            $returnType = $returnType->getWrappedValueHolderValue();
-        }
+        // if ($returnType instanceof ValueHolderInterface) {
+        //    $returnType = $returnType->getWrappedValueHolderValue();
+        // }
 
         $resolver = $returnType;
         $returnTypeClass = trim(\get_class($returnType), '\\');
