@@ -19,6 +19,8 @@
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Database/." isTestSource="false" packagePrefix="Meteia\Database\" />
       <sourceFolder url="file://$MODULE_DIR$/Meteia/CommandLine/." isTestSource="false" packagePrefix="Meteia\CommandLine\" />
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Cryptography/." isTestSource="false" packagePrefix="Meteia\Cryptography\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Authentication/." isTestSource="false" packagePrefix="Meteia\Authentication\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/GraphQL/." isTestSource="false" packagePrefix="Meteia\GraphQL\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/stephank/composer-plugin-nixify" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
@@ -72,6 +74,11 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/console" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/service-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/tuupola/base58" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webonyx/graphql-php" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nesbot/carbon" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/translation" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/translation-contracts" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
