@@ -18,7 +18,6 @@ class AccessToken
     ) {
     }
 
-
     public static function fromJsonString(string $json): AccessToken
     {
         $r = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
@@ -26,7 +25,6 @@ class AccessToken
 
         return new AccessToken($r->access_token, $r->token_type, $expires, $r->refresh_token, $r->scope);
     }
-
 
     public function hasScope(string $scope): bool
     {

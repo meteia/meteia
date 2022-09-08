@@ -6,7 +6,7 @@ namespace Meteia\Database;
 
 abstract class MySQL
 {
-    public const DATE = "Y-m-d";
+    public const DATE = 'Y-m-d';
 
-    public const DATETIME = "Y-m-d H:i:s";
+    public const DATETIME = 'Y-m-d H:i:s';
 }

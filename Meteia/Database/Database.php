@@ -19,7 +19,6 @@ class Database extends ExtendedPdo
         return array_map($this->prepareBoundValue(...), $values);
     }
 
-
     private function prepareBoundValue(mixed $value): mixed
     {
         if (is_array($value)) {
@@ -44,7 +43,7 @@ class Database extends ExtendedPdo
             return $value->format(MySQL::DATETIME);
         }
         if ($value instanceof Stringable) {
-            return (string)$value;
+            return (string) $value;
         }
 
         return $value;
