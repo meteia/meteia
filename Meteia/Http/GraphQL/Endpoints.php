@@ -17,7 +17,7 @@ class Endpoints extends ListOfType implements QueryField, Resolver
         private readonly Link $link,
         private readonly NamedEndpoints $namedEndpoints,
     ) {
-        parent::__construct($link);
+        parent::__construct(self::nonNull($link));
     }
 
     public function data(mixed $root, array $args, RequestContext $requestContext): array
