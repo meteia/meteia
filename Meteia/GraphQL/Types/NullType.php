@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL\Types;
 
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NullValueNode;
 use GraphQL\Type\Definition\LeafType;
 use GraphQL\Type\Definition\OutputType;
@@ -44,11 +45,9 @@ class NullType extends Type implements OutputType, LeafType
     /**
      * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input.
      *
-     * @param \GraphQL\Language\AST\Node $valueNode
-     *
      * @return mixed
      */
-    public function parseLiteral($valueNode)
+    public function parseLiteral(Node $valueNode, ?array $variables = null)
     {
         return null;
     }
