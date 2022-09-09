@@ -20,11 +20,10 @@ class ParseBody implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $ct = implode('', $request->getHeader('Content-Type'));
-        switch ($ct) {
-            case 'application/json':
-                $contents = $request->getBody()->getContents();
-                $json = json_decode($contents, true, 256, JSON_THROW_ON_ERROR);
-                $request = $request->withParsedBody($json);
+        if (str_contains($ct, 'application/json')) {
+            $contents = $request->getBody()->getContents();
+            $json = json_decode($contents, true, 256, JSON_THROW_ON_ERROR);
+            $request = $request->withParsedBody($json);
         }
 
         return $handler->handle($request);

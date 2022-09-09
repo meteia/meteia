@@ -22,7 +22,7 @@ class DeveloperErrorEndpoint implements ErrorEndpoint
 
     public function response(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
-        if ($request->getHeaderLine('Content-Type') === 'application/json') {
+        if (str_contains($request->getHeaderLine('Content-Type'), 'application/json')) {
             return new JsonResponse([
                 'message' => $throwable->getMessage(),
                 'stackTrace' => array_values(array_map(function ($frame) {
