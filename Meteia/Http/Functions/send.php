@@ -19,11 +19,13 @@ function send(ResponseInterface $response)
         $response->getReasonPhrase(),
     );
 
-    header($http_line, true, $response->getStatusCode());
+    if (!headers_sent()) {
+        header($http_line, true, $response->getStatusCode());
 
-    foreach ($response->getHeaders() as $name => $values) {
-        foreach ($values as $value) {
-            header("$name: $value", false);
+        foreach ($response->getHeaders() as $name => $values) {
+            foreach ($values as $value) {
+                header("$name: $value", false);
+            }
         }
     }
 
