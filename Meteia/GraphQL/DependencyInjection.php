@@ -9,11 +9,18 @@ use Meteia\Classy\PsrClasses;
 use Meteia\DependencyInjection\Container;
 use Meteia\GraphQL\Contracts\Field;
 use Meteia\GraphQL\SchemaFields;
+use Meteia\ValueObjects\Identity\FilesystemPath;
 
 return [
     SchemaFields::class => function (ApplicationPath $applicationPath, ApplicationNamespace $namespace, Container $container): SchemaFields {
-        $classes = new PsrClasses($applicationPath, (string) $namespace, $applicationPath->find('GraphQL', '.*\.php'));
-        $classes = new ClassesImplementing($classes, Field::class);
+        $meteiaPath = (new FilesystemPath(__DIR__, '..', '..'))->realpath();
+        $meteiaClasses = new PsrClasses($meteiaPath, 'Meteia', ['.+', 'GraphQL', '.+\.php']);
+
+        $applicationClasses = new PsrClasses($applicationPath, (string) $namespace, ['.+', 'GraphQL', '.+\.php']);
+        $classes = new ClassesImplementing([
+            ...iterator_to_array($meteiaClasses),
+            ...iterator_to_array($applicationClasses),
+        ], Field::class);
 
         return new SchemaFields($container, $classes);
     },

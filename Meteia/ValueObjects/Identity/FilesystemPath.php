@@ -28,9 +28,9 @@ class FilesystemPath extends StringLiteral
 
     public function find(string ...$regex): Iterator
     {
-        $regex = '#' . implode(DIRECTORY_SEPARATOR, $regex) . '#';
-        // jdd($regex);
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator((string) $this));
+        $basePath = $this->realpath();
+        $regex = '#' . $basePath->join(...$regex) . '$#';
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator((string) $basePath));
 
         return new RegexIterator($iterator, $regex, RegexIterator::MATCH);
     }
@@ -77,6 +77,6 @@ class FilesystemPath extends StringLiteral
 
     public function withoutPrefix(FilesystemPath $prefix): self
     {
-        return new self(trim(str_replace((string) $prefix, '', (string) $this), '\\'));
+        return new self(trim(str_replace((string) $prefix, '', (string) $this), DIRECTORY_SEPARATOR));
     }
 }

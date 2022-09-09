@@ -13,16 +13,17 @@ class PsrClasses implements IteratorAggregate
     public function __construct(
         private readonly FilesystemPath $baseDirectory,
         private readonly string $namespacePrefix,
-        private readonly iterable $candidateFiles,
+        private readonly array $regex,
     ) {
     }
 
     public function getIterator(): Generator
     {
         $searchRoot = $this->baseDirectory->join($this->namespacePrefix);
-        foreach ($this->candidateFiles as $file) {
+        foreach ($searchRoot->find(...$this->regex) as $file) {
             $file = new FilesystemPath($file);
-            $className = $this->fileToClassName((string) $file->withoutPrefix($searchRoot));
+            $withoutPrefix = (string) $file->withoutPrefix($searchRoot);
+            $className = $this->fileToClassName($withoutPrefix);
             if (!class_exists($className)) {
                 continue;
             }
