@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-use IteratorAggregate;
-use Meteia\Bluestone\Contracts\Renderable;
-use Traversable;
+use Stringable;
 
-class Metadata implements IteratorAggregate
+class Metadata implements Stringable
 {
-    private $tags = [];
+    private array $tags = [];
 
-    public function getIterator(): Traversable
+    public function __toString()
     {
-        foreach ($this->tags as $tag) {
-            yield $tag;
-        }
+        return implode('', $this->tags);
     }
 
-    public function include(Renderable $view): void
+    public function include(Stringable $view): void
     {
         $this->tags[] = $view;
     }

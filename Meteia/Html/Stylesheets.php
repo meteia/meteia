@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace Meteia\Html;
 
 use Meteia\Html\Elements\Link;
+use Stringable;
 
-class Stylesheets implements \IteratorAggregate
+class Stylesheets implements Stringable
 {
-    private $stylesheets = [];
+    private array $stylesheets = [];
 
-    public function getIterator(): \Traversable
+    public function __toString()
     {
-        foreach ($this->stylesheets as $stylesheet) {
-            yield $stylesheet;
-        }
+        return implode('', $this->stylesheets);
     }
 
     public function load($href, ?string $integrity = null, ?string $crossorigin = null): void
     {
-        $this->stylesheets[] = new Link('stylesheet', $href, $integrity, $crossorigin);
+        $this->stylesheets[$href] = new Link('stylesheet', $href, $integrity, $crossorigin);
     }
 }
