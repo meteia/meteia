@@ -6,8 +6,4 @@ namespace Meteia\ValueObjects\Identity;
 
 class CorrelationId extends UniqueId
 {
-    public static function prefix(): string
-    {
-        return 'cor';
-    }
 }

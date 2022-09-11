@@ -1,11 +1,11 @@
 declare(strict_types=1);
 
-namespace <?= $namespace ?>\Entities;
+namespace <?= $namespace ?>\Database\Entities;
 
 use Meteia\Database\Database;
 use Meteia\Database\DatabaseEntity;
 
-class <?= $entityName . PHP_EOL ?>
+class <?= $className . PHP_EOL ?>
 {
     use DatabaseEntity;
 

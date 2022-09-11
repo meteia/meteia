@@ -8,8 +8,4 @@ use Meteia\ValueObjects\Identity\UniqueId;
 
 class CommandId extends UniqueId
 {
-    public static function prefix(): string
-    {
-        return 'cmd';
-    }
 }

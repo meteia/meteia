@@ -8,8 +8,4 @@ use Meteia\ValueObjects\Identity\UniqueId;
 
 class LogSourceId extends UniqueId
 {
-    public static function prefix(): string
-    {
-        return 'log';
-    }
 }

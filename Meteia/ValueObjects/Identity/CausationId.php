@@ -6,8 +6,4 @@ namespace Meteia\ValueObjects\Identity;
 
 class CausationId extends UniqueId
 {
-    public static function prefix(): string
-    {
-        return 'cau';
-    }
 }

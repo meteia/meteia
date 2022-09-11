@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace Meteia\ValueObjects\Identity;
 
 use Exception;
-use Meteia\ValueObjects\Contracts\HasPrefix;
 use Tuupola\Base62;
 
-abstract class UniqueId implements HasPrefix, \Stringable, \JsonSerializable
+abstract class UniqueId implements \Stringable, \JsonSerializable
 {
     protected const EPOCH = 1577836800;
     protected const LEN_ENCODED = 27;
     protected const LEN_RANDOM = 16;
     protected const LEN_TIMESTAMP = 4;
-    protected const PREFIX = '!!!';
 
     public readonly string $token;
 
@@ -30,7 +28,7 @@ abstract class UniqueId implements HasPrefix, \Stringable, \JsonSerializable
             $token = str_repeat('0', $padding) . $token;
         }
         assert(strlen($token) === static::LEN_ENCODED, 'expected ' . static::LEN_ENCODED . ' got ' . strlen($token));
-        $this->token = implode('_', [static::prefix(), $token]);
+        $this->token = $token;
     }
 
     public static function random(): static
@@ -44,8 +42,6 @@ abstract class UniqueId implements HasPrefix, \Stringable, \JsonSerializable
 
     public static function fromToken(string $token): static
     {
-        [$prefix, $token] = explode('_', $token, 2);
-        assert($prefix === static::prefix(), 'Expected token with prefix ' . static::prefix());
         $token = ltrim($token, '0');
         $data = (new Base62())->decode($token);
 
