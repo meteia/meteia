@@ -65,6 +65,15 @@ class FilesystemPath extends StringLiteral
         return file_get_contents((string) $this);
     }
 
+    public function write(string $content): void
+    {
+        $dirname = dirname((string) $this);
+        if (!is_dir($dirname)) {
+            mkdir($dirname, 0777, true);
+        }
+        file_put_contents((string) $this, $content);
+    }
+
     public function readJson(): mixed
     {
         return json_decode($this->read(), false, 512, JSON_THROW_ON_ERROR);
