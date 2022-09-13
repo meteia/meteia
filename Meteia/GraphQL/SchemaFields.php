@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\GraphQL;
 
 use Generator;
+use GraphQL\Type\Definition\Type;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\DependencyInjection\Container;
 use Meteia\GraphQL\Contracts\QueryField;
@@ -24,7 +25,7 @@ class SchemaFields
             /** @var QueryField $field */
             $field = $this->container->get($queryFieldClassName);
             yield $this->fieldName($queryFieldClassName) => [
-                'type' => $field,
+                'type' => Type::nonNull($field),
                 'args' => method_exists($field, 'args') ? $field->args() : [],
                 // 'resolve' => function ($value, $args, RequestContext $context) use ($queryFieldClassName) {
                 //    /** @var ObjectResolver $resolver */
