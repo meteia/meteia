@@ -27,6 +27,7 @@ class UniqueIdType extends ScalarType implements Resolver
 
     public function parseLiteral($valueNode, array $variables = null)
     {
+        jdd($valueNode);
         if ($valueNode instanceof StringValueNode) {
             // return $valueNode->value;
             try {
@@ -44,10 +45,9 @@ class UniqueIdType extends ScalarType implements Resolver
 
     public function parseValue($value)
     {
+        jdd($value);
         try {
-            $uid = $this->uniqueIdClass::fromToken($value);
-            // jdd(get_class($uid), $uid);
-            return $uid;
+            return $this->uniqueIdClass::fromToken($value);
         } catch (\Throwable $t) {
             throw new InvalidScalarValue($t->getMessage());
         }
@@ -55,24 +55,13 @@ class UniqueIdType extends ScalarType implements Resolver
 
     public function serialize($value)
     {
-        // FIXME: Why is $value a stdClass here?
-        // jdd(get_class($value), $value);
-        return $value->id ?? $value;
-
-        jdd(get_class($value), $value);
-        if ($value instanceof $this->uniqueIdClass) {
-            jdd(get_class($value), $value);
-        }
-        // jdd($value);
-        return $value->token();
-        // return $value->token();
-        // jdd($value);
-        // return $value;
+        return (string) $value;
     }
 
     public function data($root, array $args, RequestContext $requestContext): mixed
     {
-        // jdd($root, $args);
-        return $root;
+        if (isset($root->id) && $root->id instanceof $this->uniqueIdClass) return $root->id;
+
+        return new $this->uniqueIdClass($root->id ?? $args['id'] ?? $root);
     }
 }
