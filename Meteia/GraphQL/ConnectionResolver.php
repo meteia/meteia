@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Meteia\GraphQL;
 
 use Meteia\GraphQL\Types\ConnectionField;
+use Tuupola\Base62;
+
+use function Meteia\Polyfills\without_prefix;
 
 trait ConnectionResolver
 {
     private bool $debug = false;
+    private static ?Base62 $codec = null;
 
-    protected function processedRows(array $rows, array $args): object
+    protected function processedRows(array $rows, array $args, array $cursorColumns): object
     {
-        $cursorField = '__cursor';
         if (!$args || !count($args)) {
             throw new \Exception('A type that has ' . get_called_class() . ' as a field is likely not passing through default arguments.');
         }
@@ -32,8 +35,8 @@ trait ConnectionResolver
         }
 
         /** @var array $edges */
-        $edges = array_map(function ($row) use ($cursorField) {
-            return $this->asEdge($row, $cursorField);
+        $edges = array_map(function ($row) use ($cursorColumns) {
+            return $this->asEdge($row, $cursorColumns);
         }, $rows);
         $firstEdge = $edges[0] ?? null;
         $lastEdge = end($edges);
@@ -82,26 +85,32 @@ trait ConnectionResolver
         return false;
     }
 
-    private function asEdge($row, $cursorField)
+    private function asEdge(object $row, array $cursorColumns): object
     {
-        if (!isset($row->{$cursorField})) {
-            throw new \ErrorException("Row is missing the required field: $cursorField");
+        $cursorValues = [];
+        foreach ($cursorColumns as $cursorColumn) {
+            if (!isset($row->{$cursorColumn})) {
+                throw new \ErrorException(sprintf("Row is missing the required field: %s", $cursorColumn));
+            }
+            $cursorValues[] = $row->{$cursorColumn};
         }
-
-        if ($cursorField === 'cursor_value') {
-            return (object) [
-                'cursor' => $this->debug ? $row->{$cursorField} : base64_encode($row->{$cursorField}),
-                'node' => $row,
-            ];
-        }
-
-        // if (!isset($row->primaryKey)) {
-        //    throw new \ErrorException('Row is missing the required field: primaryKey');
-        // }
 
         return (object) [
-            'cursor' => $row->{$cursorField},
+            'cursor' => $this->encodeCursor($cursorValues),
             'node' => $row,
         ];
+    }
+
+    private function encodeCursor(array $cursorData): string {
+        if (static::$codec === null) static::$codec = new Base62();
+
+        return 'cur_' . static::$codec->encode(implode('|', $cursorData));
+    }
+
+    protected function decodeCursor(string $cursor): array {
+        if (static::$codec === null) static::$codec = new Base62();
+        $cursor = without_prefix($cursor, 'cur_');
+
+        return explode('|', static::$codec->decode($cursor));
     }
 }

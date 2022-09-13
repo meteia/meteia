@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\GraphQL;
 
 use Aura\Sql\ExtendedPdoInterface;
+use Meteia\Database\Database;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\GraphQL\Types\ConnectionField;
@@ -14,30 +15,31 @@ abstract class TableConnectionResolver implements Resolver
     use ConnectionResolver;
 
     public function __construct(
-        private ExtendedPdoInterface $db,
-        private string $table,
-        private array $cursorOver = ['id'],
+        private readonly Database $db,
+        private readonly string $table,
+        private readonly array $cursorOver = ['id'],
     ) {
     }
 
-    public function data(mixed $root, array $args, RequestContext $requestContext): mixed
+    public function data(mixed $root, array $args, RequestContext $requestContext): object
     {
-        $cursorSeparator = '|';
+        $cursor = $args[ConnectionField::ARG_AFTER] ?? $args[ConnectionField::ARG_BEFORE] ?? false;
         $cursorColumns = implode(',', $this->cursorOver);
+        $cursorDirection = !$cursor || isset($args[ConnectionField::ARG_AFTER]) ? 'forward' : 'reverse';
 
         $where = [];
         $bindings = [
             'limit' => $args[ConnectionField::ARG_FIRST] + 1,
         ];
 
-        $cursor = $args[ConnectionField::ARG_AFTER] ?? $args[ConnectionField::ARG_BEFORE] ?? false;
         if ($cursor) {
-            $cursorDirection = isset($args[ConnectionField::ARG_AFTER]) ? '>' : '<';
+            $compare = $cursorDirection === 'forward' ? '>' : '<';
 
-            $cursor = explode($cursorSeparator, $cursor, count($this->cursorOver));
-            $placeholders = str_repeat('?,', count($cursor) - 1) . '?';
-            $where[] = sprintf('(%s) %s (%s)', $cursorColumns, $cursorDirection, $placeholders);
-            $bindings = array_merge($bindings, $cursor);
+            $cursorValues = $this->decodeCursor($cursor);
+            assert(count($cursorValues) === count($this->cursorOver));
+            $placeholders = str_repeat('?,', count($cursorValues) - 1) . '?';
+            $where[] = sprintf('(%s) %s (%s)', $cursorColumns, $compare, $placeholders);
+            $bindings = array_merge($cursorValues, $bindings);
         }
 
         $whereString = '';
@@ -45,14 +47,12 @@ abstract class TableConnectionResolver implements Resolver
             $whereString = 'WHERE ' . implode(' AND ', $where);
         }
 
-        $query = <<<SQL
-            SELECT CONCAT_WS('{$cursorSeparator}', {$cursorColumns}) as `__cursor`, {$this->table}.*
-            FROM $this->table
-            $whereString
-            LIMIT :limit
-        SQL;
+        $query = sprintf('SELECT * FROM %s %s LIMIT :limit', $this->table, $whereString);
         $rows = $this->db->fetchObjects($query, $bindings);
+        if ($cursorDirection === 'reverse') {
+            $rows = array_reverse($rows);
+        }
 
-        return $this->processedRows($rows, $args);
+        return $this->processedRows($rows, $args, $this->cursorOver);
     }
 }
