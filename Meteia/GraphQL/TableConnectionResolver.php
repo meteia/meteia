@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
-use Aura\Sql\ExtendedPdoInterface;
 use Meteia\Database\Database;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;

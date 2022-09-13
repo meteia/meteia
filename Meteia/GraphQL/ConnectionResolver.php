@@ -6,7 +6,6 @@ namespace Meteia\GraphQL;
 
 use Meteia\GraphQL\Types\ConnectionField;
 use Tuupola\Base62;
-
 use function Meteia\Polyfills\without_prefix;
 
 trait ConnectionResolver
@@ -90,7 +89,7 @@ trait ConnectionResolver
         $cursorValues = [];
         foreach ($cursorColumns as $cursorColumn) {
             if (!isset($row->{$cursorColumn})) {
-                throw new \ErrorException(sprintf("Row is missing the required field: %s", $cursorColumn));
+                throw new \ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
             }
             $cursorValues[] = $row->{$cursorColumn};
         }
@@ -101,14 +100,20 @@ trait ConnectionResolver
         ];
     }
 
-    private function encodeCursor(array $cursorData): string {
-        if (static::$codec === null) static::$codec = new Base62();
+    private function encodeCursor(array $cursorData): string
+    {
+        if (static::$codec === null) {
+            static::$codec = new Base62();
+        }
 
         return 'cur_' . static::$codec->encode(implode('|', $cursorData));
     }
 
-    protected function decodeCursor(string $cursor): array {
-        if (static::$codec === null) static::$codec = new Base62();
+    protected function decodeCursor(string $cursor): array
+    {
+        if (static::$codec === null) {
+            static::$codec = new Base62();
+        }
         $cursor = without_prefix($cursor, 'cur_');
 
         return explode('|', static::$codec->decode($cursor));

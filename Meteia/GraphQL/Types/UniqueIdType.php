@@ -60,7 +60,9 @@ class UniqueIdType extends ScalarType implements Resolver
 
     public function data($root, array $args, RequestContext $requestContext): mixed
     {
-        if (isset($root->id) && $root->id instanceof $this->uniqueIdClass) return $root->id;
+        if (isset($root->id) && $root->id instanceof $this->uniqueIdClass) {
+            return $root->id;
+        }
 
         return new $this->uniqueIdClass($root->id ?? $args['id'] ?? $root);
     }
