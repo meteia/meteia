@@ -9,7 +9,7 @@ use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\GraphQL\Types\ConnectionField;
 
-abstract class TableConnectionResolver implements Resolver
+abstract class TableConnectionResolver implements Resolver, TableConnectionBindings
 {
     use ConnectionResolver;
 
@@ -41,13 +41,19 @@ abstract class TableConnectionResolver implements Resolver
             $bindings = array_merge($cursorValues, $bindings);
         }
 
+        foreach ($this->resolveWhereBindings($root, $args, $requestContext) as $column => $value) {
+            $compare = $value === null ? 'IS' : '=';
+            $where[] = sprintf('`%s` %s :%s', $column, $compare, $column);
+            $bindings[$column] = $value;
+        }
+
         $whereString = '';
-        if ($where) {
+        if (count($where)) {
             $whereString = 'WHERE ' . implode(' AND ', $where);
         }
 
         $query = sprintf('SELECT * FROM %s %s LIMIT :limit', $this->table, $whereString);
-        $rows = $this->db->fetchObjects($query, $bindings);
+        $rows = $this->db->fetchObjects($query, $this->db->prepareBindings($bindings));
         if ($cursorDirection === 'reverse') {
             $rows = array_reverse($rows);
         }
