@@ -45,7 +45,9 @@ class UniqueIdType extends ScalarType implements Resolver
 
     public function parseValue($value)
     {
-        jdd($value);
+        if ($value instanceof $this->uniqueIdClass) {
+            return $value;
+        }
         try {
             return $this->uniqueIdClass::fromToken($value);
         } catch (\Throwable $t) {
