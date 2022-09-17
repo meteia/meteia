@@ -52,6 +52,8 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
             $whereString = 'WHERE ' . implode(' AND ', $where);
         }
 
+        // TODO: Add order-by
+
         $query = sprintf('SELECT * FROM %s %s LIMIT :limit', $this->table, $whereString);
         $rows = $this->db->fetchObjects($query, $this->db->prepareBindings($bindings));
         if ($cursorDirection === 'reverse') {
