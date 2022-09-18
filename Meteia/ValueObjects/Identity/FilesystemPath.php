@@ -111,10 +111,13 @@ class FilesystemPath extends StringLiteral
         return new self(trim(str_replace((string) $prefix, '', (string) $this), DIRECTORY_SEPARATOR));
     }
 
-    public function extension(): string {
+    public function extension(): string
+    {
         $filename = pathinfo((string) $this, PATHINFO_BASENAME);
         $extensionIdx = stripos($filename, '.');
-        if ($extensionIdx === false) return '';
+        if ($extensionIdx === false) {
+            return '';
+        }
 
         return substr($filename, $extensionIdx);
     }

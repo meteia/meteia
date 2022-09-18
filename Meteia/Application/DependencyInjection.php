@@ -17,5 +17,5 @@ return [
     },
     ApplicationPublicDir::class => function (ApplicationPath $applicationPath) {
         return new ApplicationPublicDir($applicationPath->join('public'));
-    }
+    },
 ];

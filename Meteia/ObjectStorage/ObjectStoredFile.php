@@ -11,10 +11,8 @@ class ObjectStoredFile implements StoredFile
 {
     public function __construct(
         private readonly Uri $uri,
-    )
-    {
+    ) {
     }
-
 
     public function uri(): Uri
     {

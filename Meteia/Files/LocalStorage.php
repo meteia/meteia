@@ -17,7 +17,6 @@ class LocalStorage implements Storage
     ) {
     }
 
-
     public function store($src, string $dest, string $mimeType): StoredFile
     {
         assert(is_resource($src));

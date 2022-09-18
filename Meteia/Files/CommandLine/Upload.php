@@ -14,19 +14,17 @@ use Symfony\Component\Console\Input\InputInterface;
 class Upload implements Command
 {
     private const ARG_FILES = 'files';
+
     public function __construct(
         private readonly ContentAddressableStorage $contentAddressableStorage,
         private readonly InputInterface $input,
-    )
-    {
+    ) {
     }
-
 
     public static function description(): string
     {
         return 'Upload one or more files to the configured storage';
     }
-
 
     public function execute(): void
     {
@@ -35,10 +33,9 @@ class Upload implements Command
             $mimeType = mime_content_type($file);
             $file = new FilesystemPath($file);
             $storedFile = $this->contentAddressableStorage->store($file->open(), $file->extension(), $mimeType);
-            echo sprintf("%s => %s", $file, $storedFile->uri()) . PHP_EOL;
+            echo sprintf('%s => %s', $file, $storedFile->uri()) . PHP_EOL;
         }
     }
-
 
     public static function inputDefinition(): InputDefinition
     {

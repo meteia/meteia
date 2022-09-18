@@ -17,7 +17,6 @@ class ContentAddressableStorage
     ) {
     }
 
-
     /**
      * @param resource $source
      */
@@ -30,10 +29,10 @@ class ContentAddressableStorage
             $fileExtension = '.' . $fileExtension;
         }
 
-        $hashCtx = hash_init('sha256', HASH_HMAC, (string)$this->contentAddressableStorageSecretKey);
+        $hashCtx = hash_init('sha256', HASH_HMAC, (string) $this->contentAddressableStorageSecretKey);
         hash_update_stream($hashCtx, $source);
         $hash = $this->base62->encode(hash_final($hashCtx, true));
-        $dest = sprintf("%s/%s%s", substr($hash, 0, 2), substr($hash, 2), $fileExtension);
+        $dest = sprintf('%s/%s%s', substr($hash, 0, 2), substr($hash, 2), $fileExtension);
 
         return $this->storage->store($source, $dest, $mimeType);
     }

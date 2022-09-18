@@ -14,7 +14,6 @@ class LocalStoredFile implements StoredFile
     ) {
     }
 
-
     public function uri(): Uri
     {
         return $this->uri;
