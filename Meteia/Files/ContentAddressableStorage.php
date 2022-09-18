@@ -6,24 +6,35 @@ namespace Meteia\Files;
 
 use Meteia\Files\Contracts\Storage;
 use Meteia\Files\Contracts\StoredFile;
-use Psr\Http\Message\StreamInterface;
+use Tuupola\Base62;
 
 class ContentAddressableStorage
 {
-    /**
-     * @var Storage
-     */
-    private $storage;
-
-    public function __construct(Storage $storage)
-    {
-        $this->storage = $storage;
+    public function __construct(
+        private readonly Storage $storage,
+        private readonly ContentAddressableStorageSecretKey $contentAddressableStorageSecretKey,
+        private readonly Base62 $base62,
+    ) {
     }
 
-    public function store(StreamInterface $stream): StoredFile
-    {
-        $path = sha1(random_bytes(32));
 
-        return $this->storage->store($stream, $path);
+    /**
+     * @param resource $source
+     */
+    public function store($source, string $fileExtension, string $mimeType): StoredFile
+    {
+        assert(is_resource($source));
+        rewind($source);
+
+        if (strlen($fileExtension) && $fileExtension[0] !== '.') {
+            $fileExtension = '.' . $fileExtension;
+        }
+
+        $hashCtx = hash_init('sha256', HASH_HMAC, (string)$this->contentAddressableStorageSecretKey);
+        hash_update_stream($hashCtx, $source);
+        $hash = $this->base62->encode(hash_final($hashCtx, true));
+        $dest = sprintf("%s/%s%s", substr($hash, 0, 2), substr($hash, 2), $fileExtension);
+
+        return $this->storage->store($source, $dest, $mimeType);
     }
 }

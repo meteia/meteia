@@ -65,6 +65,16 @@ class FilesystemPath extends StringLiteral
         return file_get_contents((string) $this);
     }
 
+    public function open()
+    {
+        $resource = fopen((string) $this, 'r');
+        if ($resource === false) {
+            throw new \Exception('Unable to open file: ' . $this);
+        }
+
+        return $resource;
+    }
+
     public function write(string $content): void
     {
         $dirname = dirname((string) $this);
@@ -72,6 +82,18 @@ class FilesystemPath extends StringLiteral
             mkdir($dirname, 0777, true);
         }
         file_put_contents((string) $this, $content);
+    }
+
+    public function writeStream($src): void
+    {
+        assert(is_resource($src));
+        $dirname = dirname((string) $this);
+        if (!is_dir($dirname)) {
+            mkdir($dirname, 0777, true);
+        }
+        $dest = fopen((string) $this, 'w');
+        stream_copy_to_stream($src, $dest);
+        fclose($dest);
     }
 
     public function readJson(): mixed
@@ -87,5 +109,13 @@ class FilesystemPath extends StringLiteral
     public function withoutPrefix(FilesystemPath $prefix): self
     {
         return new self(trim(str_replace((string) $prefix, '', (string) $this), DIRECTORY_SEPARATOR));
+    }
+
+    public function extension(): string {
+        $filename = pathinfo((string) $this, PATHINFO_BASENAME);
+        $extensionIdx = stripos($filename, '.');
+        if ($extensionIdx === false) return '';
+
+        return substr($filename, $extensionIdx);
     }
 }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Meteia\Application\ApplicationPath;
 use Meteia\Application\ApplicationPublicDir;
 use Meteia\Application\ApplicationResources;
 use Meteia\Application\ApplicationResourcesBaseUri;
@@ -14,4 +15,7 @@ return [
     ApplicationResources::class => function (ApplicationResourcesBaseUri $applicationResourcesBaseUri, ApplicationPublicDir $publicDir): ApplicationResources {
         return new ApplicationResources($applicationResourcesBaseUri, $publicDir, $publicDir->join('dist/manifest.json'));
     },
+    ApplicationPublicDir::class => function (ApplicationPath $applicationPath) {
+        return new ApplicationPublicDir($applicationPath->join('public'));
+    }
 ];
