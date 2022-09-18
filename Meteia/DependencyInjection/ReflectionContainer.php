@@ -56,7 +56,6 @@ class ReflectionContainer implements Container
             return $this->cache[$id];
         }
 
-        jdd($this->definitions, "$id was not resolvable, and $target was not a class?");
         throw new \Exception("$id was not resolvable, and $target was not a class?");
     }
 
