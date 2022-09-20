@@ -9,6 +9,7 @@ use DateTimeZone;
 use GuzzleHttp\Client;
 use Meteia\Files\Contracts\Storage;
 use Meteia\Files\Contracts\StoredFile;
+use Meteia\ValueObjects\Identity\Uri;
 
 class ObjectStorage implements Storage
 {
@@ -22,6 +23,13 @@ class ObjectStorage implements Storage
         private readonly SecretKey $secretKey,
         private readonly Region $region,
     ) {
+    }
+
+    public function exists(string $dest): bool
+    {
+        $client = new Client();
+
+        return $client->head($this->canonicalUri($dest))->getStatusCode() === 200;
     }
 
     public function store($src, string $dest, string $mimeType): StoredFile
@@ -41,7 +49,7 @@ class ObjectStorage implements Storage
             'aws4_request',
         ]);
 
-        $canonicalUri = $this->endpoint->withPath(implode('/', [$this->bucketName, $dest]));
+        $canonicalUri = $this->canonicalUri($dest);
         $canonicalHeaders = [
             'host' => $this->endpoint->getHost(),
             'x-amz-content-sha256' => $hashedPayload,
@@ -94,6 +102,11 @@ class ObjectStorage implements Storage
         return implode("\n", array_map(function ($key, $value) {
             return sprintf('%s:%s', strtolower($key), trim($value));
         }, array_keys($headers), $headers)) . "\n";
+    }
+
+    private function canonicalUri(string $dest): Uri
+    {
+        return new Uri($this->endpoint->withPath(implode('/', [$this->bucketName, $dest])));
     }
 
     private function sign(DateTime $now, string $content): string
