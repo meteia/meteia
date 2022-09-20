@@ -46,9 +46,9 @@ return [
         return new Host($scheme . '://' . $host);
     },
     CsrfSecretKey::class => function (Configuration $configuration): CsrfSecretKey {
-        $value = $configuration->string('CSRF_SECRET_KEY', '');
+        $value = $configuration->string('METEIA_CSRF_SECRET_KEY', '');
         if ($value === '') {
-            throw new \Exception('CSRF_SECRET_KEY not set');
+            throw new \Exception('METEIA_CSRF_SECRET_KEY not set');
         }
 
         return CsrfSecretKey::fromToken($value);

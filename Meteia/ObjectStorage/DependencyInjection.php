@@ -11,18 +11,18 @@ use Meteia\ObjectStorage\SecretKey;
 
 return [
     AccessKey::class => function (Configuration $configuration): AccessKey {
-        return new AccessKey($configuration->string('OBJECT_STORAGE_ACCESS_KEY', ''));
+        return new AccessKey($configuration->string('METEIA_FILES_OBJECT_STORAGE_ACCESS_KEY', ''));
     },
     SecretKey::class => function (Configuration $configuration): SecretKey {
-        return new SecretKey($configuration->string('OBJECT_STORAGE_SECRET_KEY', ''));
+        return new SecretKey($configuration->string('METEIA_FILES_OBJECT_STORAGE_SECRET_KEY', ''));
     },
     BucketName::class => function (Configuration $configuration): BucketName {
-        return new BucketName($configuration->string('OBJECT_STORAGE_BUCKET', ''));
+        return new BucketName($configuration->string('METEIA_FILES_OBJECT_STORAGE_BUCKET', ''));
     },
     Endpoint::class => function (Configuration $configuration): Endpoint {
-        return new Endpoint($configuration->string('OBJECT_STORAGE_ENDPOINT', ''));
+        return new Endpoint($configuration->string('METEIA_FILES_OBJECT_STORAGE_ENDPOINT', ''));
     },
     Region::class => function (Configuration $configuration): Region {
-        return new Region($configuration->string('OBJECT_STORAGE_REGION', ''));
+        return new Region($configuration->string('METEIA_FILES_OBJECT_STORAGE_REGION', ''));
     },
 ];
