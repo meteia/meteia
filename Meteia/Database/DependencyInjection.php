@@ -17,6 +17,7 @@ return [
 
         return new Database($dsn, $username, $password, [
             \PDO::MYSQL_ATTR_FOUND_ROWS => true,
+            \PDO::ATTR_EMULATE_PREPARES => false,
         ]);
     },
 ];
