@@ -15,20 +15,19 @@ class Backblaze implements Storage
     public function __construct(
         private readonly Api $api,
         private readonly KeyId $keyId,
-        private readonly ApplicationKey $applicationKey
-    )
-    {
+        private readonly ApplicationKey $applicationKey,
+    ) {
     }
 
     public function store($src, string $dest): StoredFile
     {
-        //// TODO: Should the bucket be determined by path, or by something else?
-        //[$bucket, $path] = explode(DIRECTORY_SEPARATOR, $path, 2);
+        // // TODO: Should the bucket be determined by path, or by something else?
+        // [$bucket, $path] = explode(DIRECTORY_SEPARATOR, $path, 2);
         //
         //
-        //$authorizedAccount = $this->api->authorizeAccount($this->keyId, $this->applicationKey);
-        //$authorizedAccount->upload($stream, $bucket, $path);
+        // $authorizedAccount = $this->api->authorizeAccount($this->keyId, $this->applicationKey);
+        // $authorizedAccount->upload($stream, $bucket, $path);
         //
-        //return new StoredFile();
+        // return new StoredFile();
     }
 }

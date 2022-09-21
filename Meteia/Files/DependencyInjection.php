@@ -12,6 +12,7 @@ use Meteia\ObjectStorage\ObjectStorage;
 return [
     Storage::class => function (Container $container, Configuration $configuration): Storage {
         $backend = $configuration->string('METEIA_FILES_BACKEND', 'local');
+
         return $container->get(match ($backend) {
             'object' => ObjectStorage::class,
             default => LocalStorage::class,
