@@ -21,11 +21,6 @@ class ReflectionContainer implements Container
         $this->definitions[Container::class] = $this;
     }
 
-    public function internals(): array
-    {
-        return ['cache' => $this->cache, 'definitions' => $this->definitions];
-    }
-
     public function call($callable, array $parameters = []): mixed
     {
         if (is_array($callable) && is_object($callable[0])) {
@@ -47,16 +42,14 @@ class ReflectionContainer implements Container
         }
 
         if (is_callable($target)) {
-            return $this->resolveCallable($target);
+            return $this->save($id, $this->resolveCallable($target));
         }
 
         if (class_exists($target)) {
-            $this->cache[$id] = $this->resolveClass($target);
-
-            return $this->cache[$id];
+            return $this->save($id, $this->resolveClass($target));
         }
 
-        throw new \Exception("$id was not resolvable, and $target was not a class?");
+        throw new Exception("$id was not resolvable, and $target was not a class?");
     }
 
     public function has(string $id): bool
@@ -79,7 +72,12 @@ class ReflectionContainer implements Container
             return;
         }
 
-        throw new \Exception("Uncertain what to do with this... $id, $value");
+        throw new Exception("Uncertain what to do with this... $id, $value");
+    }
+
+    public function internals(): array
+    {
+        return ['cache' => $this->cache, 'definitions' => $this->definitions];
     }
 
     private function resolveCallable(callable $callable, array $parameters = []): mixed
@@ -132,7 +130,7 @@ class ReflectionContainer implements Container
 
         $expectedType = $rp->getType();
         if ($expectedType === null) {
-            throw new \Exception('Missing Type? ' . $rp->getName());
+            throw new Exception('Missing Type? ' . $rp->getName());
         }
 
         if ($rp->isDefaultValueAvailable()) {
@@ -147,5 +145,12 @@ class ReflectionContainer implements Container
         }
 
         throw new Exception('Unsupported Type');
+    }
+
+    private function save(string $id, mixed $resolved): mixed
+    {
+        $this->cache[$id] = $resolved;
+
+        return $resolved;
     }
 }
