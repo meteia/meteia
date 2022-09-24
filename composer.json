@@ -46,6 +46,7 @@
         "ext-sodium": "*",
         "guzzlehttp/guzzle": ">=7.5.0",
         "laminas/laminas-diactoros": "^2.15.0",
+        "league/mime-type-detection": "^1.11",
         "nesbot/carbon": "^2.62.1",
         "nyholm/psr7": "^1.5.1",
         "nyholm/psr7-server": "^1.0.2",

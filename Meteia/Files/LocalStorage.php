@@ -23,7 +23,7 @@ class LocalStorage implements Storage
         return $this->onDiskDest($dest)->exists();
     }
 
-    public function store($src, string $dest, string $mimeType): StoredFile
+    public function store($src, string $dest): StoredFile
     {
         assert(is_resource($src));
         rewind($src);

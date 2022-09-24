@@ -7,6 +7,7 @@ namespace Meteia\ObjectStorage;
 use DateTime;
 use DateTimeZone;
 use GuzzleHttp\Client;
+use League\MimeTypeDetection\ExtensionMimeTypeDetector;
 use Meteia\Files\Contracts\Storage;
 use Meteia\Files\Contracts\StoredFile;
 use Meteia\ValueObjects\Identity\Uri;
@@ -22,6 +23,7 @@ class ObjectStorage implements Storage
         private readonly AccessKey $accessKey,
         private readonly SecretKey $secretKey,
         private readonly Region $region,
+        private readonly ExtensionMimeTypeDetector $extensionMimeTypeDetector,
     ) {
     }
 
@@ -32,7 +34,7 @@ class ObjectStorage implements Storage
         return $client->head($this->canonicalUri($dest))->getStatusCode() === 200;
     }
 
-    public function store($src, string $dest, string $mimeType): StoredFile
+    public function store($src, string $dest): StoredFile
     {
         assert(is_resource($src));
         rewind($src);
@@ -52,6 +54,7 @@ class ObjectStorage implements Storage
         $canonicalUri = $this->canonicalUri($dest);
         $canonicalHeaders = [
             'host' => $this->endpoint->getHost(),
+            'content-type' => $this->extensionMimeTypeDetector->detectMimeTypeFromFile($dest),
             'x-amz-content-sha256' => $hashedPayload,
             'x-amz-date' => $now->format(self::DATETIME),
         ];
