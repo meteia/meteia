@@ -22,7 +22,6 @@
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Authentication/." isTestSource="false" packagePrefix="Meteia\Authentication\" />
       <sourceFolder url="file://$MODULE_DIR$/Meteia/GraphQL/." isTestSource="false" packagePrefix="Meteia\GraphQL\" />
       <sourceFolder url="file://$MODULE_DIR$/Meteia/Files/." isTestSource="false" packagePrefix="Meteia\Files\" />
-      <sourceFolder url="file://$MODULE_DIR$/Meteia/ObjectStorage/." isTestSource="false" packagePrefix="Meteia\ObjectStorage\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/stephank/composer-plugin-nixify" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
