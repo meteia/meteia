@@ -6,9 +6,10 @@ namespace Meteia\Files;
 
 use Meteia\Application\ApplicationPublicDir;
 use Meteia\Files\Contracts\Storage;
-use Meteia\Files\Contracts\StoredFile;
 use Meteia\Http\Host;
 use Meteia\ValueObjects\Identity\FilesystemPath;
+use Meteia\ValueObjects\Identity\Resource;
+use Meteia\ValueObjects\Identity\Uri;
 
 class LocalStorage implements Storage
 {
@@ -18,20 +19,22 @@ class LocalStorage implements Storage
     ) {
     }
 
+    public function canonicalUri(string $dest): Uri
+    {
+        return $this->host->withPath(implode('/', ['files', $dest]));
+    }
+
     public function exists(string $dest): bool
     {
         return $this->onDiskDest($dest)->exists();
     }
 
-    public function store($src, string $dest): StoredFile
+    public function store(Resource $src, string $dest): StoredFile
     {
-        assert(is_resource($src));
-        rewind($src);
-
         $onDiskDest = $this->onDiskDest($dest);
-        $onDiskDest->writeStream($src);
+        $src->writeStream($onDiskDest);
 
-        return new LocalStoredFile($this->host->withPath(implode('/', ['files', $dest])));
+        return new StoredFile($this->canonicalUri($dest));
     }
 
     private function onDiskDest(string $dest): FilesystemPath

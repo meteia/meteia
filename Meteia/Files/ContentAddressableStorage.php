@@ -4,36 +4,46 @@ declare(strict_types=1);
 
 namespace Meteia\Files;
 
+use Meteia\Cryptography\Hash;
+use Meteia\Files\Configuration\ContentAddressableStorageSecretKey;
 use Meteia\Files\Contracts\Storage;
-use Meteia\Files\Contracts\StoredFile;
-use Tuupola\Base62;
+use Meteia\ValueObjects\Identity\Resource;
+use Meteia\ValueObjects\Identity\Uri;
 
 class ContentAddressableStorage
 {
     public function __construct(
         private readonly Storage $storage,
         private readonly ContentAddressableStorageSecretKey $contentAddressableStorageSecretKey,
-        private readonly Base62 $base62,
     ) {
     }
 
-    /**
-     * @param resource $source
-     */
-    public function store($source, string $fileExtension, string $mimeType): StoredFile
+    public function canonicalUri(Hash $hash, string $fileExtension): Uri
     {
-        assert(is_resource($source));
-        rewind($source);
+        return $this->storage->canonicalUri($this->dest($hash, $fileExtension));
+    }
 
-        if (strlen($fileExtension) && $fileExtension[0] !== '.') {
+    public function store(Resource $src, string $fileExtension): ContentAddressableStoredFile
+    {
+        $hash = $this->hash($src);
+        $storedFile = $this->storage->store($src, $this->dest($hash, $fileExtension));
+
+        return new ContentAddressableStoredFile(FileHash::fromHash($hash), $storedFile->publicUri);
+    }
+
+    public function hash(Resource $src): Hash
+    {
+        return $src->hash('sha256', $this->contentAddressableStorageSecretKey);
+    }
+
+    private function dest(Hash $fileHash, string $fileExtension): string
+    {
+        $hashString = $fileHash->base62();
+        $fileExtension = trim(trim($fileExtension), '.');
+        if (strlen($fileExtension)) {
             $fileExtension = '.' . $fileExtension;
         }
 
-        $hashCtx = hash_init('sha256', HASH_HMAC, (string) $this->contentAddressableStorageSecretKey);
-        hash_update_stream($hashCtx, $source);
-        $hash = $this->base62->encode(hash_final($hashCtx, true));
-        $dest = sprintf('%s/%s%s', substr($hash, 0, 2), substr($hash, 2), $fileExtension);
-
-        return $this->storage->store($source, $dest, $mimeType);
+        return sprintf('%s/%s%s', substr($hashString, 0, 2), substr($hashString, 2), $fileExtension);
     }
 }

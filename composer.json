@@ -31,7 +31,6 @@
             "Meteia\\Html\\": "Meteia/Html/.",
             "Meteia\\Http\\": "Meteia/Http/.",
             "Meteia\\Logging\\": "Meteia/Logging/.",
-            "Meteia\\ObjectStorage\\": "Meteia/ObjectStorage/.",
             "Meteia\\Performance\\": "Meteia/Performance/.",
             "Meteia\\Polyfills\\": "Meteia/Polyfills/.",
             "Meteia\\ValueObjects\\": "Meteia/ValueObjects/."
@@ -97,7 +96,6 @@
         "meteia/html": "self.version",
         "meteia/http": "self.version",
         "meteia/logging": "self.version",
-        "meteia/object-storage": "self.version",
         "meteia/performance": "self.version",
         "meteia/polyfills": "self.version",
         "meteia/value-objects": "self.version"

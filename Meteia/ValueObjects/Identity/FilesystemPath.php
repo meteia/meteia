@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Identity;
 
+use Exception;
 use Iterator;
+use Meteia\Cryptography\Hash;
+use Meteia\Cryptography\SecretKey;
 use Meteia\ValueObjects\Primitive\StringLiteral;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -21,9 +24,25 @@ class FilesystemPath extends StringLiteral
         parent::__construct($value);
     }
 
+    public function delete()
+    {
+        unlink((string) $this);
+    }
+
     public function exists(): bool
     {
         return file_exists((string) $this);
+    }
+
+    public function extension(): string
+    {
+        $filename = pathinfo((string) $this, PATHINFO_BASENAME);
+        $extensionIdx = stripos($filename, '.');
+        if ($extensionIdx === false) {
+            return '';
+        }
+
+        return substr($filename, $extensionIdx);
     }
 
     public function find(string ...$regex): Iterator
@@ -33,6 +52,14 @@ class FilesystemPath extends StringLiteral
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator((string) $basePath));
 
         return new RegexIterator($iterator, $regex, RegexIterator::MATCH);
+    }
+
+    public function hash(string $algo, ?SecretKey $hmacKey = null): Hash
+    {
+        $hashCtx = $hmacKey ? hash_init($algo, HASH_HMAC, (string) $hmacKey) : hash_init($algo);
+        hash_update_file($hashCtx, (string) $this);
+
+        return new Hash(hash_final($hashCtx));
     }
 
     public function isReadable(): bool
@@ -60,40 +87,19 @@ class FilesystemPath extends StringLiteral
         }
     }
 
-    public function read(): string
-    {
-        return file_get_contents((string) $this);
-    }
-
-    public function open()
+    public function open(): Resource
     {
         $resource = fopen((string) $this, 'r');
         if ($resource === false) {
-            throw new \Exception('Unable to open file: ' . $this);
+            throw new Exception('Unable to open file: ' . $this);
         }
 
-        return $resource;
+        return new Resource($resource);
     }
 
-    public function write(string $content): void
+    public function read(): string
     {
-        $dirname = dirname((string) $this);
-        if (!is_dir($dirname)) {
-            mkdir($dirname, 0777, true);
-        }
-        file_put_contents((string) $this, $content);
-    }
-
-    public function writeStream($src): void
-    {
-        assert(is_resource($src));
-        $dirname = dirname((string) $this);
-        if (!is_dir($dirname)) {
-            mkdir($dirname, 0777, true);
-        }
-        $dest = fopen((string) $this, 'w');
-        stream_copy_to_stream($src, $dest);
-        fclose($dest);
+        return file_get_contents((string) $this);
     }
 
     public function readJson(): mixed
@@ -111,14 +117,12 @@ class FilesystemPath extends StringLiteral
         return new self(trim(str_replace((string) $prefix, '', (string) $this), DIRECTORY_SEPARATOR));
     }
 
-    public function extension(): string
+    public function write(string $content): void
     {
-        $filename = pathinfo((string) $this, PATHINFO_BASENAME);
-        $extensionIdx = stripos($filename, '.');
-        if ($extensionIdx === false) {
-            return '';
+        $dirname = dirname((string) $this);
+        if (!is_dir($dirname)) {
+            mkdir($dirname, 0777, true);
         }
-
-        return substr($filename, $extensionIdx);
+        file_put_contents((string) $this, $content);
     }
 }

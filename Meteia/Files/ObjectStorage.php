@@ -2,14 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Meteia\ObjectStorage;
+namespace Meteia\Files;
 
 use DateTime;
 use DateTimeZone;
+use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use League\MimeTypeDetection\ExtensionMimeTypeDetector;
+use Meteia\Files\Configuration\AccessKey;
+use Meteia\Files\Configuration\BucketName;
+use Meteia\Files\Configuration\Endpoint;
+use Meteia\Files\Configuration\Region;
+use Meteia\Files\Configuration\SecretKey;
 use Meteia\Files\Contracts\Storage;
-use Meteia\Files\Contracts\StoredFile;
+use Meteia\ValueObjects\Identity\Resource;
 use Meteia\ValueObjects\Identity\Uri;
 
 class ObjectStorage implements Storage
@@ -27,21 +34,29 @@ class ObjectStorage implements Storage
     ) {
     }
 
+    public function canonicalUri(string $dest): Uri
+    {
+        return new Uri($this->endpoint->withPath(implode('/', [$this->bucketName, $dest])));
+    }
+
     public function exists(string $dest): bool
     {
         $client = new Client();
-
-        return $client->head($this->canonicalUri($dest))->getStatusCode() === 200;
+        try {
+            return $client->head($this->canonicalUri($dest))->getStatusCode() === 200;
+        } catch (ClientException) {
+            return false;
+        }
     }
 
-    public function store($src, string $dest): StoredFile
+    public function store(Resource $src, string $dest): StoredFile
     {
-        assert(is_resource($src));
-        rewind($src);
+        $canonicalUri = $this->canonicalUri($dest);
+        if ($this->exists($dest)) {
+            return new StoredFile($canonicalUri);
+        }
 
-        $ctx = hash_init('sha256');
-        hash_update_stream($ctx, $src);
-        $hashedPayload = hash_final($ctx);
+        $hashedPayload = $src->hash('sha256')->hex();
 
         $now = new DateTime('now', new DateTimeZone('utc'));
         $scope = implode('/', [
@@ -51,10 +66,17 @@ class ObjectStorage implements Storage
             'aws4_request',
         ]);
 
-        $canonicalUri = $this->canonicalUri($dest);
+        $contentType = $this->extensionMimeTypeDetector->detectMimeTypeFromFile($dest) ?? 'application/octet-stream';
+        $contentLength = $src->size();
+        if (!$contentLength) {
+            throw new Exception('Trying to upload an empty file?');
+        }
+
         $canonicalHeaders = [
             'host' => $this->endpoint->getHost(),
-            'content-type' => $this->extensionMimeTypeDetector->detectMimeTypeFromFile($dest),
+            'content-length' => $contentLength,
+            'content-type' => $contentType,
+            'cache-control' => 'public, max-age=31536000, immutable',
             'x-amz-content-sha256' => $hashedPayload,
             'x-amz-date' => $now->format(self::DATETIME),
         ];
@@ -63,7 +85,7 @@ class ObjectStorage implements Storage
 
         $canonicalRequest = implode("\n", [
             'PUT',
-            '/' . $canonicalUri->getPath(),
+            $canonicalUri->getPath(),
             '',
             $this->canonicalHeaders($canonicalHeaders),
             $signedHeaders,
@@ -79,22 +101,26 @@ class ObjectStorage implements Storage
         ]);
 
         $signature = $this->sign($now, $stringToSign);
-        rewind($src);
 
         $client = new Client();
-        $client->request('PUT', (string) $canonicalUri, [
-            'headers' => [
-                'Authorization' => 'AWS4-HMAC-SHA256 ' . implode(', ', [
-                        sprintf('Credential=%s/%s', $this->accessKey, $scope),
-                        "SignedHeaders=$signedHeaders",
-                        "Signature=$signature",
-                    ]),
-                ...$canonicalHeaders,
-            ],
-            'body' => $src,
-        ]);
+        try {
+            $client->request('PUT', (string) $canonicalUri, [
+                'headers' => [
+                    'Authorization' => 'AWS4-HMAC-SHA256 ' . implode(', ', [
+                            sprintf('Credential=%s/%s', $this->accessKey, $scope),
+                            "SignedHeaders=$signedHeaders",
+                            "Signature=$signature",
+                        ]),
+                    ...$canonicalHeaders,
+                ],
+                'body' => $src->resource(),
+            ]);
+        } catch (ClientException $e) {
+            echo $e->getResponse()->getBody()->getContents() . PHP_EOL;
+            throw $e;
+        }
 
-        return new ObjectStoredFile($canonicalUri);
+        return new StoredFile($canonicalUri);
     }
 
     private function canonicalHeaders(array $headers): string
@@ -103,13 +129,8 @@ class ObjectStorage implements Storage
         array_map(trim(...), $headers);
 
         return implode("\n", array_map(function ($key, $value) {
-            return sprintf('%s:%s', strtolower($key), trim($value));
+            return sprintf('%s:%s', strtolower($key), trim((string) $value));
         }, array_keys($headers), $headers)) . "\n";
-    }
-
-    private function canonicalUri(string $dest): Uri
-    {
-        return new Uri($this->endpoint->withPath(implode('/', [$this->bucketName, $dest])));
     }
 
     private function sign(DateTime $now, string $content): string

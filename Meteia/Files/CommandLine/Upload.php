@@ -30,10 +30,9 @@ class Upload implements Command
     {
         $files = $this->input->getArgument(self::ARG_FILES);
         foreach ($files as $file) {
-            $mimeType = mime_content_type($file);
             $file = new FilesystemPath($file);
-            $storedFile = $this->contentAddressableStorage->store($file->open(), $file->extension(), $mimeType);
-            echo sprintf('%s => %s', $file, $storedFile->uri()) . PHP_EOL;
+            $storedFile = $this->contentAddressableStorage->store($file->open(), $file->extension());
+            echo sprintf('%s => %s', $file, $storedFile) . PHP_EOL;
         }
     }
 

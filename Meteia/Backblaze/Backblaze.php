@@ -8,7 +8,7 @@ use Meteia\Backblaze\Api\Api;
 use Meteia\Backblaze\Configuration\ApplicationKey;
 use Meteia\Backblaze\Configuration\KeyId;
 use Meteia\Files\Contracts\Storage;
-use Meteia\Files\Contracts\StoredFile;
+use Meteia\Files\StoredFile;
 
 class Backblaze implements Storage
 {

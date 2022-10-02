@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Meteia\ObjectStorage;
+namespace Meteia\Files\Configuration;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class AccessControlList extends StringLiteral
+class AccessKey extends StringLiteral
 {
 }
