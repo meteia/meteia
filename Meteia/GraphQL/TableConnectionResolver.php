@@ -9,6 +9,8 @@ use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\GraphQL\Types\ConnectionField;
 
+use function Meteia\Polyfills\array_map_assoc;
+
 abstract class TableConnectionResolver implements Resolver, TableConnectionBindings
 {
     use ConnectionResolver;
@@ -42,8 +44,11 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
         }
 
         foreach ($this->resolveWhereBindings($root, $args, $requestContext) as $column => $value) {
-            $compare = $value === null ? 'IS' : '=';
-            $where[] = sprintf('`%s` %s :%s', $column, $compare, $column);
+            if ($value === null) {
+                $where[] = sprintf('`%s` IS NULL', $column);
+                continue;
+            }
+            $where[] = sprintf('`%s` = :%s', $column, $column);
             $bindings[$column] = $value;
         }
 
@@ -54,10 +59,18 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
 
         // TODO: Add order-by
 
-        $query = sprintf('SELECT * FROM %s %s LIMIT :limit', $this->table, $whereString);
-        $rows = $this->db->fetchObjects($query, $this->db->prepareBindings($bindings));
+        $query = sprintf('SELECT * FROM `%s` %s LIMIT :limit', $this->table, $whereString);
+        //jdd($query, $this->db->prepareBindings($bindings));
+        $rows = $this->db->fetchAll($query, $this->db->prepareBindings($bindings));
         if ($cursorDirection === 'reverse') {
             $rows = array_reverse($rows);
+        }
+        if (count($rows)) {
+            // FIXME: This seems pretty expensive just to fix column names... would it better in the query?
+            // Maybe we could ask for mappings (maybe even static?) similar to how we do resolveWhereBindings
+            // TODO: This probably should be a trait, or some place more reusable
+            $columnNameMap = array_map_assoc(fn ($i, $column) => [$column => lcfirst(implode(array_map(ucfirst(...), explode('_', $column))))], array_keys($rows[0]));
+            $rows = array_map(fn ($row) => (object) array_map_assoc(fn ($column, $row) => [$columnNameMap[$column] => $row], $row), $rows);
         }
 
         return $this->processedRows($rows, $args, $this->cursorOver);
