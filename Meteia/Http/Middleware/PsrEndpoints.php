@@ -18,10 +18,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 class PsrEndpoints implements MiddlewareInterface
 {
     public function __construct(
-        private Container $container,
-        private EndpointMap $endpointMap,
-        private BestMatchingClass $bestMatchingClass,
-        private Timings $timings,
+        private readonly Container $container,
+        private readonly EndpointMap $endpointMap,
+        private readonly BestMatchingClass $bestMatchingClass,
+        private readonly Timings $timings,
     ) {
     }
 
@@ -44,6 +44,7 @@ class PsrEndpoints implements MiddlewareInterface
             return $this->container->get(HomepageEndpoint::class);
         }
 
+        // FIXME: This is code path is very slow
         $className = $this->endpointMap->classNameFor($path);
         $bestMatchingClass = $this->bestMatchingClass->in($className, Endpoint::class, ['\\Index']);
 
