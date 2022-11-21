@@ -35,7 +35,7 @@ abstract class ConnectionField extends ObjectType
     {
         $args = array_map_assoc(function ($key, $value) {
             return [$key => $value['defaultValue'] ?? null];
-        }, $this->args());
+        }, $this->argsWith());
 
         return array_filter($args);
     }
