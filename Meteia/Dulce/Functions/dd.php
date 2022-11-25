@@ -6,41 +6,22 @@ use Meteia\Http\Responses\JsonResponse;
 use function Meteia\Http\Functions\send;
 use function Meteia\Polyfills\common_prefix_length;
 
-if (!function_exists('dump_object_via_reflection')) {
-    function dump_object_via_reflection($object)
+if (!function_exists('dump_value')) {
+    function dump_value(mixed $value, array &$seen = []): mixed
     {
-        if (!is_object($object)) {
-            if (is_string($object) && strlen($object) > 0 && !ctype_print($object)) {
-                return '0x' . bin2hex($object);
-            }
-            if (is_array($object)) {
-                return array_map(dump_object_via_reflection(...), $object);
-            }
-
-            return $object;
+        if (is_object($value)) {
+            $objectHash = spl_object_hash($value);
+            if (isset($seen[$objectHash])) return '[object ' . get_class($value) . ' ' . $objectHash .']';
+            $seen[$objectHash] = true;
+            return dump_value(get_object_vars($value), $seen);
         }
-        if ($object instanceof JsonSerializable) {
-            return dump_object_via_reflection($object->jsonSerialize());
+        if (is_array($value)) {
+            return array_map(fn ($innerValue) => dump_value($innerValue, $seen), $value);
         }
-        $reflectionClass = new ReflectionClass($object);
-
-        $properties = $reflectionClass->getProperties();
-
-        $array = get_object_vars($object);
-        // $array['__class'] = get_class($object);
-        foreach ($properties as $property) {
-            $property->setAccessible(true);
-            $value = $property->getValue($object);
-            if (is_object($value)) {
-                $array[$property->getName()] = dump_object_via_reflection($value);
-            } elseif (is_string($value) && !ctype_print($value)) {
-                $array[$property->getName()] = bin2hex($value);
-            } else {
-                $array[$property->getName()] = $value;
-            }
+        if (is_string($value) && strlen($value) > 0 && !ctype_print($value)) {
+            return '0x' . bin2hex($value);
         }
-
-        return $array;
+        return $value;
     }
 }
 
@@ -49,7 +30,7 @@ if (!function_exists('jdd')) {
     {
         $stackTrace = debug_backtrace();
         $stackTrace = array_slice(array_filter($stackTrace, function ($frame) {
-            return isset($frame['file'], $frame['line']) && strpos($frame['file'], '/vendor/') === false;
+            return isset($frame['file'], $frame['line']) && !str_contains($frame['file'], '/vendor/');
         }), 0);
         $commonPrefix = common_prefix_length(array_column($stackTrace, 'file'));
         $stackTrace = array_map(function ($frame) use ($commonPrefix) {
@@ -57,7 +38,7 @@ if (!function_exists('jdd')) {
         }, $stackTrace);
 
         $data = [
-            'data' => array_map('dump_object_via_reflection', func_get_args()),
+            'data' => array_map(dump_value(...), func_get_args()),
             'stackTrace' => $stackTrace,
         ];
 
@@ -79,14 +60,14 @@ if (!function_exists('hdd')) {
         $stackTrace = array_slice(array_filter($stackTrace, function ($frame) {
             return isset($frame['file'], $frame['line']) && preg_match('#/(vendor|DependencyInjection)/#', $frame['file']) === 0;
         }), 0);
-        $fileNames = array_pluck($stackTrace, 'file');
+        $fileNames = array_column($stackTrace, 'file');
         $prefixLength = common_prefix_length($fileNames);
         $stackTrace = array_map(function ($frame) use ($prefixLength) {
             return substr($frame['file'], $prefixLength) . ':' . $frame['line'];
         }, $stackTrace);
         $stackTrace = array_reverse($stackTrace);
 
-        $data = array_map('dump_object_via_reflection', func_get_args());
+        $data = array_map(dump_value(...), func_get_args());
         array_map(function ($idx, $data) use ($id) {
             header("X-Debug-$id-Data-$idx: " . (is_string($data) ? $data : json_encode($data)), false);
         }, array_keys($data), $data);
