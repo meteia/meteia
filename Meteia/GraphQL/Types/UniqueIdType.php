@@ -27,19 +27,13 @@ class UniqueIdType extends ScalarType implements Resolver
 
     public function parseLiteral($valueNode, array $variables = null)
     {
-        jdd($valueNode);
         if ($valueNode instanceof StringValueNode) {
-            // return $valueNode->value;
             try {
-                $uid = $this->uniqueIdClass::fromToken($valueNode->value);
-                // jdd(get_class($uid), $uid);
-                return $uid;
+                return $this->uniqueIdClass::fromToken($valueNode->value);
             } catch (\Throwable $t) {
                 throw new InvalidScalarValue($t->getMessage());
             }
         }
-        jdd($valueNode);
-
         return null;
     }
 
