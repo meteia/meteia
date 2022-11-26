@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-use Meteia\Bluestone\Contracts\Renderable;
+use Stringable;
 
-interface Header extends Renderable
+interface Header extends Stringable
 {
     public function title($title): Header;
 }

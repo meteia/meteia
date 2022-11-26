@@ -6,7 +6,7 @@ namespace Meteia\Http;
 
 trait ClassBasedName
 {
-    private function classBasedName($class = null)
+    private function classBasedName($class = null): string
     {
         $names = explode('\\', $class ?? get_called_class());
 

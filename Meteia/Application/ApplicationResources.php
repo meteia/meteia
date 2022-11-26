@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Application;
 
-use Meteia\Bluestone\Contracts\Renderable;
 use Meteia\Html\Elements\Head;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 use function Meteia\Polyfills\common_prefix_length;
@@ -28,9 +27,10 @@ class ApplicationResources
         }
     }
 
-    public function requireEntryModule(Renderable $renderable, Head $head): void
+    public function requireEntryModule(mixed $target, Head $head, bool $isReact = false): void
     {
-        $entry = '/' . str_replace('\\', '/', $renderable::class) . 'Entry.ts';
+        $targetName = is_object($target) ? $target::class : $target;
+        $entry = '/' . str_replace('\\', '/', $targetName) . 'Entry.' . ($isReact ? 'tsx' : 'ts');
         $this->requireModule($entry, $head);
     }
 

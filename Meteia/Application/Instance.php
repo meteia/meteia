@@ -47,7 +47,7 @@ class Instance
         );
         $container = new TimedContainer($timings, $container);
 
-         Dulce::onFatalError(
+        Dulce::onFatalError(
             $container,
             function (\Throwable $throwable) use ($applicationDefinitions) {
                 // A fresh container is needed to clear out any previous state, layout rendering in particular
@@ -59,7 +59,7 @@ class Instance
                 $response = $freshContainer->call([$errorEndpoint, 'response'], [$throwable]);
                 send($response);
             },
-         );
+        );
 
         /** @var RequestHandlerInterface $requestHandler */
         $requestHandler = $container->get(RequestHandlerInterface::class);

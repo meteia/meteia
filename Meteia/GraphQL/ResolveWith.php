@@ -16,7 +16,6 @@ trait ResolveWith
         ];
     }
 
-
     public function resolveWithRoot(string $propertyName, mixed $default): array
     {
         return [

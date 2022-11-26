@@ -11,8 +11,11 @@ if (!function_exists('dump_value')) {
     {
         if (is_object($value)) {
             $objectHash = spl_object_hash($value);
-            if (isset($seen[$objectHash])) return '[object ' . get_class($value) . ' ' . $objectHash .']';
+            if (isset($seen[$objectHash])) {
+                return '[object ' . get_class($value) . ' ' . $objectHash . ']';
+            }
             $seen[$objectHash] = true;
+
             return dump_value(get_object_vars($value), $seen);
         }
         if (is_array($value)) {
@@ -21,6 +24,7 @@ if (!function_exists('dump_value')) {
         if (is_string($value) && strlen($value) > 0 && !ctype_print($value)) {
             return '0x' . bin2hex($value);
         }
+
         return $value;
     }
 }

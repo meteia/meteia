@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace Meteia\Dulce\Templates;
 
 use Meteia\Application\RepositoryPath;
-use Meteia\Bluestone\Contracts\Renderable;
 use Meteia\Bluestone\PhpTemplate;
+use Throwable;
 use function Meteia\Polyfills\without_prefix;
 
-class StackTrace implements Renderable
+class StackTrace
 {
     use PhpTemplate;
 
-    private \Throwable $throwable;
+    private Throwable $throwable;
 
     public function __construct(
-        private RepositoryPath $repositoryPath,
+        private readonly RepositoryPath $repositoryPath,
     ) {
     }
 
-    public function for(\Throwable $throwable): self
+    public function for(Throwable $throwable): self
     {
         $copy = clone $this;
         $copy->throwable = $throwable;

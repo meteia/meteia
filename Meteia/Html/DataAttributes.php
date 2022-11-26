@@ -6,7 +6,7 @@ namespace Meteia\Html;
 
 trait DataAttributes
 {
-    public function attrs(...$names)
+    public function attrs(...$names): string
     {
         $attrs = get_object_vars($this);
         $attrs = array_filter($attrs, function ($key) use ($names) {

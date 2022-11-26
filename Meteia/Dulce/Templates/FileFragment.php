@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace Meteia\Dulce\Templates;
 
-use Meteia\Bluestone\Contracts\Renderable;
 use Meteia\Bluestone\PhpTemplate;
+use function array_slice;
 
-class FileFragment implements Renderable
+class FileFragment
 {
     use PhpTemplate;
 
-    public function __construct(private string $file, private int $line)
+    public function __construct(private readonly string $file, private readonly int $line)
     {
     }
 
     public function lines(): array
     {
-        $lines = file_get_contents($this->file);
-        $lines = explode("\n", $lines);
+        $lines = explode("\n", file_get_contents($this->file));
 
         $offset = (int) max(0, $this->line - ceil(11 / 2));
 
-        $lines = \array_slice($lines, $offset, 11);
+        $lines = array_slice($lines, $offset, 11);
 
         $output = [];
         foreach ($lines as $line) {

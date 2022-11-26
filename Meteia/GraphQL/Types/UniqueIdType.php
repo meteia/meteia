@@ -34,6 +34,7 @@ class UniqueIdType extends ScalarType implements Resolver
                 throw new InvalidScalarValue($t->getMessage());
             }
         }
+
         return null;
     }
 

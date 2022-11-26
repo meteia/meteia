@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Bluestone\Contracts\Renderable;
 use Meteia\Html\Element;
 
-class Link implements Renderable
+class Link
 {
     use Element;
 

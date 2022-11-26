@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Bluestone;
 
-use Meteia\Bluestone\Contracts\Renderable;
-
-class MutableString implements Renderable
+class MutableString
 {
     public function __construct(private string $string = '')
     {

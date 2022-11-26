@@ -8,7 +8,6 @@ use Meteia\Database\Database;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\GraphQL\Types\ConnectionField;
-
 use function Meteia\Polyfills\array_map_assoc;
 
 abstract class TableConnectionResolver implements Resolver, TableConnectionBindings
@@ -57,10 +56,11 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
             $whereString = 'WHERE ' . implode(' AND ', $where);
         }
 
-        // TODO: Add order-by
+        // TODO: Add order-by args
+        $orderString = sprintf('ORDER BY %s DESC', $cursorColumns);
 
-        $query = sprintf('SELECT * FROM `%s` %s LIMIT :limit', $this->table, $whereString);
-        //jdd($query, $this->db->prepareBindings($bindings));
+        $query = sprintf('SELECT * FROM `%s` %s %s LIMIT :limit', $this->table, $whereString, $orderString);
+        // jdd($query, $this->db->prepareBindings($bindings));
         $rows = $this->db->fetchAll($query, $this->db->prepareBindings($bindings));
         if ($cursorDirection === 'reverse') {
             $rows = array_reverse($rows);

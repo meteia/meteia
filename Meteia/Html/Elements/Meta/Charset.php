@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements\Meta;
 
-use Meteia\Bluestone\Contracts\Renderable;
 use Meteia\Bluestone\PhpTemplate;
 
-class Charset implements Renderable
+class Charset
 {
     use PhpTemplate;
 
