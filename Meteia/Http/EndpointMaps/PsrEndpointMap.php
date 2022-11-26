@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Http\EndpointMaps;
 
 use Doctrine\Inflector\Inflector;
+use Exception;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Http\Endpoint;
 use Meteia\Http\EndpointMap;
@@ -33,11 +34,14 @@ class PsrEndpointMap implements EndpointMap
     public function path(string $endpoint): string
     {
         if (!is_subclass_of($endpoint, Endpoint::class)) {
-            throw new \Exception('Invalid Endpoint');
+            throw new Exception('Invalid Endpoint');
         }
         $parts = explode('\\', $endpoint);
         array_shift($parts);
         array_splice($parts, 1, 1);
+        if ($parts[count($parts) - 1] === 'Index') {
+            array_pop($parts);
+        }
 
         $path = '/' . implode('/', $parts);
         $path = preg_replace('~(?<=\\w)([A-Z])~u', '-$1', $path);
