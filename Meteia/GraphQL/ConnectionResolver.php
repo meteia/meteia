@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
+use ErrorException;
+use Exception;
 use Meteia\GraphQL\Types\ConnectionField;
 use Tuupola\Base62;
+
 use function Meteia\Polyfills\without_prefix;
 
 trait ConnectionResolver
@@ -16,7 +19,7 @@ trait ConnectionResolver
     protected function processedRows(array $rows, array $args, array $cursorColumns): object
     {
         if (!$args || !count($args)) {
-            throw new \Exception('A type that has ' . get_called_class() . ' as a field is likely not passing through default arguments.');
+            throw new Exception('A type that has ' . get_called_class() . ' as a field is likely not passing through default arguments.');
         }
         $hasNextPage = $this->hasNextPage(count($rows), $args);
         if (isset($args[ConnectionField::ARG_FIRST])) {
@@ -34,9 +37,7 @@ trait ConnectionResolver
         }
 
         /** @var array $edges */
-        $edges = array_map(function ($row) use ($cursorColumns) {
-            return $this->asEdge($row, $cursorColumns);
-        }, $rows);
+        $edges = array_map(fn ($row) => $this->asEdge($row, $cursorColumns), $rows);
         $firstEdge = $edges[0] ?? null;
         $lastEdge = end($edges);
 
@@ -89,7 +90,7 @@ trait ConnectionResolver
         $cursorValues = [];
         foreach ($cursorColumns as $cursorColumn) {
             if (!isset($row->{$cursorColumn})) {
-                throw new \ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
+                throw new ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
             }
             $cursorValues[] = $row->{$cursorColumn};
         }

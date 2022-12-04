@@ -11,22 +11,22 @@ use PhpSpec\ObjectBehavior;
  */
 class ImmutableURISpec extends ObjectBehavior
 {
-    public function let()
+    public function let(): void
     {
         $this->beConstructedWith('/');
     }
 
-    public function it_is_initializable()
+    public function it_is_initializable(): void
     {
         $this->shouldHaveType(ImmutableURI::class);
     }
 
-    public function it_appends_a_path()
+    public function it_appends_a_path(): void
     {
         $this->withPath('/potato')->__toString()->shouldEqual('/potato');
     }
 
-    public function it_appends_a_query_string()
+    public function it_appends_a_query_string(): void
     {
         $this->withQuery(['food' => 'potato'])->__toString()->shouldEqual('/?food=potato');
         $this->withPath('/hmm')->withQuery(['food' => 'potato'])->__toString()->shouldEqual('/hmm?food=potato');

@@ -64,20 +64,20 @@ abstract class ImmutableArray implements IteratorAggregate, Countable, ArrayAcce
         return $this->values[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new ObjectMutationProhibited();
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new ObjectMutationProhibited();
     }
 
-    protected function guardType($value)
+    protected function guardType($value): void
     {
         if (!is_a($value, static::TYPE)) {
-            throw new ImproperType(get_class($value), [static::TYPE]);
+            throw new ImproperType($value::class, [static::TYPE]);
         }
     }
 }

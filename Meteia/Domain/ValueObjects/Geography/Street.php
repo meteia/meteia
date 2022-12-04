@@ -105,7 +105,7 @@ class Street
         return $this->getCompleteStreet()->string();
     }
 
-    private function buildComplexElements()
+    private function buildComplexElements(): void
     {
         $this->replacements['%completeAddressNumber%'] = $this->format(StreetFormat::ADDRESS_NUMBER);
         $this->replacements['%preStreetName%'] = $this->format(StreetFormat::PRE_STREET_NAME);

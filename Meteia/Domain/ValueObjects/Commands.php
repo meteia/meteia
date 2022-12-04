@@ -10,7 +10,7 @@ class Commands extends ImmutableArrayValueObject
 {
     public const TYPE = Command::class;
 
-    public function publishTo(CommandExchange $commandExchange)
+    public function publishTo(CommandExchange $commandExchange): void
     {
         /** @var Command $command */
         foreach ($this as $command) {

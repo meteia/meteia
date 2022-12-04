@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Bluestone;
 
-class ImmutableString implements \Stringable
+use Stringable;
+
+class ImmutableString implements Stringable
 {
     public function __construct(private readonly string $string = '')
     {

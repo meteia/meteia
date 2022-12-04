@@ -37,7 +37,7 @@ class AutoResolve
         // }
 
         $resolver = $returnType;
-        $returnTypeClass = trim(\get_class($returnType), '\\');
+        $returnTypeClass = trim($returnType::class, '\\');
         $resolverClass = $returnTypeClass . 'Resolver';
         if (class_exists($resolverClass)) {
             /** @var Resolver $resolver */
@@ -49,9 +49,7 @@ class AutoResolve
         }
         if ($resolver instanceof Resolver) {
             if (isset($source->{$resolveInfo->fieldName}) && \is_array($source->{$resolveInfo->fieldName}) && $expectsList) {
-                return array_map(function ($source) use ($resolver, $args, $requestContext) {
-                    return $resolver->data($source, $args, $requestContext);
-                }, $source->{$resolveInfo->fieldName});
+                return array_map(fn ($source) => $resolver->data($source, $args, $requestContext), $source->{$resolveInfo->fieldName});
             }
 
             return $resolver->data($source, $args, $requestContext);

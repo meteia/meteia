@@ -6,7 +6,7 @@ namespace Meteia\Http\Functions;
 
 use Psr\Http\Message\ResponseInterface;
 
-function send(ResponseInterface $response)
+function send(ResponseInterface $response): void
 {
     while (ob_get_level()) {
         ob_end_clean();

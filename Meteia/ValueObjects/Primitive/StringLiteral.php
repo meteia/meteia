@@ -6,8 +6,9 @@ namespace Meteia\ValueObjects\Primitive;
 
 use Meteia\Domain\Contracts\Comparable;
 use Meteia\ValueObjects\PrimitiveValueObject;
+use Stringable;
 
-abstract class StringLiteral extends PrimitiveValueObject implements \Stringable
+abstract class StringLiteral extends PrimitiveValueObject implements Stringable
 {
     public function __construct($value)
     {

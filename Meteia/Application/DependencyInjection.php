@@ -9,13 +9,7 @@ use Meteia\Application\ApplicationResourcesBaseUri;
 use Meteia\Configuration\Configuration;
 
 return [
-    ApplicationResourcesBaseUri::class => function (Configuration $configuration) {
-        return new ApplicationResourcesBaseUri($configuration->string('RESOURCES_BASE_URI', ''));
-    },
-    ApplicationResources::class => function (ApplicationResourcesBaseUri $applicationResourcesBaseUri, ApplicationPublicDir $publicDir): ApplicationResources {
-        return new ApplicationResources($applicationResourcesBaseUri, $publicDir, $publicDir->join('dist/manifest.json'));
-    },
-    ApplicationPublicDir::class => function (ApplicationPath $applicationPath) {
-        return new ApplicationPublicDir($applicationPath->join('public'));
-    },
+    ApplicationResourcesBaseUri::class => fn (Configuration $configuration) => new ApplicationResourcesBaseUri($configuration->string('RESOURCES_BASE_URI', '')),
+    ApplicationResources::class => fn (ApplicationResourcesBaseUri $applicationResourcesBaseUri, ApplicationPublicDir $publicDir): ApplicationResources => new ApplicationResources($applicationResourcesBaseUri, $publicDir, $publicDir->join('dist/manifest.json')),
+    ApplicationPublicDir::class => fn (ApplicationPath $applicationPath) => new ApplicationPublicDir($applicationPath->join('public')),
 ];

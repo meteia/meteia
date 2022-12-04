@@ -26,7 +26,7 @@ class Uri extends StringLiteral
 
     public function withPath($path): Uri
     {
-        if (strpos((string) $path, '/') !== 0) {
+        if (!str_starts_with((string) $path, '/')) {
             $path = '/' . (string) $path;
         }
 

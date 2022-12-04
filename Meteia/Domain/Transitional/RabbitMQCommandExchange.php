@@ -23,9 +23,9 @@ class RabbitMQCommandExchange implements PublishesCommands
         $this->messageSerializer = $messageSerializer;
     }
 
-    public function publish(Command $command)
+    public function publish(Command $command): void
     {
-        $routingKey = str_replace('\\', '.', get_class($command));
+        $routingKey = str_replace('\\', '.', $command::class);
         $body = $this->messageSerializer->serialize($command);
         $message = new RabbitMQCommandMessage($body, '');
         $this->exchange->publish($message, 'Meteia', $routingKey);

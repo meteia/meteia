@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Meteia\ValueObjects\Identity;
 
 use Exception;
+use JsonSerializable;
 use Meteia\ValueObjects\Contracts\HasPrefix;
+use Stringable;
 use Tuupola\Base62;
 
-abstract class UniqueId implements HasPrefix, \Stringable, \JsonSerializable
+abstract class UniqueId implements HasPrefix, Stringable, JsonSerializable
 {
     protected const EPOCH = 1577836800;
     protected const LEN_ENCODED = 27;

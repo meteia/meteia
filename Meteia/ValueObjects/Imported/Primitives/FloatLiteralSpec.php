@@ -11,23 +11,23 @@ use PhpSpec\ObjectBehavior;
  */
 class FloatLiteralSpec extends ObjectBehavior
 {
-    public function let()
+    public function let(): void
     {
         $this->beConstructedWith(23.24);
     }
 
-    public function it_is_initializable()
+    public function it_is_initializable(): void
     {
         $this->shouldHaveType(FloatLiteral::class);
     }
 
-    public function it_throws_an_exception_on_invalid_input()
+    public function it_throws_an_exception_on_invalid_input(): void
     {
         $this->beConstructedWith('NaN');
         $this->shouldThrow()->duringInstantiation();
     }
 
-    public function it_supports_basic_operations()
+    public function it_supports_basic_operations(): void
     {
         $this->add(new FloatLiteral(1))->shouldBeLike('24.24');
         $this->add(new FloatLiteral(-1))->shouldBeLike('22.24');
@@ -42,7 +42,7 @@ class FloatLiteralSpec extends ObjectBehavior
         $this->divideBy(new FloatLiteral(-2))->shouldBeLike('-11.62');
     }
 
-    public function it_can_be_compared()
+    public function it_can_be_compared(): void
     {
         $this->equalTo(new FloatLiteral(23.24))->shouldEqual(true);
         $this->equalTo(new FloatLiteral(23.242))->shouldEqual(false);

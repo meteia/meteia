@@ -13,17 +13,17 @@ use PhpSpec\ObjectBehavior;
  */
 class WithMagicMethodSpec extends ObjectBehavior
 {
-    public function let()
+    public function let(): void
     {
         $this->beAnInstanceOf(WithMagicMethodStub::class);
     }
 
-    public function it_provides_a_with_magic_method()
+    public function it_provides_a_with_magic_method(): void
     {
         $this->withKey('green')->key->shouldEqual('green');
     }
 
-    public function it_provides_a_with_magic_method_alt()
+    public function it_provides_a_with_magic_method_alt(): void
     {
         $this->shouldThrow(MethodNotFound::class)->during('unknown');
     }

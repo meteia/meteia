@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Bluestone;
 
 use Meteia\Bluestone\Errors\TemplateNotFound;
+use ReflectionClass;
 
 trait PhpTemplate
 {
@@ -18,7 +19,7 @@ trait PhpTemplate
 
     private function _getTemplatePath(string $viewClassName): string
     {
-        $templateClass = new \ReflectionClass($viewClassName);
+        $templateClass = new ReflectionClass($viewClassName);
 
         while ($templateClass) {
             $templatePath = str_replace('.php', '.tpl', $templateClass->getFileName());

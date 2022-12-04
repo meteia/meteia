@@ -11,22 +11,22 @@ use PhpSpec\ObjectBehavior;
  */
 class CountrySpec extends ObjectBehavior
 {
-    public function let()
+    public function let(): void
     {
         $this->beConstructedWith('US');
     }
 
-    public function it_can_get_a_country_code()
+    public function it_can_get_a_country_code(): void
     {
         $this->getCode()->shouldReturnString('US');
     }
 
-    public function it_can_get_a_country_name()
+    public function it_can_get_a_country_name(): void
     {
         $this->getName()->shouldReturnString('United States');
     }
 
-    public function it_can_convert_to_a_string()
+    public function it_can_convert_to_a_string(): void
     {
         $this->__toString()->shouldReturnString('United States');
     }

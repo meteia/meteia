@@ -9,7 +9,7 @@ use Meteia\Domain\Exceptions\ImmutableEntityException;
 
 class ImmutableEntity implements Entity
 {
-    public function __set($key, $value)
+    public function __set($key, $value): void
     {
         throw new ImmutableEntityException("Unable to set '$key' as " . get_class($this) . ' is immutable.');
     }

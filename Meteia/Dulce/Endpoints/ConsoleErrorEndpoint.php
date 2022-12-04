@@ -19,7 +19,7 @@ class ConsoleErrorEndpoint implements ErrorEndpoint
 
     public function response(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
-        $output = sprintf('fatal error: %s %s', get_class($throwable), $throwable->getMessage()) . PHP_EOL . PHP_EOL;
+        $output = sprintf('fatal error: %s %s', $throwable::class, $throwable->getMessage()) . PHP_EOL . PHP_EOL;
         $output .= 'stack backtrace (oldest first)' . PHP_EOL;
 
         $frames = $this->frames->from($throwable);

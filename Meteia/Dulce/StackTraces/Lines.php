@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Dulce\StackTraces;
 
-class Lines implements \IteratorAggregate
+use IteratorAggregate;
+
+class Lines implements IteratorAggregate
 {
     public function __construct()
     {

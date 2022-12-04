@@ -8,15 +8,16 @@ use Laminas\Diactoros\Response;
 use Meteia\Http\Endpoint;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 class ErrorEndpoint implements Endpoint
 {
     /**
-     * @var \Throwable
+     * @var Throwable
      */
     private $throwable;
 
-    public function __construct(\Throwable $throwable)
+    public function __construct(Throwable $throwable)
     {
         $this->throwable = $throwable;
     }

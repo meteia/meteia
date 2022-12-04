@@ -8,7 +8,7 @@ use Meteia\Application\ApplicationPublicDir;
 use Meteia\Application\Instance;
 use Meteia\Http\Middleware\ParseBody;
 
-(function () {
+(function (): void {
     require implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'vendor', 'autoload.php']);
 
     $namespace = new ApplicationNamespace('ExampleApp');

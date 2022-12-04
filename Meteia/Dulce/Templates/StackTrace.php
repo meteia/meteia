@@ -7,6 +7,7 @@ namespace Meteia\Dulce\Templates;
 use Meteia\Application\RepositoryPath;
 use Meteia\Bluestone\PhpTemplate;
 use Throwable;
+
 use function Meteia\Polyfills\without_prefix;
 
 class StackTrace
@@ -37,9 +38,7 @@ class StackTrace
         $frames[0]['file'] = $this->throwable->getFile();
         $frames[0]['line'] = $this->throwable->getLine();
 
-        $frames = array_filter($frames, function ($frame) {
-            return !isset($frame['file']) || stripos($frame['file'], 'vendor') === false;
-        });
+        $frames = array_filter($frames, fn ($frame) => !isset($frame['file']) || stripos($frame['file'], 'vendor') === false);
 
         return array_map(function ($trace) {
             if (!isset($trace['file'], $trace['line'])) {

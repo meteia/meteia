@@ -128,9 +128,7 @@ class ObjectStorage implements Storage
         ksort($headers);
         array_map(trim(...), $headers);
 
-        return implode("\n", array_map(function ($key, $value) {
-            return sprintf('%s:%s', strtolower($key), trim((string) $value));
-        }, array_keys($headers), $headers)) . "\n";
+        return implode("\n", array_map(fn ($key, $value) => sprintf('%s:%s', strtolower($key), trim((string) $value)), array_keys($headers), $headers)) . "\n";
     }
 
     private function sign(DateTime $now, string $content): string

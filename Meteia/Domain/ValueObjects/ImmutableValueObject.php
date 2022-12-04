@@ -16,7 +16,7 @@ abstract class ImmutableValueObject implements ValueObject
         }
     }
 
-    public function __set($key, $value)
+    public function __set($key, $value): void
     {
         throw new ImmutableValueObjectException(get_class($this) . ' is immutable');
     }

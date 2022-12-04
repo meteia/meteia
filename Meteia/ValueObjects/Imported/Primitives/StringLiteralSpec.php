@@ -11,22 +11,22 @@ use PhpSpec\ObjectBehavior;
  */
 class StringLiteralSpec extends ObjectBehavior
 {
-    public function let()
+    public function let(): void
     {
         $this->beConstructedWith('A Very Unique String');
     }
 
-    public function it_is_initializable()
+    public function it_is_initializable(): void
     {
         $this->shouldHaveType(StringLiteral::class);
     }
 
-    public function it_can_be_cast_as_string()
+    public function it_can_be_cast_as_string(): void
     {
         $this->shouldBeLike('A Very Unique String');
     }
 
-    public function it_can_check_equality()
+    public function it_can_check_equality(): void
     {
         $this->caseInsensitiveEquals(new StringLiteral('A Very Unique String'))->shouldEqual(true);
         $this->caseInsensitiveEquals(new StringLiteral('A VERY UNIQUE STRING'))->shouldEqual(true);

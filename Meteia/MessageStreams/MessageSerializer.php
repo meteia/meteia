@@ -6,6 +6,8 @@ namespace Meteia\MessageStreams;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use DateTime;
+use DateTimeImmutable;
 use DateTimeZone;
 use Meteia\MessageStreams\CustomSerializers\CarbonSerializer;
 use Meteia\MessageStreams\CustomSerializers\DateTimeSerializer;
@@ -19,8 +21,8 @@ class MessageSerializer
     public function __construct()
     {
         $this->zjs = new JsonSerializer(null, [
-            \DateTime::class => new DateTimeSerializer(),
-            \DateTimeImmutable::class => new DateTimeSerializer(true),
+            DateTime::class => new DateTimeSerializer(),
+            DateTimeImmutable::class => new DateTimeSerializer(true),
             Carbon::class => new CarbonSerializer(),
             CarbonImmutable::class => new CarbonSerializer(true),
             DateTimeZone::class => new DateTimeZoneSerializer(),

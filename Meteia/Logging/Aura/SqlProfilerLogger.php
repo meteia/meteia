@@ -19,7 +19,7 @@ class SqlProfilerLogger extends AbstractLogger
         $this->logger = $logger;
     }
 
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if ($context['statement']) {
             $lines = array_map('trim', explode(PHP_EOL, $context['statement']));

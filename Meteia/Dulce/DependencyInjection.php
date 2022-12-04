@@ -30,9 +30,7 @@ return [
 
         return $container->get(DeveloperErrorEndpoint::class);
     },
-    EditorUri::class => function (Configuration $configuration): EditorUri {
-        return new EditorUri($configuration->string('ERRORS_EDITOR_URI', 'phpstorm://open'));
-    },
+    EditorUri::class => fn (Configuration $configuration): EditorUri => new EditorUri($configuration->string('ERRORS_EDITOR_URI', 'phpstorm://open')),
     FrameFilters::class => function (): FrameFilters {
         // FIXME: This feels ugly, not sure how I want to handle this
         return new FrameFilters([

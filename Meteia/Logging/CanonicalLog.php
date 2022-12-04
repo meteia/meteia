@@ -10,7 +10,7 @@ class CanonicalLog
 {
     private string $logLine = '';
 
-    public function log(Stringable|string $message, array $context = [])
+    public function log(Stringable|string $message, array $context = []): void
     {
     }
 

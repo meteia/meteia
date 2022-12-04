@@ -12,7 +12,7 @@ use PhpSpec\ObjectBehavior;
  */
 class StreetSpec extends ObjectBehavior
 {
-    public function let()
+    public function let(): void
     {
         $baseArray = [
             'addressNumberPrefix' => 'PRE',
@@ -29,24 +29,24 @@ class StreetSpec extends ObjectBehavior
         $this->beConstructedWith($baseArray);
     }
 
-    public function it_prints_the_full_number()
+    public function it_prints_the_full_number(): void
     {
         $this->getNumber()->shouldReturnStreet('PRE NUM POST');
     }
 
-    public function it_prints_the_street_name()
+    public function it_prints_the_street_name(): void
     {
         $this->getStreetName()->shouldReturnStreet('-MOD -DIRECTION -TYPE STREET TYPE- DIRECTION- MOD-');
     }
 
-    public function it_prints_the_full_street()
+    public function it_prints_the_full_street(): void
     {
         $this->getCompleteStreet()->shouldReturnStreet(
             'PRE NUM POST -MOD -DIRECTION -TYPE STREET TYPE- DIRECTION- MOD-',
         );
     }
 
-    public function it_removes_white_space()
+    public function it_removes_white_space(): void
     {
         $baseArray = [
             'addressNumberPrefix' => '',
@@ -64,20 +64,20 @@ class StreetSpec extends ObjectBehavior
         $this->getCompleteStreet()->shouldReturnStreet('NUM - STREET -');
     }
 
-    public function it_can_create_from_number_and_name()
+    public function it_can_create_from_number_and_name(): void
     {
         $this->beConstructedWith('302', 'Stone Ave');
         $this->getCompleteStreet()->shouldReturnStreet('302 Stone Ave');
     }
 
-    public function it_can_create_from_name()
+    public function it_can_create_from_name(): void
     {
         $this->beConstructedWith('302 E Stone Ave');
         $this->getCompleteStreet()->shouldReturnStreet('302 E Stone Ave');
         $this->__toString()->shouldReturnStreet('302 E Stone Ave');
     }
 
-    public function it_can_create_from_blank_name()
+    public function it_can_create_from_blank_name(): void
     {
         $this->beConstructedWith('');
         $this->getCompleteStreet()->shouldReturnStreet('');

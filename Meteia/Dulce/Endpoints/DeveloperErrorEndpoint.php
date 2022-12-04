@@ -25,9 +25,7 @@ class DeveloperErrorEndpoint implements ErrorEndpoint
         if (str_contains($request->getHeaderLine('Content-Type'), 'application/json')) {
             return new JsonResponse([
                 'message' => $throwable->getMessage(),
-                'stackTrace' => array_values(array_map(function ($frame) {
-                    return implode(':', [$frame->file, $frame->line]);
-                }, $this->stackTrace->for($throwable)->stackFrames())),
+                'stackTrace' => array_values(array_map(fn ($frame) => implode(':', [$frame->file, $frame->line]), $this->stackTrace->for($throwable)->stackFrames())),
             ]);
         }
 

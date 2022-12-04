@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects;
 
+use IteratorAggregate;
+use JsonSerializable;
 use Meteia\Domain\Errors\ValueObjectImmutable;
+use Traversable;
 
-abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
+abstract class ValueObject implements JsonSerializable, IteratorAggregate
 {
     public function __get($key)
     {
@@ -15,7 +18,7 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         }
     }
 
-    public function __set($key, $value)
+    public function __set($key, $value): void
     {
         throw new ValueObjectImmutable(get_class($this) . ' is immutable');
     }
@@ -32,7 +35,7 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         }
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {

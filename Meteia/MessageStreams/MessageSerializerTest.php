@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Meteia\MessageStreams\MessageSerializer;
 
 return;
-it('serialize/unserialize DateTime', function () {
+it('serialize/unserialize DateTime', function (): void {
     /** @var \PhpBench\Tests\TestCase $this */
     $ms = new MessageSerializer();
 
@@ -21,10 +21,10 @@ it('serialize/unserialize DateTime', function () {
         $before->format(DateTimeInterface::RFC3339_EXTENDED),
         $after->format(DateTimeInterface::RFC3339_EXTENDED),
     );
-    $this->assertEquals(get_class($before), get_class($after));
+    $this->assertEquals($before::class, $after::class);
 });
 
-it('serialize/unserialize DateTimeImmutable', function () {
+it('serialize/unserialize DateTimeImmutable', function (): void {
     /** @var \PhpBench\Tests\TestCase $this */
     $ms = new MessageSerializer();
 
@@ -39,10 +39,10 @@ it('serialize/unserialize DateTimeImmutable', function () {
         $before->format(DateTimeInterface::RFC3339_EXTENDED),
         $after->format(DateTimeInterface::RFC3339_EXTENDED),
     );
-    $this->assertEquals(get_class($before), get_class($after));
+    $this->assertEquals($before::class, $after::class);
 });
 
-it('serialize/unserialize Carbon', function () {
+it('serialize/unserialize Carbon', function (): void {
     /** @var \PhpBench\Tests\TestCase $this */
     $ms = new MessageSerializer();
 
@@ -57,10 +57,10 @@ it('serialize/unserialize Carbon', function () {
         $before->format(DateTimeInterface::RFC3339_EXTENDED),
         $after->format(DateTimeInterface::RFC3339_EXTENDED),
     );
-    $this->assertEquals(get_class($before), get_class($after));
+    $this->assertEquals($before::class, $after::class);
 });
 
-it('serialize/unserialize UserId', function () {
+it('serialize/unserialize UserId', function (): void {
     /** @var \PhpBench\Tests\TestCase $this */
     $ms = new MessageSerializer();
 
@@ -77,5 +77,5 @@ it('serialize/unserialize UserId', function () {
         $before->token(),
         $after->token(),
     );
-    $this->assertEquals(get_class($before), get_class($after));
+    $this->assertEquals($before::class, $after::class);
 });

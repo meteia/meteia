@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Domain\Exceptions;
 
-class MutatedState extends \Exception
+use Exception;
+
+class MutatedState extends Exception
 {
 }

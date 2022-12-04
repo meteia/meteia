@@ -6,6 +6,7 @@ namespace Meteia\Application;
 
 use Meteia\Html\Elements\Head;
 use Meteia\ValueObjects\Identity\FilesystemPath;
+
 use function Meteia\Polyfills\common_prefix_length;
 
 class ApplicationResources

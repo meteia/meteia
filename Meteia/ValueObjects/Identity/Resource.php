@@ -59,7 +59,7 @@ class Resource
     {
         $dirname = dirname((string) $destination);
         if (!is_dir($dirname)) {
-            mkdir($dirname, 0777, true);
+            mkdir($dirname, 0o777, true);
         }
         $dest = fopen((string) $destination, 'w');
         rewind($this->resource);

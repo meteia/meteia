@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Meteia\Logging;
 
 use Psr\Log\AbstractLogger;
+use Stringable;
+
 use function strlen;
 
 class UdpSystemLog extends AbstractLogger
@@ -28,7 +30,7 @@ class UdpSystemLog extends AbstractLogger
         socket_close($this->socket);
     }
 
-    public function log($level, string|\Stringable $message, array $context = []): void
+    public function log($level, string|Stringable $message, array $context = []): void
     {
         $message .= PHP_EOL;
         socket_sendto($this->socket, $message, strlen($message), 0, $this->hostname, $this->port);

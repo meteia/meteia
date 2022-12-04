@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Meteia\Domain\ValueObjects\Identity;
 
 use Meteia\Domain\ValueObjects\Primitive\StringLiteral;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Webmozart\PathUtil\Path;
 
 class FilesystemPath extends StringLiteral
@@ -58,8 +60,8 @@ class FilesystemPath extends StringLiteral
             return @unlink($folder); // Delete file/link.
         }
 
-        $inner = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
-        $files = new \RecursiveIteratorIterator($inner, \RecursiveIteratorIterator::CHILD_FIRST);
+        $inner = new RecursiveDirectoryIterator($folder, RecursiveDirectoryIterator::SKIP_DOTS);
+        $files = new RecursiveIteratorIterator($inner, RecursiveIteratorIterator::CHILD_FIRST);
 
         foreach ($files as $fileInfo) {
             $action = ($fileInfo->isDir() ? 'rmdir' : 'unlink');

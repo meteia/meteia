@@ -16,16 +16,12 @@ class FrameFilters
      */
     public function __construct(array $filters = [])
     {
-        $this->filters = array_map(function (FrameFilter $filter) {
-            return $filter;
-        }, $filters);
+        $this->filters = array_map(fn (FrameFilter $filter) => $filter, $filters);
     }
 
     public function filtered(array $frames): array
     {
-        return array_filter($frames, function ($frame) {
-            return $this->filter($frame);
-        });
+        return array_filter($frames, fn ($frame) => $this->filter($frame));
     }
 
     private function filter(array $frame): bool

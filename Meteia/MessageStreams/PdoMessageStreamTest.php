@@ -9,6 +9,7 @@ use Aura\Sql\ExtendedPdoInterface;
 use Meteia\Domain\ValueObjects\AggregateRootId;
 use Meteia\MessageStreams\Contracts\Message;
 use Meteia\MessageStreams\Contracts\MessageStream;
+use TestCase;
 
 return;
 
@@ -22,16 +23,16 @@ function db(): ExtendedPdoInterface
 function init(ExtendedPdoInterface $pdo): PdoEventStream
 {
     $query = <<<SQL
-    CREATE TABLE message_streams (
-        message_stream_id       BINARY(20)                         NOT NULL,
-        message_stream_sequence BIGINT UNSIGNED                    NOT NULL,
-        message_type_id         BINARY(20)                         NOT NULL,
-        message                 MEDIUMTEXT                         NOT NULL,
-        created                 DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
-        CONSTRAINT message_stream_id UNIQUE (message_stream_id, message_stream_sequence)
-    );
-    CREATE INDEX message_type_id ON message_streams(message_type_id);
-    SQL;
+        CREATE TABLE message_streams (
+            message_stream_id       BINARY(20)                         NOT NULL,
+            message_stream_sequence BIGINT UNSIGNED                    NOT NULL,
+            message_type_id         BINARY(20)                         NOT NULL,
+            message                 MEDIUMTEXT                         NOT NULL,
+            created                 DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
+            CONSTRAINT message_stream_id UNIQUE (message_stream_id, message_stream_sequence)
+        );
+        CREATE INDEX message_type_id ON message_streams(message_type_id);
+        SQL;
     $pdo->exec($query);
 
     return new PdoEventStream($pdo, new MessageSerializer());
@@ -56,8 +57,8 @@ function init(ExtendedPdoInterface $pdo): PdoEventStream
 //    }
 // }
 
-it('stores a stream on commit', function () {
-    /** @var \TestCase $this */
+it('stores a stream on commit', function (): void {
+    /** @var TestCase $this */
 
     // Arrange
     $db = db();

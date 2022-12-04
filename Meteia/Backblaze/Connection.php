@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Backblaze;
 
+use Exception;
+use InvalidArgumentException;
 use Meteia\Backblaze\Configuration\ApplicationKey;
 use Meteia\Backblaze\Configuration\HmacKey;
 use Meteia\Backblaze\Configuration\KeyId;
@@ -41,7 +43,7 @@ class Connection
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
         curl_close($session);
         if ($http_status !== 200) {
-            throw new \Exception('Unknown error');
+            throw new Exception('Unknown error');
         }
 
         $this->authorization = json_decode($server_output, false, 512, JSON_THROW_ON_ERROR);
@@ -50,7 +52,7 @@ class Connection
     public function uploadResource($resource): string
     {
         if (!is_resource($resource)) {
-            throw new \InvalidArgumentException('Not a Resource');
+            throw new InvalidArgumentException('Not a Resource');
         }
         rewind($resource);
 
@@ -84,7 +86,7 @@ class Connection
         curl_close($session); // Clean up
         $result = json_decode($server_output, false, 512, JSON_THROW_ON_ERROR);
         if ($http_status !== 200) {
-            throw new \Exception('Unknown error');
+            throw new Exception('Unknown error');
         }
 
         return implode('/', ['https://static.mylzh.net', 'b2', $fileName]);
@@ -93,7 +95,7 @@ class Connection
     public function upload(string $filePath, string $fileExtension): string
     {
         if (!isset($this->authorization->allowed->bucketId)) {
-            throw new \Exception('Application Keys that are not limited to a bucket are not supported');
+            throw new Exception('Application Keys that are not limited to a bucket are not supported');
         }
         $uploadUrl = $this->uploadUrl($this->authorization->allowed->bucketId);
 
@@ -124,7 +126,7 @@ class Connection
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
         curl_close($session);
         if ($http_status !== 200) {
-            throw new \Exception('Unknown error');
+            throw new Exception('Unknown error');
         }
 
         $result = json_decode($server_output, false, 512, JSON_THROW_ON_ERROR);

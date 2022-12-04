@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Dulce\Templates;
 
 use Meteia\Bluestone\PhpTemplate;
+
 use function array_slice;
 
 class FileFragment

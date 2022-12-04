@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Database\CommandLine;
 
 use Doctrine\Inflector\Inflector;
+use Exception;
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,7 +37,7 @@ class NewMigration implements Command
 
         $isIdempotent = $this->input->getArgument(self::ARG_TYPE);
         if (!in_array(strtolower($isIdempotent), ['i', 'idempotent', 'ni', 'non-idempotent'], true)) {
-            throw new \Exception('Valid migration type are: i (idempotent) or ni (non-idempotent)');
+            throw new Exception('Valid migration type are: i (idempotent) or ni (non-idempotent)');
         }
         $isIdempotent = in_array(strtolower($isIdempotent), ['i', 'idempotent'], true);
         $migrationType = $isIdempotent ? 'i' : 'ni';
@@ -48,9 +49,9 @@ class NewMigration implements Command
         $filename = implode('.', [$id, $migrationType, $filename]);
         $target = $this->applicationPath->join('migrations', $filename);
         $template = <<<SQL
-        -- writing your migration in an idempotent fashion is advised (where possible, ALTER for example can't be for MYSQL)
+            -- writing your migration in an idempotent fashion is advised (where possible, ALTER for example can't be for MYSQL)
 
-        SQL;
+            SQL;
         file_put_contents((string) $target, $template);
         $this->output->writeln('Created Migration: ' . $filename);
     }

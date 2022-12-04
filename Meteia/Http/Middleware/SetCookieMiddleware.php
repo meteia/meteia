@@ -25,9 +25,7 @@ class SetCookieMiddleware implements MiddlewareInterface
     {
         $response = $handler->handle($request);
 
-        $response = array_reduce($this->cookies, function ($response, Cookie $cookie) {
-            return $response;
-        }, $response);
+        $response = array_reduce($this->cookies, fn ($response, Cookie $cookie) => $response, $response);
 
         return $response;
     }

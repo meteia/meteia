@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\MessageStreams\Exceptions;
 
-class FailedToAppendMessage extends \Exception
+use Exception;
+
+class FailedToAppendMessage extends Exception
 {
 }

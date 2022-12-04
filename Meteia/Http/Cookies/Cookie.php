@@ -42,7 +42,7 @@ class Cookie
             (string) $this->cookieAttributes,
         ]);
 
-        return $response->withAddedHeader('Set-Cookie', join('; ', $parts));
+        return $response->withAddedHeader('Set-Cookie', implode('; ', $parts));
     }
 
     public function withCookieAttributes(CookieAttributes $cookieAttributes): self

@@ -11,23 +11,23 @@ use PhpSpec\ObjectBehavior;
  */
 class IntegerLiteralSpec extends ObjectBehavior
 {
-    public function let()
+    public function let(): void
     {
         $this->beConstructedWith(23);
     }
 
-    public function it_is_initializable()
+    public function it_is_initializable(): void
     {
         $this->shouldHaveType(IntegerLiteral::class);
     }
 
-    public function it_throws_an_exception_on_invalid_input()
+    public function it_throws_an_exception_on_invalid_input(): void
     {
         $this->beConstructedWith('NaN');
         $this->shouldThrow()->duringInstantiation();
     }
 
-    public function it_supports_basic_operations()
+    public function it_supports_basic_operations(): void
     {
         $this->add(new IntegerLiteral(1))->shouldBeLike('24');
         $this->add(new IntegerLiteral(-1))->shouldBeLike('22');
@@ -42,13 +42,13 @@ class IntegerLiteralSpec extends ObjectBehavior
         $this->divideBy(new IntegerLiteral(-2))->shouldBeLike('-11');
     }
 
-    public function it_can_be_compared()
+    public function it_can_be_compared(): void
     {
         $this->equalTo(new IntegerLiteral(23))->shouldEqual(true);
         $this->equalTo(new IntegerLiteral(24))->shouldEqual(false);
     }
 
-    public function it_can_be_cast_as_a_float()
+    public function it_can_be_cast_as_a_float(): void
     {
         $this->asFloat()->equalTo(new FloatLiteral(23))->shouldEqual(true);
     }

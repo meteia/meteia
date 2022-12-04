@@ -6,6 +6,7 @@ namespace Meteia\Domain\ValueObjects\Money;
 
 use Meteia\Domain\ValueObjects\ImmutableValueObject;
 use Meteia\Domain\ValueObjects\Primitive\FloatLiteral;
+use NumberFormatter;
 
 class Money extends ImmutableValueObject
 {
@@ -13,13 +14,13 @@ class Money extends ImmutableValueObject
 
     protected Currency $currency;
 
-    private \NumberFormatter $formatter;
+    private NumberFormatter $formatter;
 
     public function __construct(FloatLiteral $value, Currency $currency)
     {
         $this->value = $value;
         $this->currency = $currency;
-        $this->formatter = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
+        $this->formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
     }
 
     public function __toString()

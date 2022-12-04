@@ -10,7 +10,7 @@ class Uri extends \Laminas\Diactoros\Uri implements UriInterface
 {
     public function __construct(...$segments)
     {
-        $value = join('/', $segments);
+        $value = implode('/', $segments);
         parent::__construct($value);
     }
 

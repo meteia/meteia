@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
+use Exception;
+
 trait DeferredResolve
 {
     /** @var array */
@@ -15,13 +17,13 @@ trait DeferredResolve
     /** @var string[] */
     private $mergedArgs = [];
 
-    public function clearDeferred()
+    public function clearDeferred(): void
     {
         $this->deferred = [];
         $this->mergedArgs = [];
     }
 
-    public function defer($id, $args = [])
+    public function defer($id, $args = []): void
     {
         $id = (string) $id;
         if (isset($this->fetched[$id])) {
@@ -44,7 +46,7 @@ trait DeferredResolve
         return $this->fetched[$id] ?? null;
     }
 
-    protected function store($id, $type)
+    protected function store($id, $type): void
     {
         $this->fetched[$id] = $type;
     }
@@ -65,6 +67,6 @@ trait DeferredResolve
 
     private function load(): array
     {
-        throw new \Exception('load() must be implemented by the using class');
+        throw new Exception('load() must be implemented by the using class');
     }
 }

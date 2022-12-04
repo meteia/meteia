@@ -6,7 +6,5 @@ use Meteia\EventSourcing\Contracts\EventStream;
 use Meteia\EventSourcing\PdoEventStream;
 
 return [
-    EventStream::class => function (PdoEventStream $pdoEventStream): EventStream {
-        return $pdoEventStream;
-    },
+    EventStream::class => fn (PdoEventStream $pdoEventStream): EventStream => $pdoEventStream,
 ];

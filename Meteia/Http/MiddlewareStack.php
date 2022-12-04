@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Http;
 
+use IteratorAggregate;
 use Psr\Http\Server\MiddlewareInterface;
 use Traversable;
 
-class MiddlewareStack implements \IteratorAggregate
+class MiddlewareStack implements IteratorAggregate
 {
     /**
      * @return Traversable<MiddlewareInterface>

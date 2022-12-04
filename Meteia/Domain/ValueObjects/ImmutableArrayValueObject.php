@@ -37,7 +37,7 @@ abstract class ImmutableArrayValueObject implements PrimitiveValueObject, ArrayV
 
     public function __toString()
     {
-        return join(', ', $this->values);
+        return implode(', ', $this->values);
     }
 
     public function getIterator()
@@ -47,11 +47,11 @@ abstract class ImmutableArrayValueObject implements PrimitiveValueObject, ArrayV
         }
     }
 
-    protected function guardType($values)
+    protected function guardType($values): void
     {
         foreach ($values as $value) {
             if (!is_a($value, static::TYPE)) {
-                throw new InvalidValueObjectException(get_class($value), [static::TYPE]);
+                throw new InvalidValueObjectException($value::class, [static::TYPE]);
             }
         }
     }
@@ -89,12 +89,12 @@ abstract class ImmutableArrayValueObject implements PrimitiveValueObject, ArrayV
         return $this->values[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new ImmutableValueObjectException();
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new ImmutableValueObjectException();
     }

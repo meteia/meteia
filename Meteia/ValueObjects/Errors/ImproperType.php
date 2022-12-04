@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Yeso\Exceptions;
 
-class ImproperType extends \Exception
+use Exception;
+
+class ImproperType extends Exception
 {
     public function __construct(string $type, array $allowed_types)
     {

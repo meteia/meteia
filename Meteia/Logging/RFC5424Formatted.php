@@ -8,6 +8,7 @@ use DateTime;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+
 use function gettype;
 use function is_array;
 use function is_object;

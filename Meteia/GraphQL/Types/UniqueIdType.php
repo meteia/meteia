@@ -11,6 +11,7 @@ use Meteia\GraphQL\ClientAwareErrors\InvalidScalarValue;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\ValueObjects\Identity\UniqueId;
+use Throwable;
 
 class UniqueIdType extends ScalarType implements Resolver
 {
@@ -30,7 +31,7 @@ class UniqueIdType extends ScalarType implements Resolver
         if ($valueNode instanceof StringValueNode) {
             try {
                 return $this->uniqueIdClass::fromToken($valueNode->value);
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 throw new InvalidScalarValue($t->getMessage());
             }
         }
@@ -45,7 +46,7 @@ class UniqueIdType extends ScalarType implements Resolver
         }
         try {
             return $this->uniqueIdClass::fromToken($value);
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             throw new InvalidScalarValue($t->getMessage());
         }
     }

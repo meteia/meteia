@@ -42,7 +42,7 @@ class ServerTimingProfiler implements ProfilerInterface
         return true;
     }
 
-    public function setActive(bool $active)
+    public function setActive(bool $active): void
     {
     }
 

@@ -11,6 +11,7 @@ use DateTimeInterface;
 use Exception;
 use Meteia\Cryptography\Hash;
 use Meteia\ValueObjects\Identity\UniqueId;
+use PDOException;
 use Stringable;
 
 class Database extends ExtendedPdo
@@ -75,7 +76,7 @@ class Database extends ExtendedPdo
     {
         try {
             $this->insert($table, [...$setBindings, ...$whereBindings]);
-        } catch (\PDOException $exception) {
+        } catch (PDOException $exception) {
             $setBindings = array_filter($setBindings, fn ($key) => !array_key_exists($key, $whereBindings), ARRAY_FILTER_USE_KEY);
             if (count($setBindings) === 0) {
                 // Nothing to update

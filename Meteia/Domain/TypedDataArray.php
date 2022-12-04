@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use InvalidArgumentException;
 use Meteia\Domain\Contracts\TypedData;
 use Meteia\Domain\ValueObjects\Money\PreciseUSD;
+
 use function Meteia\Library\ArrayUtils\collection_to_array;
 
 class TypedDataArray implements TypedData
@@ -71,7 +73,7 @@ class TypedDataArray implements TypedData
     {
         $value = array_get($this->data, $name, self::NOT_FOUND);
         if ($value === self::NOT_FOUND) {
-            throw new \InvalidArgumentException();
+            throw new InvalidArgumentException();
         }
 
         return $value;

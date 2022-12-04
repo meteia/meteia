@@ -26,9 +26,7 @@ class Frames
         ]);
         $frames = $this->filters->filtered($frames);
 
-        return array_map(function ($frame) {
-            return $this->frame($frame['file'], $frame['line']);
-        }, $frames);
+        return array_map(fn ($frame) => $this->frame($frame['file'], $frame['line']), $frames);
     }
 
     private function frame(string $file, int $line): Frame

@@ -17,9 +17,7 @@ class BestMatchingClass
         for ($i = \count($pathParts); $i > 1; --$i) {
             $possibleClassName = implode('\\', \array_slice($pathParts, 0, $i));
 
-            $possibleClassNames = array_map(function ($postfix) use ($possibleClassName) {
-                return $possibleClassName . $postfix;
-            }, $postFixes);
+            $possibleClassNames = array_map(fn ($postfix) => $possibleClassName . $postfix, $postFixes);
 
             foreach ($possibleClassNames as $possibleClassName) {
                 if (is_subclass_of($possibleClassName, $implementing)) {

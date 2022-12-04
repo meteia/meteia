@@ -37,7 +37,7 @@ class AuthorizedAccount
         $response = $this->client->send($request);
     }
 
-    private function getUploadUrl()
+    private function getUploadUrl(): void
     {
         dd('TODO');
         $request = new Request('GET', '', [

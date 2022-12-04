@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Application;
 
+use Exception;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\DependencyInjection\TimedContainer;
@@ -15,6 +16,8 @@ use Meteia\Performance\Timings;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
+
 use function Meteia\Http\Functions\send;
 
 class Instance
@@ -26,7 +29,7 @@ class Instance
     ) {
     }
 
-    public function run(array $middleware = [])
+    public function run(array $middleware = []): void
     {
         // ob_start();
         $timings = new Timings();
@@ -41,18 +44,16 @@ class Instance
         /** @var Container $container */
         $container = $timings->measure(
             'di.init',
-            function () use ($applicationDefinitions) {
-                return ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions);
-            },
+            fn () => ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions),
         );
         $container = new TimedContainer($timings, $container);
 
         Dulce::onFatalError(
             $container,
-            function (\Throwable $throwable) use ($applicationDefinitions) {
+            function (Throwable $throwable) use ($applicationDefinitions): void {
                 // A fresh container is needed to clear out any previous state, layout rendering in particular
                 $freshContainer = ContainerBuilder::build($this->path, $this->namespace, [
-                    \Throwable::class => $throwable,
+                    Throwable::class => $throwable,
                     ...$applicationDefinitions,
                 ]);
                 $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
@@ -71,7 +72,7 @@ class Instance
 
         $response = $requestHandler->handle($serverRequest);
         if (!$response instanceof ResponseInterface) {
-            throw new \Exception('Invalid Response');
+            throw new Exception('Invalid Response');
         }
 
         send($response);

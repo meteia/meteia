@@ -27,13 +27,9 @@ class PsrEndpoints implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $endpoint = $this->timings->measure('endpoint.lookup', function () use ($request) {
-            return $this->endpoint($request);
-        });
+        $endpoint = $this->timings->measure('endpoint.lookup', fn () => $this->endpoint($request));
 
-        return $this->timings->measure('endpoint.response', function () use ($endpoint, $request) {
-            return $endpoint->response($request);
-        });
+        return $this->timings->measure('endpoint.response', fn () => $endpoint->response($request));
     }
 
     private function endpoint(ServerRequestInterface $request): Endpoint

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL\ClientAwareErrors;
 
+use Exception;
 use GraphQL\Error\ClientAware;
 
-class InvalidScalarValue extends \Exception implements ClientAware
+class InvalidScalarValue extends Exception implements ClientAware
 {
     public function getCategory(): string
     {

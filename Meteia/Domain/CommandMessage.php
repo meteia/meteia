@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use DateTime;
 use Meteia\Domain\Contracts\AggregateRoot;
 use Meteia\Domain\Contracts\Command;
 use Meteia\Domain\Transitional\RabbitMQCommandExchange;
@@ -28,7 +29,7 @@ class CommandMessage
         $issuedCommands->append(
             $this->aggregateRootId,
             $this->command,
-            new \DateTime(),
+            new DateTime(),
         );
     }
 

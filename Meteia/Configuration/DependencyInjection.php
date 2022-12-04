@@ -10,7 +10,5 @@ use Meteia\Configuration\EnvironmentConfiguration;
 
 return [
     Configuration::class => EnvironmentConfiguration::class,
-    Inflector::class => function () {
-        return InflectorFactory::createForLanguage(Language::ENGLISH)->build();
-    },
+    Inflector::class => fn () => InflectorFactory::createForLanguage(Language::ENGLISH)->build(),
 ];

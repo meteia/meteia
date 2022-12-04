@@ -133,7 +133,7 @@ class PdoEventStream implements EventStream
         return $target;
     }
 
-    private function createSnapshot(AggregateRootId $aggregateRootId, int $aggregateSequence, $target)
+    private function createSnapshot(AggregateRootId $aggregateRootId, int $aggregateSequence, $target): void
     {
         $this->timings->add($target::class . '.snapshotUpdate', 1);
         $query = '

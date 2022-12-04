@@ -117,7 +117,7 @@ class Address
     /**
      * Function to build the more complex elements. Order can matter!
      */
-    private function buildComplexElements()
+    private function buildComplexElements(): void
     {
         $this->buildLineBreakElement('street');
         $this->replacements['%line2%'] = $this->format(AddressFormat::LINE2);
@@ -187,7 +187,7 @@ class Address
      *
      * @param $data
      */
-    private function buildZipSeparator($data)
+    private function buildZipSeparator($data): void
     {
         if (isset($data['zip4separator'])) {
             $this->replacements['%zip4separator%'] = $data['zip4separator'];
@@ -203,7 +203,7 @@ class Address
      *
      * @param $data
      */
-    private function buildStateSeparator($data)
+    private function buildStateSeparator($data): void
     {
         if (isset($data['stateSeparator'])) {
             $this->replacements['%stateSeparator%'] = $data['stateSeparator'];

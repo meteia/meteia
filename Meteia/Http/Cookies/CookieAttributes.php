@@ -130,9 +130,7 @@ class CookieAttributes
             'SameSite' => $this->sameSite,
         ]);
 
-        $kvParts = array_map(function ($key, $value) {
-            return $key . '=' . $value;
-        }, array_keys($kvParts), $kvParts);
+        $kvParts = array_map(fn ($key, $value) => $key . '=' . $value, array_keys($kvParts), $kvParts);
 
         $flagParts = array_filter([
             $this->secure,
@@ -141,6 +139,6 @@ class CookieAttributes
 
         $parts = array_merge($kvParts, $flagParts);
 
-        return join('; ', $parts);
+        return implode('; ', $parts);
     }
 }

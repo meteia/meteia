@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Meteia\Database\CommandLine;
 
+use GlobIterator;
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Meteia\Database\Database;
+use PDOException;
+use SplFileInfo;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,8 +51,8 @@ class Migrate implements Command
         $migrationIds = $this->db->fetchCol("SELECT DATE_FORMAT(id, '%Y%m%d%H%i%s') FROM migrations ORDER BY id;");
 
         $files = (string) $this->applicationPath->join('migrations', '*.sql');
-        /** @var \SplFileInfo $file */
-        foreach (new \GlobIterator($files) as $file) {
+        /** @var SplFileInfo $file */
+        foreach (new GlobIterator($files) as $file) {
             $filename = $file->getBasename('.sql');
             [$id, $type, $name] = explode('.', $filename, 3);
             if (in_array($id, $migrationIds, true)) {
@@ -66,7 +69,7 @@ class Migrate implements Command
                 $this->output->writeln(sprintf('applying : %s', $filename));
                 $this->db->exec($sql);
                 $this->output->writeln(sprintf('applied  : %s', $filename));
-            } catch (\PDOException $t) {
+            } catch (PDOException $t) {
                 if ($type === 'ni') {
                     $this->output->writeln(sprintf('ignoring error during non-idempotent migration %s', $filename));
                     $this->output->writeln(sprintf("\t%s", $t->getMessage()));

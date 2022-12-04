@@ -24,7 +24,7 @@ class FilesystemPath extends StringLiteral
         parent::__construct($value);
     }
 
-    public function delete()
+    public function delete(): void
     {
         unlink((string) $this);
     }
@@ -121,7 +121,7 @@ class FilesystemPath extends StringLiteral
     {
         $dirname = dirname((string) $this);
         if (!is_dir($dirname)) {
-            mkdir($dirname, 0777, true);
+            mkdir($dirname, 0o777, true);
         }
         file_put_contents((string) $this, $content);
     }

@@ -15,7 +15,7 @@ class ImmutableURI extends StringLiteral implements URI
     public function __construct(...$segments)
     {
         $segments = array_filter($segments);
-        $value = join('/', $segments);
+        $value = implode('/', $segments);
         parent::__construct($value);
     }
 
@@ -87,7 +87,7 @@ class ImmutableURI extends StringLiteral implements URI
     public function withPath($path)
     {
         $parts = explode('/', (string) $path);
-        $parts = array_filter($parts, function ($i) { return $i !== ''; });
+        $parts = array_filter($parts, fn ($i) => $i !== '');
         $path = '/' . implode('/', $parts);
 
         return new static($this->getZendUri()->setPath($path));
@@ -119,7 +119,7 @@ class ImmutableURI extends StringLiteral implements URI
 
     public function withUserInfo($user, $password = null)
     {
-        return new static($this->getZendUri()->setUserInfo(join(':', [$user, $password])));
+        return new static($this->getZendUri()->setUserInfo(implode(':', [$user, $password])));
     }
 
     private function getZendUri(): \Laminas\Uri\Uri

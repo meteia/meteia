@@ -115,7 +115,7 @@ class PdoMessageStream implements MessageStream
         return $target;
     }
 
-    private function createSnapshot(UniqueId $messageStreamId, MessageStreamSequence $messageStreamSequence, $target)
+    private function createSnapshot(UniqueId $messageStreamId, MessageStreamSequence $messageStreamSequence, $target): void
     {
         $this->timings->add($target::class . '.snapshotUpdate', 1);
         $query = '

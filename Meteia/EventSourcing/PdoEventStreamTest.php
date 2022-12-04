@@ -15,6 +15,7 @@ use Meteia\Performance\Timings;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use TestCase;
+
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertTrue;
 
@@ -30,27 +31,27 @@ function db(): ExtendedPdoInterface
 function init(ExtendedPdoInterface $pdo): PdoEventStream
 {
     $query = <<<SQL
-        CREATE TABLE events (
-            aggregate_root_id  BINARY(20)                         NOT NULL,
-            aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
-            event_type_id      BINARY(16)                         NOT NULL,
-            event              MEDIUMTEXT                         NOT NULL,
-            created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-            correlation_id     BINARY(20)                         NOT NULL,
-            causation_id       BINARY(20)                         NOT NULL,
-            CONSTRAINT aggregate_sequence UNIQUE (aggregate_root_id, aggregate_sequence)
-        );
-        CREATE INDEX event_type_id ON events(event_type_id);
+            CREATE TABLE events (
+                aggregate_root_id  BINARY(20)                         NOT NULL,
+                aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
+                event_type_id      BINARY(16)                         NOT NULL,
+                event              MEDIUMTEXT                         NOT NULL,
+                created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                correlation_id     BINARY(20)                         NOT NULL,
+                causation_id       BINARY(20)                         NOT NULL,
+                CONSTRAINT aggregate_sequence UNIQUE (aggregate_root_id, aggregate_sequence)
+            );
+            CREATE INDEX event_type_id ON events(event_type_id);
 
-        CREATE TABLE event_snapshots (
-            aggregate_root_id  BINARY(20)                         NOT NULL,
-            aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
-            aggregate_hash     BINARY(16)                         NOT NULL,
-            snapshot           MEDIUMTEXT                         NOT NULL,
-            created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-            CONSTRAINT aggregate_root_id UNIQUE (aggregate_root_id)
-        );
-    SQL;
+            CREATE TABLE event_snapshots (
+                aggregate_root_id  BINARY(20)                         NOT NULL,
+                aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
+                aggregate_hash     BINARY(16)                         NOT NULL,
+                snapshot           MEDIUMTEXT                         NOT NULL,
+                created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                CONSTRAINT aggregate_root_id UNIQUE (aggregate_root_id)
+            );
+        SQL;
     $pdo->exec($query);
 
     return new PdoEventStream($pdo, new MessageSerializer(), new Timings());
@@ -75,7 +76,7 @@ function init(ExtendedPdoInterface $pdo): PdoEventStream
 //    }
 // }
 
-it('appends and', function () {
+it('appends and', function (): void {
     /** @var TestCase $this */
 
     // Arrange
@@ -102,7 +103,7 @@ it('appends and', function () {
     $tar->assertReplayed();
 });
 
-it('supports snapshots', function () {
+it('supports snapshots', function (): void {
     /** @var TestCase $this */
 
     // Arrange
@@ -166,7 +167,7 @@ class CountingAggregateRoot implements EventSourced
     ) {
     }
 
-    public function commitInto(UnitOfWorkContext $unitOfWorkContext)
+    public function commitInto(UnitOfWorkContext $unitOfWorkContext): void
     {
     }
 
@@ -174,7 +175,7 @@ class CountingAggregateRoot implements EventSourced
         AggregateRootId $aggregateRootId,
         DomainEvent $event,
         int $eventSequence,
-    ) {
+    ): void {
         // FIXME: Better way to force snapshots
         usleep(1000);
         assertEquals($this->sequence + 1, $eventSequence);
@@ -187,12 +188,12 @@ class CountingAggregateRoot implements EventSourced
         $this->wakeupCalled = true;
     }
 
-    public function assertReplayed()
+    public function assertReplayed(): void
     {
         assertEquals($this->expectedEvents, $this->actualEvents);
     }
 
-    public function assertSnapshot()
+    public function assertSnapshot(): void
     {
         assertTrue($this->wakeupCalled);
     }

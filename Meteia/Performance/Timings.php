@@ -22,9 +22,7 @@ class Timings
 
     public function all(): array
     {
-        return array_map_assoc(function ($k, $v) {
-            return [$k => round($v, 2)];
-        }, $this->timings);
+        return array_map_assoc(fn ($k, $v) => [$k => round($v, 2)], $this->timings);
     }
 
     public function measure(string $category, callable $c)
