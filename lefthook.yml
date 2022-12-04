@@ -14,6 +14,7 @@ pre-commit:
     nixpkgs-fmt:
       glob: "*.nix"
       run: nixpkgs-fmt {staged_files} && git add {staged_files}
+      exclude: "composer-project.nix"
     php-cs-fixer:
       glob: "*.{php,tpl}"
       run: php-cs-fixer --config=.php-cs-fixer.php fix {staged_files} && git add {staged_files}
