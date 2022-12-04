@@ -12,6 +12,7 @@ use function Meteia\Polyfills\common_prefix_length;
 class ApplicationResources
 {
     private array $knownFiles = [];
+    private bool $useManifest = false;
 
     private readonly string $prefix;
 
@@ -24,8 +25,14 @@ class ApplicationResources
         $relativeManifest = substr((string) $manifest, $commonLen);
         $this->prefix = '/' . trim(dirname($relativeManifest), '/');
         if ($manifest->isReadable()) {
+            $this->useManifest = true;
             $this->knownFiles = json_decode($manifest->read(), true, 512, JSON_THROW_ON_ERROR);
         }
+    }
+
+    public function useManifest(): bool
+    {
+        return $this->useManifest;
     }
 
     public function requireEntryModule(mixed $target, Head $head, bool $isReact = false): void
