@@ -1,0 +1,37 @@
+# https://taskfile.dev
+
+# Tasks are for local development and testing only.
+# The actual build done with Nix is more deterministic so things
+# like `composer install` don't work as expected there.
+
+version: '3'
+
+tasks:
+  lint:
+    deps: [composer]
+    cmds:
+      - php-cs-fixer fix
+
+  composer:
+    cmds:
+      - composer update
+    sources:
+      - composer.json
+      - composer.lock
+
+  node_modules:
+    cmds:
+      - yarn install
+    sources:
+      - package.json
+      - yarn.lock
+
+  monorepo:
+    deps: [composer]
+    sources:
+      - composer.json
+      - Meteia/*/composer.json
+    generates:
+      - composer.json
+    cmds:
+      - monorepo-builder merge

@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
     utils.url = "github:numtide/flake-utils";
   };
 
@@ -29,6 +29,9 @@
             php.packages.composer
             php.packages.php-cs-fixer
             php.packages.phpmd
+
+            lefthook
+            go-task
           ];
         };
       }
