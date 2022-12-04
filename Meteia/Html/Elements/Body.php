@@ -13,8 +13,12 @@ class Body
 {
     use PhpTemplate;
 
-    public function __construct(public Header $header, public Stringable $content, public Footer $footer)
-    {
+    public function __construct(
+        public Header $header,
+        public Stringable $content,
+        public Footer $footer,
+        public string $className = '',
+    ) {
     }
 
     public function content(Stringable $content): void

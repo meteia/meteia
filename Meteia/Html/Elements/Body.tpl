@@ -1,5 +1,5 @@
-<body>
-<?= $this->header ?>
-<?= $this->content ?>
-<?= $this->footer ?>
+<body class="<?= $this->className; ?>">
+<?= $this->header; ?>
+<?= $this->content; ?>
+<?= $this->footer; ?>
 </body>

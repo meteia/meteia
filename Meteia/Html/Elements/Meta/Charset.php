@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Meteia\Html\Elements\Meta;
 
 use Meteia\Bluestone\PhpTemplate;
+use Stringable;
 
-class Charset
+class Charset implements Stringable
 {
     use PhpTemplate;
 

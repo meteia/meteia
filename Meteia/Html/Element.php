@@ -12,8 +12,8 @@ trait Element
         $tagName = array_pop($tagName);
         $tagName = strtolower($tagName);
 
-        $attrs = get_object_vars($this);
-        $attrs = array_filter($attrs);
+        $originalAttrs = get_object_vars($this);
+        $attrs = array_filter($originalAttrs, fn ($value, $key) => !in_array($key, ['children'], true), ARRAY_FILTER_USE_BOTH);
         $attrs = array_map(
             function ($k, $v) {
                 if (is_bool($v) && $v) {
@@ -27,6 +27,6 @@ trait Element
         );
         $attrs = implode(' ', $attrs);
 
-        return sprintf('<%s %s /></%s>' . PHP_EOL, $tagName, $attrs, $tagName);
+        return sprintf('<%s %s />%s</%s>' . PHP_EOL, $tagName, $attrs, $originalAttrs['children'] ?? '', $tagName);
     }
 }

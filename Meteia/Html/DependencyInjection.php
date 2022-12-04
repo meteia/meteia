@@ -14,7 +14,5 @@ return [
     Header::class => PlaceholderHeader::class,
     Footer::class => PlaceholderFooter::class,
     Layout::class => PlaceholderLayout::class,
-    Title::class => function () {
-        return new Title('Untitled');
-    },
+    Title::class => fn () => new Title('Untitled'),
 ];
