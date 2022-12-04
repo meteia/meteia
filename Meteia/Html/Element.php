@@ -12,7 +12,7 @@ trait Element
         $tagName = array_pop($tagName);
         $tagName = strtolower($tagName);
 
-        $originalAttrs = get_object_vars($this);
+        $originalAttrs = array_filter(get_object_vars($this), fn ($val) => !empty($val));
         $attrs = array_filter($originalAttrs, fn ($value, $key) => !in_array($key, ['children'], true), ARRAY_FILTER_USE_BOTH);
         $attrs = array_map(
             function ($k, $v) {
