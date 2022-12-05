@@ -35,3 +35,4 @@ tasks:
       - composer.json
     cmds:
       - monorepo-builder merge
+      - composer update

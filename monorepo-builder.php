@@ -7,7 +7,7 @@ use Symplify\MonorepoBuilder\Config\MBConfig;
 
 return static function (MBConfig $config): void {
     $config->packageDirectories([
-        __DIR__ . '/Meteia',
+        implode(DIRECTORY_SEPARATOR, [__DIR__, 'Meteia']),
     ]);
 
     $config->dataToAppend([
