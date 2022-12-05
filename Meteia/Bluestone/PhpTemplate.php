@@ -9,7 +9,7 @@ use ReflectionClass;
 
 trait PhpTemplate
 {
-    public function __toString()
+    public function __toString(): string
     {
         ob_start();
         include $this->_getTemplatePath(get_called_class());

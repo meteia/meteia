@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Authentication\Oauth;
 
 use Carbon\Carbon;
+use DateTime;
 use DateTimeInterface;
 
 class AccessToken
@@ -21,7 +22,7 @@ class AccessToken
     public static function fromJsonString(string $json): AccessToken
     {
         $r = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
-        $expires = (new Carbon())->addSeconds($r->expires_in)->subMinute();
+        $expires = (new DateTime())->modify("+$r->expires_in seconds");
 
         return new AccessToken($r->access_token, $r->token_type, $expires, $r->refresh_token, $r->scope);
     }

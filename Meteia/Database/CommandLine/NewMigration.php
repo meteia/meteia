@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Database\CommandLine;
 
-use Doctrine\Inflector\Inflector;
 use Exception;
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
+use Meteia\Library\StringCase;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,7 +22,6 @@ class NewMigration implements Command
         private readonly InputInterface $input,
         private readonly OutputInterface $output,
         private readonly ApplicationPath $applicationPath,
-        private readonly Inflector $inflector,
     ) {
     }
 
@@ -44,7 +43,7 @@ class NewMigration implements Command
 
         $filename = $this->input->getArgument(self::ARG_NAME);
         $filename = pathinfo($filename, PATHINFO_FILENAME);
-        $filename = $this->inflector->tableize($filename) . '.sql';
+        $filename = StringCase::snake($filename) . '.sql';
         $filename = mb_substr($filename, 0, 63);
         $filename = implode('.', [$id, $migrationType, $filename]);
         $target = $this->applicationPath->join('migrations', $filename);

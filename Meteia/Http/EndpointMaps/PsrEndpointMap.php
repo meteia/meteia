@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Meteia\Http\EndpointMaps;
 
-use Doctrine\Inflector\Inflector;
 use Exception;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Http\Endpoint;
 use Meteia\Http\EndpointMap;
 use Meteia\Http\Host;
+use Meteia\Library\StringCase;
 use Meteia\ValueObjects\Identity\Uri;
 
 class PsrEndpointMap implements EndpointMap
 {
     public function __construct(
-        private readonly Inflector $inflector,
         private readonly ApplicationNamespace $namespace,
         private readonly Host $host,
     ) {
@@ -26,7 +25,7 @@ class PsrEndpointMap implements EndpointMap
         $parts = array_values(array_filter(explode('/', $path)));
         array_splice($parts, 1, 0, 'Endpoints');
         array_unshift($parts, (string) $this->namespace);
-        $parts = array_map($this->inflector->classify(...), $parts);
+        $parts = array_map(StringCase::pascal(...), $parts);
 
         return implode('\\', $parts);
     }

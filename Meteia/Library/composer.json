@@ -1,0 +1,12 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Meteia\\Library\\": "."
+        }
+    },
+    "name": "meteia/library",
+    "require": {
+        "ext-intl": "*",
+        "php": "^8.1"
+    }
+}

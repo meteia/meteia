@@ -1,11 +1,11 @@
 {
-    "name": "meteia/command-line",
-    "require": {
-      "symfony/console": ">=v6.1.4"
-    },
     "autoload": {
         "psr-4": {
             "Meteia\\CommandLine\\": "."
         }
+    },
+    "name": "meteia/command-line",
+    "require": {
+        "symfony/console": "^6.2.0"
     }
 }
