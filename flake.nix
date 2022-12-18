@@ -4,8 +4,14 @@
     utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, utils, ... }:
-    utils.lib.eachDefaultSystem (system:
+  outputs =
+    { self
+    , nixpkgs
+    , utils
+    , ...
+    }:
+    utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -14,10 +20,17 @@
         };
 
         php = pkgs.php81.buildEnv {
-          extensions = { enabled, all, ... }: with all; enabled ++ [
-            event
-            imagick
-          ];
+          extensions =
+            { enabled
+            , all
+            , ...
+            }:
+              with all;
+              enabled
+              ++ [
+                event
+                imagick
+              ];
         };
       in
       {
