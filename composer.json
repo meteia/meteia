@@ -8,6 +8,7 @@
     "autoload": {
         "files": [
             "Meteia/Dulce/Functions/dd.php",
+            "Meteia/Html/Elements.php",
             "Meteia/Http/Functions/send.php",
             "Meteia/Polyfills/Arrays.php",
             "Meteia/Polyfills/Strings.php"
@@ -26,6 +27,7 @@
             "Meteia\\Files\\": "Meteia/Files/.",
             "Meteia\\GraphQL\\": "Meteia/GraphQL/.",
             "Meteia\\Html\\": "Meteia/Html/.",
+            "Meteia\\Htmx\\": "Meteia/Htmx/.",
             "Meteia\\Http\\": "Meteia/Http/.",
             "Meteia\\Library\\": "Meteia/Library/.",
             "Meteia\\Logging\\": "Meteia/Logging/.",
@@ -60,6 +62,7 @@
         "meteia/files": "self.version",
         "meteia/graphql": "self.version",
         "meteia/html": "self.version",
+        "meteia/htmx": "self.version",
         "meteia/http": "self.version",
         "meteia/library": "self.version",
         "meteia/logging": "self.version",

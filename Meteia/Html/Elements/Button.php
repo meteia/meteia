@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Html\Element;
+use Meteia\Html\CustomElement;
 use Stringable;
 
-class Button
+class Button extends CustomElement
 {
-    use Element;
-
-    public function __construct(
-        public Stringable|string $children,
-        public ?string $class = null,
-    ) {
+    public function __construct(array $attributes = [], Stringable|string|null $children = null)
+    {
+        parent::__construct('button', $attributes, $children);
     }
 }

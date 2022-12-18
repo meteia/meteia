@@ -45,7 +45,7 @@ abstract class StringCase
      *
      * @license https://github.com/doctrine/inflector/blob/2.0.x/LICENSE
      */
-    public function kebab(string $string): string
+    public static function kebab(string $string): string
     {
         $rules = implode(' ', [
             ':: Any-Latin;',
@@ -56,7 +56,6 @@ abstract class StringCase
         ]);
         $transliterator = Transliterator::createFromRules($rules, Transliterator::FORWARD);
         $normalized = $transliterator->transliterate($string);
-        $lowered = mb_strtolower($normalized);
 
         $replacements = [
             '/\W/' => ' ',
@@ -65,7 +64,7 @@ abstract class StringCase
             '/[^A-Z^a-z^0-9^\/]+/' => '-',
         ];
 
-        $urlized = $lowered;
+        $urlized = $normalized;
 
         foreach ($replacements as $pattern => $replacement) {
             $replaced = preg_replace($pattern, $replacement, $urlized);
@@ -76,11 +75,12 @@ abstract class StringCase
 
             $urlized = $replaced;
         }
+        $lowered = mb_strtolower($urlized);
 
-        return trim($urlized, '-');
+        return trim($lowered, '-');
     }
 
-    public function screamingKebab(string $string): string
+    public static function screamingKebab(string $string): string
     {
         return mb_strtoupper(self::kebab($string));
     }

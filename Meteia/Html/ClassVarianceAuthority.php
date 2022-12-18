@@ -16,4 +16,9 @@ class ClassVarianceAuthority implements ClassName
 
         return implode(' ', [...$this->core, ...$activeVariants]);
     }
+
+    public function attribute(array $props): ClassAttribute
+    {
+        return new ClassAttribute($this->use($props));
+    }
 }

@@ -4,34 +4,33 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Bluestone\PhpTemplate;
+use Stringable;
 
-class Title
+class Title implements Stringable
 {
-    use PhpTemplate;
+    protected string $prefix;
 
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    /**
-     * @var string
-     */
-    protected $suffix;
+    protected string $suffix;
 
     public function __construct(private string $title)
     {
     }
 
-    public function set(string $title): void
+    public function __toString(): string
     {
-        $this->title = $title;
+        return <<<EOF
+            <title>$this->title</title>
+            EOF;
     }
 
     public function prefix(string $prefix): void
     {
         $this->prefix = $prefix;
+    }
+
+    public function set(string $title): void
+    {
+        $this->title = $title;
     }
 
     public function suffix(string $suffix): void

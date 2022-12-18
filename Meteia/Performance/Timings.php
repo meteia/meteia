@@ -22,18 +22,18 @@ class Timings
 
     public function all(): array
     {
-        return array_map_assoc(fn ($k, $v) => [$k => round($v, 2)], $this->timings);
+        return array_map_assoc(fn ($k, $v) => [$k => round($v, 4)], $this->timings);
     }
 
     public function measure(string $category, callable $c)
     {
         $category = $this->filteredCategory($category);
         ++$this->timeDepth;
-        $startTime = microtime(true) * 1000;
+        $startTime = hrtime(true);
         $result = $c();
-        $endTime = microtime(true) * 1000;
+        $endTime = hrtime(true);
         --$this->timeDepth;
-        $duration = $endTime - $startTime - $this->childDurations;
+        $duration = (($endTime - $startTime) / 1000000) - $this->childDurations;
         $this->childDurations += $duration;
         if ($this->timeDepth === 0) {
             $this->childDurations = 0;

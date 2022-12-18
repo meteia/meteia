@@ -7,12 +7,13 @@ namespace Meteia\Classy;
 use Generator;
 use IteratorAggregate;
 use Meteia\ValueObjects\Identity\FilesystemPath;
+use Stringable;
 
 class PsrClasses implements IteratorAggregate
 {
     public function __construct(
         private readonly FilesystemPath $baseDirectory,
-        private readonly string $namespacePrefix,
+        private readonly string|Stringable $namespacePrefix,
         private readonly array $regex,
     ) {
     }

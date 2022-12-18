@@ -1,10 +1,12 @@
 {
-    "name": "meteia/html",
-    "require": {
-    },
     "autoload": {
+        "files": [
+            "Elements.php"
+        ],
         "psr-4": {
             "Meteia\\Html\\": "."
         }
-    }
+    },
+    "name": "meteia/html",
+    "require": {}
 }
