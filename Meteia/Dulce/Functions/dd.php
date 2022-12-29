@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Meteia\Http\Responses\JsonResponse;
-
 use function Meteia\Http\Functions\send;
 use function Meteia\Polyfills\common_prefix_length;
 
@@ -31,7 +30,7 @@ if (!function_exists('dump_value')) {
 }
 
 if (!function_exists('jdd')) {
-    function jdd(): void
+    function jdd(): never
     {
         $stackTrace = debug_backtrace();
         $stackTrace = array_slice(array_filter($stackTrace, fn ($frame) => isset($frame['file'], $frame['line']) && !str_contains($frame['file'], '/vendor/')), 0);
