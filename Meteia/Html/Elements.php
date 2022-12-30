@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
+function html(string $raw): string
+{
+    return htmlspecialchars($raw, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5);
+}
+
 function attributes(array $attributes): string
 {
     if (count($attributes) === 0) {
         return '';
     }
-    $attributes = array_filter($attributes, fn ($val) => !empty($val));
+    $attributes = array_filter($attributes, fn ($val) => !($val === null || $val === false));
     $attributes = array_map(
         function ($k, $v) {
             if (is_bool($v) && $v) {
                 return $k;
             }
 
-            return sprintf('%s="%s"', $k, htmlentities((string) $v, ENT_HTML5 | ENT_COMPAT, 'UTF-8'));
+            return sprintf('%s="%s"', $k, html((string) $v));
         },
         array_keys($attributes),
         $attributes,
