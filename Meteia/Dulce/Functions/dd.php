@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Meteia\Http\Responses\JsonResponse;
+
 use function Meteia\Http\Functions\send;
 use function Meteia\Polyfills\common_prefix_length;
 
