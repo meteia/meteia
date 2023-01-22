@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Identity;
 
+use JsonSerializable;
 use Psr\Http\Message\UriInterface;
 
-class Uri extends \Laminas\Diactoros\Uri implements UriInterface
+class Uri extends \Laminas\Diactoros\Uri implements UriInterface, JsonSerializable
 {
     public function __construct(...$segments)
     {
@@ -14,14 +15,10 @@ class Uri extends \Laminas\Diactoros\Uri implements UriInterface
         parent::__construct($value);
     }
 
-    // public function withPath($path)
-    // {
-    //    if (strpos((string)$path, '/') !== 0) {
-    //        $path = '/' . (string)$path;
-    //    }
-    //
-    //    return new static($this->getZendUri()->setPath($path));
-    // }
+    public function jsonSerialize(): string
+    {
+        return (string) $this;
+    }
 
     public function withQueryData(array $kv): self
     {
@@ -31,22 +28,4 @@ class Uri extends \Laminas\Diactoros\Uri implements UriInterface
 
         return $this->withQuery($qs);
     }
-
-    //
-    // public function withScheme($scheme)
-    // {
-    //    return new static($this->getZendUri()->setScheme($scheme));
-    // }
-    //
-    //
-    // public function withUserInfo($user, $password = null)
-    // {
-    //    return new static($this->getZendUri()->setUserInfo(join(':', [$user, $password])));
-    // }
-    //
-    //
-    // private function getZendUri()
-    // {
-    //    return new \Laminas\Diactoros\Uri($this->value);
-    // }
 }
