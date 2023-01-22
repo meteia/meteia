@@ -25,12 +25,12 @@ class Dulce
             $errorHandler = $container->get(Dulce::class);
             $errorHandler->onShutdown($callback);
         });
-        set_error_handler(function (...$args) use ($container, $callback): void {
-            /** @var self $errorHandler */
-            $errorHandler = $container->get(Dulce::class);
-            $args[] = $callback;
-            $errorHandler->onError(...$args);
-        });
+        //set_error_handler(function (...$args) use ($container, $callback): void {
+        //    /** @var self $errorHandler */
+        //    $errorHandler = $container->get(Dulce::class);
+        //    $args[] = $callback;
+        //    $errorHandler->onError(...$args);
+        //});
         set_exception_handler(function (Throwable $throwable) use ($callback): void {
             $callback($throwable);
         });
