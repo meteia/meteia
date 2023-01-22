@@ -10,8 +10,9 @@ class JsonPostBody implements ServerRequestBody
 {
     private readonly array $data;
 
-    public function __construct(RequestBody $requestBody)
-    {
+    public function __construct(
+        RequestBody $requestBody,
+    ) {
         $this->data = json_decode($requestBody->content(), true, 512, JSON_THROW_ON_ERROR);
     }
 

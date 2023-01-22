@@ -24,7 +24,7 @@ class SimpleLog implements MiddlewareInterface
         $logFile = $this->repositoryPath->join('http.log');
         $line = PHP_EOL . sprintf('--> %s %s', $request->getMethod(), $request->getUri()) . PHP_EOL;
         if (strlen($this->requestBody->content())) {
-            $line .= "  " . $this->requestBody->content() . PHP_EOL;
+            $line .= '  ' . $this->requestBody->content() . PHP_EOL;
         }
         file_put_contents((string) $logFile, $line, FILE_APPEND | LOCK_EX);
 

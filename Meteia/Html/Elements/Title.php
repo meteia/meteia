@@ -18,7 +18,7 @@ class Title implements Stringable
 
     public function __toString(): string
     {
-        return "<title>" . html($this->title) . "</title>";
+        return '<title>' . html($this->title) . '</title>';
     }
 
     public function prefix(string $prefix): void
