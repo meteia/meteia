@@ -95,6 +95,7 @@
         "psr/http-server-middleware": "^1.0.1",
         "psr/log": "^3.0.0",
         "symfony/console": "^6.2.0",
+        "symfony/serializer": "^6.2.3",
         "tuupola/base62": "^2.1.0",
         "webonyx/graphql-php": "^14.11.6"
     },
