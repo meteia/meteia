@@ -11,9 +11,9 @@ pre-commit:
     sort-json:
       glob: "*.json"
       run: sort-json {staged_files} && git add {staged_files}
-    nixpkgs-fmt:
+    alejandra:
       glob: "*.nix"
-      run: nixpkgs-fmt {staged_files} && git add {staged_files}
+      run: alejandra {staged_files} && git add {staged_files}
       exclude: "composer-project.nix"
     php-cs-fixer:
       glob: "*.{php,tpl}"
