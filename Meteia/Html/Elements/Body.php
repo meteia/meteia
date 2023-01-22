@@ -12,8 +12,8 @@ class Body implements Stringable
 {
     public function __construct(
         public Header $header,
-        public Stringable $content,
         public Footer $footer,
+        public Stringable|string $content = '',
         public string $className = '',
     ) {
     }
@@ -31,7 +31,7 @@ class Body implements Stringable
             EOF;
     }
 
-    public function content(Stringable $content): void
+    public function content(Stringable|string $content): void
     {
         $this->content = $content;
     }
