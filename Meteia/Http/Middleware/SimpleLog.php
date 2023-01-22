@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Http\Middleware;
 
-use Meteia\Application\RepositoryPath;
+use Meteia\Http\Configuration\LogPath;
 use Meteia\Http\RequestBody;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,13 +15,13 @@ class SimpleLog implements MiddlewareInterface
 {
     public function __construct(
         private readonly RequestBody $requestBody,
-        private readonly RepositoryPath $repositoryPath,
+        private readonly LogPath $logPath,
     ) {
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $logFile = $this->repositoryPath->join('http.log');
+        $logFile = $this->logPath->join('http.log');
         $line = PHP_EOL . sprintf('--> %s %s', $request->getMethod(), $request->getUri()) . PHP_EOL;
         if (strlen($this->requestBody->content())) {
             $line .= '  ' . $this->requestBody->content() . PHP_EOL;

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Meteia\Application\RepositoryPath;
 use Meteia\Configuration\Configuration;
+use Meteia\Http\Configuration\LogPath;
 use Meteia\Http\Csrf\CsrfSecretKey;
 use Meteia\Http\EndpointMap;
 use Meteia\Http\EndpointMaps\PsrEndpointMap;
@@ -53,4 +55,5 @@ return [
 
         return CsrfSecretKey::fromToken($value);
     },
+    LogPath::class => fn (Configuration $configuration, RepositoryPath $repositoryPath): LogPath => new LogPath($configuration->string('METEIA_LOG_PATH', (string) $repositoryPath)),
 ];
