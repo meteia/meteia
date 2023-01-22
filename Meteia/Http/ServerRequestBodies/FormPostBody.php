@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace Meteia\Http\ServerRequestBodies;
 
-use Psr\Http\Message\ServerRequestInterface;
+use Meteia\Http\RequestBody;
 
 class FormPostBody implements ServerRequestBody
 {
-    /**
-     * @var array
-     */
-    private $data;
+    private readonly array $data;
 
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(RequestBody $request)
     {
-        $contents = $request->getBody()->getContents();
+        $contents = $request->content();
         parse_str($contents, $data);
         $this->data = $data;
     }
 
-    public function all()
+    public function all(): array
     {
         return $this->data;
     }

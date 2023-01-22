@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Meteia\Http\ServerRequestBodies;
 
-use Psr\Http\Message\ServerRequestInterface;
+use Meteia\Http\RequestBody;
 
 class JsonPostBody implements ServerRequestBody
 {
-    private array $data;
+    private readonly array $data;
 
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(RequestBody $requestBody)
     {
-        $contents = $request->getBody()->getContents();
-        $this->data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+        $this->data = json_decode($requestBody->content(), true, 512, JSON_THROW_ON_ERROR);
     }
 
-    public function value(string $name, $default)
+    public function value(string $name, $default): mixed
     {
         return $this->data[$name] ?? $default;
     }
