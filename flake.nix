@@ -4,36 +4,34 @@
     utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
-    { self
-    , nixpkgs
-    , utils
-    , ...
-    }:
+  outputs = {
+    self,
+    nixpkgs,
+    utils,
+    ...
+  }:
     utils.lib.eachDefaultSystem (
-      system:
-      let
+      system: let
         pkgs = import nixpkgs {
           inherit system;
-          config = { };
-          overlays = [ ];
+          config = {};
+          overlays = [];
         };
 
         php = pkgs.php81.buildEnv {
-          extensions =
-            { enabled
-            , all
-            , ...
-            }:
-              with all;
+          extensions = {
+            enabled,
+            all,
+            ...
+          }:
+            with all;
               enabled
               ++ [
                 event
                 imagick
               ];
         };
-      in
-      {
+      in {
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             nodejs
