@@ -13,7 +13,7 @@ pre-commit:
       run: sort-json {staged_files} && git add {staged_files}
     alejandra:
       glob: "*.nix"
-      run: alejandra {staged_files} && git add {staged_files}
+      run: alejandra --quiet {staged_files} && git add {staged_files}
       exclude: "composer-project.nix"
     php-cs-fixer:
       glob: "*.{php,tpl}"
