@@ -38,7 +38,10 @@ class PsrEndpointMap implements EndpointMap
         $parts = explode('\\', $endpoint);
         array_shift($parts);
         array_splice($parts, 1, 1);
-        if ($parts[count($parts) - 1] === 'Index') {
+        $segmentCount = count($parts);
+        if ($parts[$segmentCount - 1] === 'Index') {
+            array_pop($parts);
+        } elseif ($segmentCount > 1 && $parts[$segmentCount - 1] === $parts[$segmentCount - 2]) {
             array_pop($parts);
         }
 
