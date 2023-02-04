@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Meteia\Http\Responses\JsonResponse;
-
 use function Meteia\Http\Functions\send;
 use function Meteia\Polyfills\common_prefix_length;
 
@@ -11,6 +10,9 @@ if (!function_exists('dump_value')) {
     function dump_value(mixed $value, array &$seen = []): mixed
     {
         if (is_object($value)) {
+            if ($value instanceof \DateTimeInterface) {
+                return $value->format(\DateTimeInterface::RFC3339);
+            }
             $objectHash = spl_object_hash($value);
             if (isset($seen[$objectHash])) {
                 return '[object ' . $value::class . ' ' . $objectHash . ']';
