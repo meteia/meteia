@@ -27,10 +27,7 @@ abstract class UniqueId implements HasPrefix, Stringable, JsonSerializable
             'expected ' . static::LEN_TIMESTAMP + static::LEN_RANDOM . ' got ' . strlen($bytes),
         );
         $token = (new Base62())->encode($this->bytes);
-        $padding = static::LEN_ENCODED - strlen($token);
-        if ($padding > 0) {
-            $token = str_repeat('0', $padding) . $token;
-        }
+        $token = str_pad($token, static::LEN_ENCODED, '0', STR_PAD_LEFT);
         assert(strlen($token) === static::LEN_ENCODED, 'expected ' . static::LEN_ENCODED . ' got ' . strlen($token));
         $this->token = implode('_', [static::prefix(), $token]);
     }
@@ -46,7 +43,8 @@ abstract class UniqueId implements HasPrefix, Stringable, JsonSerializable
 
     public static function fromToken(string $token): static
     {
-        [$prefix, $token] = explode('_', $token, 2);
+        // Discard any additional data on the token (e.g. a selector)
+        [$prefix, $token] = explode('_', $token, 3);
         assert($prefix === static::prefix(), 'Expected token with prefix ' . static::prefix());
         $token = ltrim($token, '0');
         $data = (new Base62())->decode($token);
@@ -59,7 +57,7 @@ abstract class UniqueId implements HasPrefix, Stringable, JsonSerializable
         return new static(hex2bin($hex));
     }
 
-    public function equalTo(UniqueId $other)
+    public function equalTo(UniqueId $other): bool
     {
         return hash_equals($this->bytes, $other->bytes);
     }
@@ -76,6 +74,18 @@ abstract class UniqueId implements HasPrefix, Stringable, JsonSerializable
     public function hex(): string
     {
         return bin2hex($this->bytes);
+    }
+
+    public function hash(): string
+    {
+        $hash = $this->binaryHash();
+
+        return implode('_', [static::prefix(), 'hash', (new Base62())->encode($hash)]);
+    }
+
+    public function binaryHash(): string
+    {
+        return hash('sha256', $this->bytes, true);
     }
 
     public function __toString(): string
