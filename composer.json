@@ -70,14 +70,8 @@
         "meteia/polyfills": "self.version",
         "meteia/value-objects": "self.version"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/jasonrm/Aura.Sql"
-        }
-    ],
     "require": {
-        "aura/sql": "dev-psr-log-v3",
+        "aura/sql": "^5.0.2",
         "ext-gmp": "*",
         "ext-intl": "*",
         "ext-pdo": "*",
