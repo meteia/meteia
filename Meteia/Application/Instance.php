@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Application;
 
-use Exception;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\DependencyInjection\TimedContainer;
@@ -12,6 +11,7 @@ use Meteia\Dulce\Dulce;
 use Meteia\Dulce\Endpoints\ErrorEndpoint;
 use Meteia\Http\Middleware\PsrEndpoints;
 use Meteia\Http\Middleware\ServerTimingHeader;
+use Meteia\Http\Responses\JsonResponse;
 use Meteia\Performance\Timings;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,12 +20,12 @@ use Throwable;
 
 use function Meteia\Http\Functions\send;
 
-class Instance
+readonly class Instance
 {
     public function __construct(
-        private ApplicationNamespace $namespace,
+        private  ApplicationNamespace $namespace,
         private ApplicationPath $path,
-        private ApplicationPublicDir $publicDir,
+        private  ApplicationPublicDir $publicDir,
     ) {
     }
 
@@ -71,9 +71,6 @@ class Instance
         $serverRequest = $container->get(ServerRequestInterface::class);
 
         $response = $requestHandler->handle($serverRequest);
-        if (!$response instanceof ResponseInterface) {
-            throw new Exception('Invalid Response');
-        }
 
         send($response);
     }
