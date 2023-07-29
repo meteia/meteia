@@ -270,8 +270,6 @@ class CountryCodeName
     }
 
     /**
-     * @param $name
-     *
      * @return StringLiteral
      */
     public static function getTwoLetterCode($name)

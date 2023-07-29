@@ -21,9 +21,9 @@ use function Meteia\Http\Functions\send;
 readonly class Instance
 {
     public function __construct(
-        private  ApplicationNamespace $namespace,
+        private ApplicationNamespace $namespace,
         private ApplicationPath $path,
-        private  ApplicationPublicDir $publicDir,
+        private ApplicationPublicDir $publicDir,
     ) {
     }
 

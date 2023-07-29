@@ -116,8 +116,6 @@ class Street
     /**
      * Ensures that the minimal data is collected and that all values exsist.
      *
-     * @param $data
-     *
      * @return array
      */
     private function buildBasicElements($data)

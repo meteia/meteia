@@ -154,8 +154,6 @@ class ComplexStringLiteral
     /**
      * Converts an object to a string.
      *
-     * @param $objectInQuestion
-     *
      * @return string
      */
     private function getStringValue($objectInQuestion)

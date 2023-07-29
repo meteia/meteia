@@ -17,8 +17,6 @@ class Address
 
     /**
      * Returns a new Address object.
-     *
-     * @param $addressInformation
      */
     public function __construct($addressInformation)
     {
@@ -143,8 +141,6 @@ class Address
     /**
      * Ensures that the minimal data is collected and that all values exsist.
      *
-     * @param $data
-     *
      * @return array
      */
     private function buildBasicElements($data)
@@ -184,8 +180,6 @@ class Address
 
     /**
      * since the zip separator is conditional on some other data, build it later.
-     *
-     * @param $data
      */
     private function buildZipSeparator($data): void
     {
@@ -200,8 +194,6 @@ class Address
 
     /**
      * since the state separator is conditional on some other data, build it later.
-     *
-     * @param $data
      */
     private function buildStateSeparator($data): void
     {

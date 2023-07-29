@@ -8,10 +8,8 @@ use Meteia\RabbitMQ\Contracts\Message;
 
 class RabbitMQCommandMessage implements Message
 {
-    /** @var */
     private $body;
 
-    /** @var */
     private $properties;
 
     public function __construct($body, $properties)
