@@ -20,7 +20,11 @@ class RequestBody
     public function content(): string
     {
         if (is_null($this->content)) {
-            $this->content = $this->request->getBody()->getContents();
+            $body = $this->request->getBody();
+            if ($body->isSeekable()) {
+                $body->rewind();
+            }
+            $this->content = $body->getContents();
         }
 
         return $this->content;

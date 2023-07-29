@@ -15,7 +15,11 @@ class ParseBody implements MiddlewareInterface
     {
         $ct = implode('', $request->getHeader('Content-Type'));
         if (str_contains($ct, 'application/json')) {
-            $contents = $request->getBody()->getContents();
+            $body = $request->getBody();
+            if ($body->isSeekable()) {
+                $body->rewind();
+            }
+            $contents = $body->getContents();
             $json = json_decode($contents, true, 256, JSON_THROW_ON_ERROR);
             $request = $request->withParsedBody($json);
         }
