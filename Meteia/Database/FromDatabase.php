@@ -54,6 +54,9 @@ trait FromDatabase
                     if ($expectedTypeClass === 'bool') {
                         return fn (object $row) => (bool) $row->$columnName;
                     }
+                    if ($expectedTypeClass === 'array') {
+                        return fn (object $row) => json_decode($row->$columnName, true);
+                    }
 
                     return fn (object $row) => $row->$columnName;
                 },
