@@ -38,7 +38,7 @@ class Migrate implements Command
         $retryCount = 0;
         while (true) {
             try {
-                $this->db->exec('SELECT 1');
+                $this->db->fetchValue('SELECT 1');
                 break;
             } catch (PDOException $exception) {
                 $retryCount++;
