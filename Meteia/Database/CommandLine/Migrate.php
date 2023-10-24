@@ -35,6 +35,23 @@ class Migrate implements Command
 
     public function execute(): void
     {
+        $retryCount = 0;
+        while (true) {
+            try {
+                $this->db->exec('SELECT 1');
+                break;
+            } catch (PDOException $exception) {
+                $retryCount++;
+                $this->output->writeln('PDOException: ' . $exception->getMessage());
+                $this->output->writeln('Database not available, retrying in ' . $retryCount . ' seconds...');
+                if ($retryCount > 10) {
+                    $this->output->writeln('database not available');
+                    exit(1);
+                }
+            }
+            sleep($retryCount);
+        }
+
         $this->db->exec('
             CREATE TABLE IF NOT EXISTS migrations (
                 id        DATETIME NOT NULL,
