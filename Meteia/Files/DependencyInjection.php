@@ -11,6 +11,7 @@ use Meteia\Files\Configuration\Region;
 use Meteia\Files\Configuration\SecretKey;
 use Meteia\Files\Contracts\Storage;
 use Meteia\Files\LocalStorage;
+use Meteia\Files\ObjectStorage;
 
 return [
     AccessKey::class => fn (Configuration $configuration): AccessKey => new AccessKey($configuration->string('METEIA_FILES_OBJECT_STORAGE_ACCESS_KEY', '')),
@@ -19,5 +20,8 @@ return [
     Endpoint::class => fn (Configuration $configuration): Endpoint => new Endpoint($configuration->string('METEIA_FILES_OBJECT_STORAGE_ENDPOINT', '')),
     Region::class => fn (Configuration $configuration): Region => new Region($configuration->string('METEIA_FILES_OBJECT_STORAGE_REGION', '')),
     ContentAddressableStorageSecretKey::class => fn (Configuration $configuration) => ContentAddressableStorageSecretKey::fromToken($configuration->string('METEIA_FILES_CONTENT_ADDRESSABLE_STORAGE_SECRET_KEY', 'invalid')),
-    Storage::class => LocalStorage::class,
+    Storage::class => fn (Configuration $configuration) => match ($configuration->string('METEIA_FILES_STORAGE', 'local')) {
+        'object' => ObjectStorage::class,
+        default => LocalStorage::class,
+    },
 ];
