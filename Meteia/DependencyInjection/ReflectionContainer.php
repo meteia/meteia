@@ -89,7 +89,12 @@ class ReflectionContainer implements Container
         }
         $resolved = $this->resolveMethodParameters($rm, $parameters);
 
-        return $callable(...$resolved);
+        $resolved = $callable(...$resolved);
+        if (is_string($resolved) && class_exists($resolved)) {
+            $resolved = $this->get($resolved);
+        }
+
+        return $resolved;
     }
 
     private function resolveClass(string $className): mixed
