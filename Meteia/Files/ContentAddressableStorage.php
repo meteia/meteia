@@ -44,6 +44,6 @@ class ContentAddressableStorage
             $fileExtension = '.' . $fileExtension;
         }
 
-        return sprintf('%s/%s%s', substr($hashString, 0, 2), substr($hashString, 2), $fileExtension);
+        return sprintf('%s/%s%s', substr($hashString, 0, 2), $hashString, $fileExtension);
     }
 }
