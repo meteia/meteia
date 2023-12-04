@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 
 class SimpleLog implements MiddlewareInterface
 {
@@ -32,7 +33,7 @@ class SimpleLog implements MiddlewareInterface
 
         try {
             $response = $handler->handle($request);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $line = sprintf('  <-- %s', $th->getCode()) . PHP_EOL;
             $line .= 'Exception  : ' . $th->getMessage() . PHP_EOL;
             $line .= 'Stack trace: ' . $th->getTraceAsString() . PHP_EOL . PHP_EOL;
@@ -43,7 +44,7 @@ class SimpleLog implements MiddlewareInterface
 
         $line = sprintf('  <-- %s', $response->getStatusCode()) . PHP_EOL;
         $line .= 'Headers  : ' . json_encode($response->getHeaders()) . PHP_EOL;
-        $line .= 'Response : '. $response->getBody()->getContents() . PHP_EOL;
+        $line .= 'Response : ' . $response->getBody()->getContents() . PHP_EOL;
         file_put_contents((string) $logFile, $line, FILE_APPEND | LOCK_EX);
 
         return $response;
