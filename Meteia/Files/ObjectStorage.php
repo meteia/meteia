@@ -13,6 +13,7 @@ use League\MimeTypeDetection\ExtensionMimeTypeDetector;
 use Meteia\Files\Configuration\AccessKey;
 use Meteia\Files\Configuration\BucketName;
 use Meteia\Files\Configuration\Endpoint;
+use Meteia\Files\Configuration\PublicUri;
 use Meteia\Files\Configuration\Region;
 use Meteia\Files\Configuration\SecretKey;
 use Meteia\Files\Contracts\Storage;
@@ -26,6 +27,7 @@ class ObjectStorage implements Storage
 
     public function __construct(
         private readonly Endpoint $endpoint,
+        private readonly PublicUri $publicUri,
         private readonly BucketName $bucketName,
         private readonly AccessKey $accessKey,
         private readonly SecretKey $secretKey,
@@ -43,7 +45,9 @@ class ObjectStorage implements Storage
     {
         $client = new Client();
         try {
-            return $client->head($this->canonicalUri($dest))->getStatusCode() === 200;
+            $publicUri = $this->publicUri->withPath($dest);
+
+            return $client->head($publicUri)->getStatusCode() === 200;
         } catch (ClientException) {
             return false;
         }
