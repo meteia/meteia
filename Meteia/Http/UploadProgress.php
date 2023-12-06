@@ -40,6 +40,7 @@ class UploadProgress
         if ($this->completedWork !== $this->totalWork && $this->shouldSendUpdate()) {
             if (!headers_sent()) {
                 header('Content-Type: application/json-lines');
+                header('X-Accel-Buffering: no');
             }
             while (ob_get_level()) {
                 ob_end_flush();
