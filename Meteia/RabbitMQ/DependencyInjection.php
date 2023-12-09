@@ -13,7 +13,7 @@ use React\EventLoop\LoopInterface;
 
 return [
     Client::class => function (Configuration $config): Client {
-        $hostname = $config->string('RABBITMQ_HOST', 'rabbitmq');
+        $hostname = $config->string('RABBITMQ_HOST', '127.0.0.1');
         $port = $config->int('RABBITMQ_PORT', 5672);
         $username = $config->string('RABBITMQ_USERNAME', 'guest');
         $password = $config->string('RABBITMQ_PASSWORD', 'guest');
@@ -34,7 +34,7 @@ return [
         ]);
     },
     \Bunny\Async\Client::class => function (LoopInterface $loop, Configuration $config): Bunny\Async\Client {
-        $hostname = $config->string('RABBITMQ_HOST', 'rabbitmq');
+        $hostname = $config->string('RABBITMQ_HOST', '127.0.0.1');
         $port = $config->int('RABBITMQ_PORT', 5672);
         $username = $config->string('RABBITMQ_USERNAME', 'guest');
         $password = $config->string('RABBITMQ_PASSWORD', 'guest');
