@@ -1,6 +1,7 @@
 *.cache
 .graphqlconfig
 .task
+/.idea/
 /node_modules/
 /vendor/
 composer.lock
