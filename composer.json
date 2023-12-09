@@ -1,103 +1,57 @@
 {
-    "authors": [
-        {
-            "email": "jason@mcneil.dev",
-            "name": "Jason R. McNeil"
-        }
+  "authors": [
+    {
+      "email": "jason@mcneil.dev",
+      "name": "Jason R. McNeil"
+    }
+  ],
+  "autoload": {
+    "files": [
+      "Meteia/Dulce/Functions/dd.php",
+      "Meteia/Html/Elements.php",
+      "Meteia/Http/Functions/send.php",
+      "Meteia/Polyfills/Arrays.php",
+      "Meteia/Polyfills/Strings.php"
     ],
-    "autoload": {
-        "files": [
-            "Meteia/Dulce/Functions/dd.php",
-            "Meteia/Html/Elements.php",
-            "Meteia/Http/Functions/send.php",
-            "Meteia/Polyfills/Arrays.php",
-            "Meteia/Polyfills/Strings.php"
-        ],
-        "psr-4": {
-            "Meteia\\Application\\": "Meteia/Application/.",
-            "Meteia\\Authentication\\": "Meteia/Authentication/.",
-            "Meteia\\Bluestone\\": "Meteia/Bluestone/.",
-            "Meteia\\Classy\\": "Meteia/Classy/.",
-            "Meteia\\CommandLine\\": "Meteia/CommandLine/.",
-            "Meteia\\Configuration\\": "Meteia/Configuration/.",
-            "Meteia\\Cryptography\\": "Meteia/Cryptography/.",
-            "Meteia\\Database\\": "Meteia/Database/.",
-            "Meteia\\DependencyInjection\\": "Meteia/DependencyInjection/.",
-            "Meteia\\Dulce\\": "Meteia/Dulce/.",
-            "Meteia\\Files\\": "Meteia/Files/.",
-            "Meteia\\GraphQL\\": "Meteia/GraphQL/.",
-            "Meteia\\Html\\": "Meteia/Html/.",
-            "Meteia\\Htmx\\": "Meteia/Htmx/.",
-            "Meteia\\Http\\": "Meteia/Http/.",
-            "Meteia\\Library\\": "Meteia/Library/.",
-            "Meteia\\Logging\\": "Meteia/Logging/.",
-            "Meteia\\Performance\\": "Meteia/Performance/.",
-            "Meteia\\Polyfills\\": "Meteia/Polyfills/.",
-            "Meteia\\ValueObjects\\": "Meteia/ValueObjects/."
-        }
-    },
-    "bin": [
-        "bin/meteia"
-    ],
-    "config": {
-        "allow-plugins": {
-            "infection/extension-installer": true,
-            "pestphp/pest-plugin": true,
-            "stephank/composer-plugin-nixify": true
-        }
-    },
-    "name": "meteia/meteia",
-    "replace": {
-        "meteia/application": "self.version",
-        "meteia/authentication": "self.version",
-        "meteia/backblaze": "self.version",
-        "meteia/bluestone": "self.version",
-        "meteia/classy": "self.version",
-        "meteia/command-line": "self.version",
-        "meteia/configuration": "self.version",
-        "meteia/cryptography": "self.version",
-        "meteia/database": "self.version",
-        "meteia/dependency-injection": "self.version",
-        "meteia/dulce": "self.version",
-        "meteia/files": "self.version",
-        "meteia/graphql": "self.version",
-        "meteia/html": "self.version",
-        "meteia/htmx": "self.version",
-        "meteia/http": "self.version",
-        "meteia/library": "self.version",
-        "meteia/logging": "self.version",
-        "meteia/performance": "self.version",
-        "meteia/polyfills": "self.version",
-        "meteia/value-objects": "self.version"
-    },
-    "require": {
-        "aura/sql": "^5.0.2",
-        "ext-gmp": "*",
-        "ext-intl": "*",
-        "ext-pdo": "*",
-        "ext-sodium": "*",
-        "guzzlehttp/guzzle": "^7.5.0",
-        "laminas/laminas-diactoros": "^2.15.0",
-        "league/mime-type-detection": "^1.11",
-        "nyholm/psr7": "^1.5.1",
-        "nyholm/psr7-server": "^1.0.2",
-        "php": "^8.3",
-        "psr/container": "^2.0.2",
-        "psr/http-factory": "^1.0.1",
-        "psr/http-message": "^1.0.1",
-        "psr/http-server-handler": "^1.0.1",
-        "psr/http-server-middleware": "^1.0.1",
-        "psr/log": "^3.0.0",
-        "symfony/console": "^6.2.0",
-        "symfony/serializer": "^6.2.3",
-        "tuupola/base62": "^2.1.0",
-        "webonyx/graphql-php": "^14.11.6"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^9.5",
-        "roave/security-advisories": "dev-master",
-        "stephank/composer-plugin-nixify": "*",
-        "symplify/monorepo-builder": "^11.1"
-    },
-    "version": "0.0.1"
+    "psr-4": {
+      "Meteia\\": "Meteia"
+    }
+  },
+  "bin": [
+    "bin/meteia"
+  ],
+  "config": {
+    "allow-plugins": {
+      "stephank/composer-plugin-nixify": false
+    }
+  },
+  "name": "meteia/meteia",
+  "require": {
+    "aura/sql": "^5.0.2",
+    "ext-gmp": "*",
+    "ext-intl": "*",
+    "ext-pdo": "*",
+    "ext-sodium": "*",
+    "guzzlehttp/guzzle": "^7.5.0",
+    "laminas/laminas-diactoros": "^3.3.0",
+    "league/mime-type-detection": "^1.11",
+    "nyholm/psr7": "^1.5.1",
+    "nyholm/psr7-server": "^1.0.2",
+    "php": "^8.1",
+    "psr/container": "^2.0.2",
+    "psr/http-factory": "^1.0.1",
+    "psr/http-message": "^2.0",
+    "psr/http-server-handler": "^1.0.1",
+    "psr/http-server-middleware": "^1.0.1",
+    "psr/log": "^3.0.0",
+    "symfony/console": "^7.0.1",
+    "symfony/serializer": "^7.0.1",
+    "tuupola/base62": "^2.1.0",
+    "webonyx/graphql-php": "^15.8.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "roave/security-advisories": "dev-master"
+  },
+  "version": "0.1.0"
 }
