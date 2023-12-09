@@ -28,6 +28,7 @@
   "name": "meteia/meteia",
   "require": {
     "aura/sql": "^5.0.2",
+    "bunny/bunny": "^0.5.5",
     "ext-gmp": "*",
     "ext-intl": "*",
     "ext-pdo": "*",
