@@ -4,7 +4,7 @@
             "Meteia\\Logging\\": "."
         }
     },
-    "name": "meteia/logging",
+    "name": "meteia/message-queue",
     "require": {
         "psr/container": "^2.0.2",
         "psr/log": "^3.0.0"
