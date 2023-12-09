@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     utils.url = "github:numtide/flake-utils";
   };
 
@@ -18,7 +18,7 @@
           overlays = [];
         };
 
-        php = pkgs.php82.buildEnv {
+        php = pkgs.php83.buildEnv {
           extensions = {
             enabled,
             all,
