@@ -1,9 +1,0 @@
-{
-    "name": "meteia/polyfills",
-    "autoload": {
-        "files": [
-          "Arrays.php",
-          "Strings.php"
-        ]
-    }
-}
