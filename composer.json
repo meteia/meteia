@@ -14,7 +14,7 @@
       "Meteia/Polyfills/Strings.php"
     ],
     "psr-4": {
-      "Meteia\\": "Meteia"
+      "Meteia\\": "Meteia/"
     }
   },
   "bin": [
