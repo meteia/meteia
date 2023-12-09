@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MessageQueue\CommandLine;
+namespace Meteia\MessageQueue\CommandLine;
 
 class RunWorker
 {
