@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Database\CommandLine;
 
+use AppendIterator;
 use GlobIterator;
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
@@ -67,9 +68,13 @@ class Migrate implements Command
 
         $migrationIds = $this->db->fetchCol("SELECT DATE_FORMAT(id, '%Y%m%d%H%i%s') FROM migrations ORDER BY id;");
 
-        $files = (string) $this->applicationPath->join('migrations', '*.sql');
+        $allMigrationFiles = new AppendIterator();
+        $meteiaMigrationsDirectory = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', '..', 'migrations', '*.sql']);
+        $allMigrationFiles->append(new GlobIterator($meteiaMigrationsDirectory));
+        $allMigrationFiles->append(new GlobIterator((string) $this->applicationPath->join('migrations', '*.sql')));
+
         /** @var SplFileInfo $file */
-        foreach (new GlobIterator($files) as $file) {
+        foreach ($allMigrationFiles as $file) {
             $filename = $file->getBasename('.sql');
             [$id, $type, $name] = explode('.', $filename, 3);
             if (in_array($id, $migrationIds, true)) {
