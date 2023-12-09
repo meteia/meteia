@@ -8,7 +8,7 @@ use Bunny\Channel;
 use Meteia\RabbitMQ\Contracts\Exchange;
 use Psr\Log\LoggerInterface;
 
-class BunnyExchange implements Exchange
+readonly class BunnyExchange implements Exchange
 {
     public function __construct(
         private LoggerInterface $log,
