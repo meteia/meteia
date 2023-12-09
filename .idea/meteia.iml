@@ -3,6 +3,25 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/Meteia" isTestSource="false" packagePrefix="Meteia\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Application/." isTestSource="false" packagePrefix="Meteia\Application\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Authentication/." isTestSource="false" packagePrefix="Meteia\Authentication\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Bluestone/." isTestSource="false" packagePrefix="Meteia\Bluestone\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Classy/." isTestSource="false" packagePrefix="Meteia\Classy\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/CommandLine/." isTestSource="false" packagePrefix="Meteia\CommandLine\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Configuration/." isTestSource="false" packagePrefix="Meteia\Configuration\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Cryptography/." isTestSource="false" packagePrefix="Meteia\Cryptography\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Database/." isTestSource="false" packagePrefix="Meteia\Database\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/DependencyInjection/." isTestSource="false" packagePrefix="Meteia\DependencyInjection\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Dulce/." isTestSource="false" packagePrefix="Meteia\Dulce\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Files/." isTestSource="false" packagePrefix="Meteia\Files\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/GraphQL/." isTestSource="false" packagePrefix="Meteia\GraphQL\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Html/." isTestSource="false" packagePrefix="Meteia\Html\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Htmx/." isTestSource="false" packagePrefix="Meteia\Htmx\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Http/." isTestSource="false" packagePrefix="Meteia\Http\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Library/." isTestSource="false" packagePrefix="Meteia\Library\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Logging/." isTestSource="false" packagePrefix="Meteia\Logging\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/Performance/." isTestSource="false" packagePrefix="Meteia\Performance\" />
+      <sourceFolder url="file://$MODULE_DIR$/Meteia/ValueObjects/." isTestSource="false" packagePrefix="Meteia\ValueObjects\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor" />
     </content>
     <orderEntry type="inheritedJdk" />
