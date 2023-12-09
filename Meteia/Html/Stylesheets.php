@@ -16,7 +16,7 @@ class Stylesheets implements Stringable
         return implode('', $this->stylesheets);
     }
 
-    public function load($href, ?string $integrity = null, ?string $crossorigin = null): void
+    public function load($href, string $integrity = null, string $crossorigin = null): void
     {
         $this->stylesheets[$href] = new Link('stylesheet', $href, $integrity, $crossorigin);
     }

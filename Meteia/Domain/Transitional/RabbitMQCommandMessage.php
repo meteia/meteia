@@ -18,17 +18,11 @@ class RabbitMQCommandMessage implements Message
         $this->properties = $properties;
     }
 
-    /**
-     * @return mixed
-     */
     public function getBody()
     {
         return $this->body;
     }
 
-    /**
-     * @return mixed
-     */
     public function getProperties()
     {
         return $this->properties;

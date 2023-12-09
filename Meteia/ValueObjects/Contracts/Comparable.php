@@ -21,8 +21,5 @@ interface Comparable
      */
     public function compareTo(Comparable $other);
 
-    /**
-     * @return mixed
-     */
     public function toNative();
 }

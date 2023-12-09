@@ -12,8 +12,6 @@ class ComplexStringLiteral
 {
     /**
      * Returns a StringLiteral object given a PHP native string or StringLiteral as parameter(s).
-     *
-     * @param ...$value
      */
     public function __construct(...$strings)
     {

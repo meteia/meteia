@@ -11,6 +11,6 @@ interface NativeElement
     public function instance(
         array $props = [],
         array $attributes = [],
-        Stringable|string|null $children = null,
+        Stringable|string $children = null,
     ): string|Stringable;
 }

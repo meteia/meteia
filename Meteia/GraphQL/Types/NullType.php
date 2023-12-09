@@ -24,8 +24,6 @@ class NullType extends Type implements OutputType, LeafType
 
     /**
      * @param \GraphQL\Language\AST\Node $valueNode
-     *
-     * @return mixed
      */
     public function isValidLiteral($valueNode)
     {
@@ -44,20 +42,14 @@ class NullType extends Type implements OutputType, LeafType
 
     /**
      * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input.
-     *
-     * @return mixed
      */
-    public function parseLiteral(Node $valueNode, ?array $variables = null)
+    public function parseLiteral(Node $valueNode, array $variables = null)
     {
         return null;
     }
 
     /**
      * Parses an externally provided value (query variable) to use as an input.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
     public function parseValue($value)
     {

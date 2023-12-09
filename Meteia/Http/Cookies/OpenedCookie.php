@@ -17,7 +17,7 @@ class OpenedCookie extends Cookie
         $this->associatedData = $associatedData;
     }
 
-    public function seal(XChaCha20Poly1305 $XChaCha20Poly1305, ?SecretKey $secret = null): SealCookieResult
+    public function seal(XChaCha20Poly1305 $XChaCha20Poly1305, SecretKey $secret = null): SealCookieResult
     {
         $ad = implode('_', array_filter([
             $this->name,

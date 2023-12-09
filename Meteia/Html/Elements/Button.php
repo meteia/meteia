@@ -9,7 +9,7 @@ use Stringable;
 
 class Button extends CustomElement
 {
-    public function __construct(array $attributes = [], Stringable|string|null $children = null)
+    public function __construct(array $attributes = [], Stringable|string $children = null)
     {
         parent::__construct('button', $attributes, $children);
     }

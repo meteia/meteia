@@ -29,7 +29,7 @@ class Resource
         return stream_get_contents($this->resource);
     }
 
-    public function hash(string $algo, ?SecretKey $hmacKey = null): Hash
+    public function hash(string $algo, SecretKey $hmacKey = null): Hash
     {
         rewind($this->resource);
         $hashCtx = $hmacKey ? hash_init($algo, HASH_HMAC, (string) $hmacKey) : hash_init($algo);
