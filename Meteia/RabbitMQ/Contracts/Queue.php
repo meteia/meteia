@@ -8,5 +8,5 @@ interface Queue
 {
     public function consume(string $queueName, MessageHandler $messageHandler): void;
 
-    public function listen(): void;
+    public function listen(int $prefetchCount = 1): void;
 }

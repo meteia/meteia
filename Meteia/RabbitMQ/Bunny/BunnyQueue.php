@@ -12,7 +12,7 @@ use Meteia\RabbitMQ\Contracts\Queue;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class BunnyQueue implements Queue
+readonly class BunnyQueue implements Queue
 {
     public function __construct(
         private LoggerInterface $log,
@@ -35,9 +35,9 @@ class BunnyQueue implements Queue
         }, $queueName);
     }
 
-    public function listen(): void
+    public function listen(int $prefetchCount = 1): void
     {
-        $this->rmq->qos(0, 5);
+        $this->rmq->qos(0, $prefetchCount);
         $this->rmq->getClient()->run();
     }
 }

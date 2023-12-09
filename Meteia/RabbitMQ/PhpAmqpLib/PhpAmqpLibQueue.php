@@ -23,7 +23,7 @@ class PhpAmqpLibQueue implements Queue
         $this->log->debug('Consuming Queue', ['queueName' => $queueName]);
     }
 
-    public function listen(): void
+    public function listen(int $prefetchCount = 1): void
     {
         $this->log->debug('Waiting on Channel Callbacks', ['count' => count($this->channel->callbacks)]);
         while (count($this->channel->callbacks)) {
