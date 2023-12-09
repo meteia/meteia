@@ -35,6 +35,7 @@
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             nodejs
+            nodePackages.pnpm
 
             php
             php.packages.composer
