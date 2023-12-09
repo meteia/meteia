@@ -20,11 +20,6 @@
   "bin": [
     "bin/meteia"
   ],
-  "config": {
-    "allow-plugins": {
-      "stephank/composer-plugin-nixify": false
-    }
-  },
   "name": "meteia/meteia",
   "require": {
     "aura/sql": "^5.0.2",
