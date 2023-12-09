@@ -19,6 +19,7 @@ use Meteia\Files\Configuration\SecretKey;
 use Meteia\Files\Contracts\Storage;
 use Meteia\ValueObjects\Identity\Resource;
 use Meteia\ValueObjects\Identity\Uri;
+use Override;
 
 class ObjectStorage implements Storage
 {
@@ -51,6 +52,12 @@ class ObjectStorage implements Storage
         } catch (ClientException) {
             return false;
         }
+    }
+
+    #[Override]
+    public function delete(string $dest): void
+    {
+        // noop
     }
 
     public function store(Resource $src, string $dest): StoredFile

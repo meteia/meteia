@@ -15,4 +15,6 @@ interface Storage
     public function exists(string $dest): bool;
 
     public function canonicalUri(string $dest): Uri;
+
+    public function delete(string $dest): void;
 }
