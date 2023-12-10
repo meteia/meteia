@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Meteia\Logging;
 
 use Meteia\Application\RepositoryPath;
+use Meteia\ValueObjects\Identity\CausationId;
+use Meteia\ValueObjects\Identity\CorrelationId;
+use Meteia\ValueObjects\Identity\ProcessId;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Stringable;
@@ -16,8 +19,11 @@ class DecoratedLog extends AbstractLogger
     private string $pathPrefix;
 
     public function __construct(
-        private readonly LoggerInterface $log,
-        readonly RepositoryPath $repositoryPath,
+        readonly private LoggerInterface $log,
+        readonly private CorrelationId $correlationId,
+        readonly private CausationId $causationId,
+        readonly private ProcessId $processId,
+        RepositoryPath $repositoryPath,
     ) {
         $this->pathPrefix = trim((string) $repositoryPath, DIRECTORY_SEPARATOR);
     }
@@ -36,6 +42,11 @@ class DecoratedLog extends AbstractLogger
         $context['source'] .= ':' . $context['line'] ?? '0';
 
         unset($context['file'], $context['line']);
-        $this->log->log($level, $message, $context);
+        $this->log->log($level, implode(' -> ', [
+            $this->correlationId,
+            $this->causationId,
+            $this->processId,
+            $message,
+        ]), $context);
     }
 }
