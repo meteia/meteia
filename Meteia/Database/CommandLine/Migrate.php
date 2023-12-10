@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Database\CommandLine;
 
-use AppendIterator;
-use GlobIterator;
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Meteia\Database\Database;
-use PDOException;
-use SplFileInfo;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,13 +36,15 @@ class Migrate implements Command
         while (true) {
             try {
                 $this->db->fetchValue('SELECT 1');
+
                 break;
-            } catch (PDOException $exception) {
-                $retryCount++;
+            } catch (\PDOException $exception) {
+                ++$retryCount;
                 $this->output->writeln('PDOException: ' . $exception->getMessage());
                 $this->output->writeln('Database not available, retrying in ' . $retryCount . ' seconds...');
                 if ($retryCount > 10) {
                     $this->output->writeln('database not available');
+
                     exit(1);
                 }
             }
@@ -68,17 +66,18 @@ class Migrate implements Command
 
         $migrationIds = $this->db->fetchCol("SELECT DATE_FORMAT(id, '%Y%m%d%H%i%s') FROM migrations ORDER BY id;");
 
-        $allMigrationFiles = new AppendIterator();
-        $meteiaMigrationsDirectory = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', '..', 'migrations', '*.sql']);
-        $allMigrationFiles->append(new GlobIterator($meteiaMigrationsDirectory));
-        $allMigrationFiles->append(new GlobIterator((string) $this->applicationPath->join('migrations', '*.sql')));
+        $allMigrationFiles = new \AppendIterator();
+        $meteiaMigrationsDirectory = implode(\DIRECTORY_SEPARATOR, [__DIR__, '..', '..', '..', 'migrations', '*.sql']);
+        $allMigrationFiles->append(new \GlobIterator($meteiaMigrationsDirectory));
+        $allMigrationFiles->append(new \GlobIterator((string) $this->applicationPath->join('migrations', '*.sql')));
 
-        /** @var SplFileInfo $file */
+        /** @var \SplFileInfo $file */
         foreach ($allMigrationFiles as $file) {
             $filename = $file->getBasename('.sql');
             [$id, $type, $name] = explode('.', $filename, 3);
-            if (in_array($id, $migrationIds, true)) {
+            if (\in_array($id, $migrationIds, true)) {
                 $this->output->writeln(sprintf('existing : %s', $filename));
+
                 continue;
             }
             $realPath = $file->getRealPath();
@@ -91,7 +90,7 @@ class Migrate implements Command
                 $this->output->writeln(sprintf('applying : %s', $filename));
                 $this->db->exec($sql);
                 $this->output->writeln(sprintf('applied  : %s', $filename));
-            } catch (PDOException $t) {
+            } catch (\PDOException $t) {
                 if ($type === 'ni') {
                     $this->output->writeln(sprintf('ignoring error during non-idempotent migration %s', $filename));
                     $this->output->writeln(sprintf("\t%s", $t->getMessage()));

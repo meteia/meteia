@@ -15,10 +15,8 @@ use Meteia\Commands\CommandMessageHandler;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\ProcessId;
-use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\Serializer;
-use Throwable;
 
 readonly class BunnyCommandBus implements CommandBus
 {
@@ -35,7 +33,7 @@ readonly class BunnyCommandBus implements CommandBus
         $this->channel->exchangeDeclare((string) $this->exchangeName, durable: true);
     }
 
-    #[Override]
+    #[\Override]
     public function publishCommand(Command $command): void
     {
         $payload = $this->serializer->serialize($command, 'json');
@@ -53,7 +51,7 @@ readonly class BunnyCommandBus implements CommandBus
         ]);
     }
 
-    #[Override]
+    #[\Override]
     public function registerCommandHandler(string $commandClassName, CommandMessageHandler $handler): void
     {
         $queueName = $this->queueNameForCommand($commandClassName);
@@ -81,7 +79,7 @@ readonly class BunnyCommandBus implements CommandBus
             try {
                 $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
                 $handler->handle($command, $commandId, $correlationId, $causationId, $processId);
-            } catch (Throwable $t) {
+            } catch (\Throwable $t) {
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), [
                     'queueName' => $queueName,
@@ -91,7 +89,7 @@ readonly class BunnyCommandBus implements CommandBus
         }, $queueName);
     }
 
-    #[Override]
+    #[\Override]
     public function run(): void
     {
         $this->client->run();

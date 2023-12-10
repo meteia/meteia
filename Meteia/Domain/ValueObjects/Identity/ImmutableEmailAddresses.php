@@ -15,6 +15,7 @@ class ImmutableEmailAddresses extends ImmutableArrayValueObject implements Email
     public function toArray()
     {
         $result = [];
+
         /** @var EmailAddress $email */
         foreach ($this->values as $email) {
             $result = array_merge($result, $email->toArray());

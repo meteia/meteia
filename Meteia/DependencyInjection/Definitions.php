@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\DependencyInjection;
 
-use Exception;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
 class Definitions
@@ -18,12 +17,12 @@ class Definitions
                 continue;
             }
             if (!\is_array($loaded)) {
-                throw new Exception("$filename should return an array");
+                throw new \Exception("{$filename} should return an array");
             }
 
             $definitions[] = $loaded;
         }
 
-        return \array_merge([], ...$definitions);
+        return array_merge([], ...$definitions);
     }
 }

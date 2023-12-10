@@ -24,12 +24,12 @@ class Street
      */
     public function __construct($streetNumber, $streetName = null)
     {
-        if (!is_null($streetName)) {
+        if ($streetName !== null) {
             $this->buildBasicElements([
-                    'addressNumberValue' => $streetNumber,
-                    'streetNameValue' => $streetName,
-                ]);
-        } elseif (is_string($streetNumber)) {
+                'addressNumberValue' => $streetNumber,
+                'streetNameValue' => $streetName,
+            ]);
+        } elseif (\is_string($streetNumber)) {
             $this->buildBasicElements([
                 'streetNameValue' => $streetNumber,
             ]);
@@ -37,6 +37,16 @@ class Street
             $this->buildBasicElements($streetNumber);
         }
         $this->buildComplexElements();
+    }
+
+    /**
+     * Returns a string representation of the StringLiteral in the format defined in the constructor.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getCompleteStreet()->string();
     }
 
     /**
@@ -95,16 +105,6 @@ class Street
         return $join->trim();
     }
 
-    /**
-     * Returns a string representation of the StringLiteral in the format defined in the constructor.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getCompleteStreet()->string();
-    }
-
     private function buildComplexElements(): void
     {
         $this->replacements['%completeAddressNumber%'] = $this->format(StreetFormat::ADDRESS_NUMBER);
@@ -115,6 +115,8 @@ class Street
 
     /**
      * Ensures that the minimal data is collected and that all values exsist.
+     *
+     * @param mixed $data
      *
      * @return array
      */
@@ -134,7 +136,7 @@ class Street
         ];
 
         foreach (array_replace($baseArray, $data) as $key => $value) {
-            if (array_key_exists($key, $baseArray)) {
+            if (\array_key_exists($key, $baseArray)) {
                 $this->replacements['%' . $key . '%'] = new StringLiteral($value);
             }
         }

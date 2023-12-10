@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Meteia\Html\Elements;
 
 use Meteia\Html\Element;
-use Stringable;
 
-class Link implements Stringable
+class Link implements \Stringable
 {
     use Element;
 

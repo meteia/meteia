@@ -24,6 +24,16 @@ class ComplexStringLiteral
     }
 
     /**
+     * Returns the string value itself.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->string();
+    }
+
+    /**
      * Tells whether the StringLiteral is empty.
      *
      * @return bool
@@ -40,7 +50,7 @@ class ComplexStringLiteral
      */
     public function length()
     {
-        return strlen($this->value);
+        return \strlen($this->value);
     }
 
     /**
@@ -76,7 +86,7 @@ class ComplexStringLiteral
         $strings = explode($delimiter, $value, $limit);
         $stringLiterals = [];
         foreach ($strings as $string) {
-            $stringLiterals[] = new ComplexStringLiteral($string);
+            $stringLiterals[] = new self($string);
         }
 
         return $stringLiterals;
@@ -97,7 +107,7 @@ class ComplexStringLiteral
     {
         $value = $this->getValue();
 
-        return new ComplexStringLiteral(mb_substr($value, $start, $length));
+        return new self(mb_substr($value, $start, $length));
     }
 
     /**
@@ -113,7 +123,7 @@ class ComplexStringLiteral
      */
     public function replace($search, $replace, &$count = null)
     {
-        return new ComplexStringLiteral(str_replace($search, $replace, $this->value, $count));
+        return new self(str_replace($search, $replace, $this->value, $count));
     }
 
     /**
@@ -126,7 +136,7 @@ class ComplexStringLiteral
      */
     public function trim($charList = " \t\n\r\0\x0B")
     {
-        return new ComplexStringLiteral(trim($this->value, $charList));
+        return new self(trim($this->value, $charList));
     }
 
     /**
@@ -139,28 +149,20 @@ class ComplexStringLiteral
         return $this->value;
     }
 
-    /**
-     * Returns the string value itself.
-     *
-     * @return string
-     */
-    public function __toString()
+    protected function getValue()
     {
-        return $this->string();
+        return '' . $this->value;
     }
 
     /**
      * Converts an object to a string.
+     *
+     * @param mixed $objectInQuestion
      *
      * @return string
      */
     private function getStringValue($objectInQuestion)
     {
         return '' . $objectInQuestion;
-    }
-
-    protected function getValue()
-    {
-        return '' . $this->value;
     }
 }

@@ -9,7 +9,6 @@ use Meteia\Dulce\StackTraces\Line;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Throwable;
 
 class ConsoleErrorEndpoint implements ErrorEndpoint
 {
@@ -17,7 +16,7 @@ class ConsoleErrorEndpoint implements ErrorEndpoint
     {
     }
 
-    public function response(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
+    public function response(\Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         $output = sprintf('fatal error: %s %s', $throwable::class, $throwable->getMessage()) . PHP_EOL . PHP_EOL;
         $output .= 'stack backtrace (oldest first)' . PHP_EOL;
@@ -25,6 +24,7 @@ class ConsoleErrorEndpoint implements ErrorEndpoint
         $frames = $this->frames->from($throwable);
         foreach (array_reverse($frames) as $frame) {
             $output .= sprintf('    %s:%d', $frame->path, $frame->lineNumber) . PHP_EOL;
+
             /** @var Line $line */
             foreach ($frame->fileFragment->lines as $line) {
                 $activeLine = $line->shouldHighlight ? '=>' : '  ';

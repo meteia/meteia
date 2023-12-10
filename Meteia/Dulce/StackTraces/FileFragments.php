@@ -15,7 +15,7 @@ class FileFragments
 
         $lines = iterator_to_array($path->lines($start, $end));
 
-        $lines = array_map(fn ($lineNumber, $line) => new Line($line, $lineNumber, $lineNumber === $focusedLine), array_keys($lines), $lines);
+        $lines = array_map(static fn ($lineNumber, $line) => new Line($line, $lineNumber, $lineNumber === $focusedLine), array_keys($lines), $lines);
 
         // $relativePath = str_replace($this->baseDirectory . '/', '', $absolutePath);
         //

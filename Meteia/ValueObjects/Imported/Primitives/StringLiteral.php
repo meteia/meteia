@@ -13,18 +13,18 @@ class StringLiteral extends PrimitiveValueObject
         $this->value = (string) $value;
     }
 
-    public function caseInsensitiveEquals(StringLiteral $string): bool
+    public function __toString()
+    {
+        return $this->value;
+    }
+
+    public function caseInsensitiveEquals(self $string): bool
     {
         return strcasecmp((string) $this, (string) $string) === 0;
     }
 
-    public function caseSensitiveEquals(StringLiteral $string): bool
+    public function caseSensitiveEquals(self $string): bool
     {
         return strcmp((string) $this, (string) $string) === 0;
-    }
-
-    public function __toString()
-    {
-        return $this->value;
     }
 }

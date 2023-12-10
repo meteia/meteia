@@ -50,6 +50,8 @@ class NullType extends Type implements OutputType, LeafType
 
     /**
      * Parses an externally provided value (query variable) to use as an input.
+     *
+     * @param mixed $value
      */
     public function parseValue($value)
     {

@@ -13,10 +13,10 @@ class FloatLiteral extends PrimitiveValueObject
 
     public function __construct($value)
     {
-        $filteredValue = \filter_var($value, FILTER_VALIDATE_FLOAT);
+        $filteredValue = filter_var($value, FILTER_VALIDATE_FLOAT);
 
         if ($filteredValue === false) {
-            throw new ImproperType(gettype($value), ['float']);
+            throw new ImproperType(\gettype($value), ['float']);
         }
 
         $this->value = $filteredValue;
@@ -24,30 +24,30 @@ class FloatLiteral extends PrimitiveValueObject
 
     public function __toString()
     {
-        return strval($this->value);
+        return (string) $this->value;
     }
 
-    public function add(FloatLiteral $value): FloatLiteral
+    public function add(self $value): self
     {
-        return new FloatLiteral(bcadd((string) $this, (string) $value, self::PRECISION));
+        return new self(bcadd((string) $this, (string) $value, self::PRECISION));
     }
 
-    public function subtract(FloatLiteral $value): FloatLiteral
+    public function subtract(self $value): self
     {
-        return new FloatLiteral(bcsub((string) $this, (string) $value, self::PRECISION));
+        return new self(bcsub((string) $this, (string) $value, self::PRECISION));
     }
 
-    public function multiplyBy(FloatLiteral $by): FloatLiteral
+    public function multiplyBy(self $by): self
     {
-        return new FloatLiteral(bcmul((string) $this, (string) $by, self::PRECISION));
+        return new self(bcmul((string) $this, (string) $by, self::PRECISION));
     }
 
-    public function divideBy(FloatLiteral $by): FloatLiteral
+    public function divideBy(self $by): self
     {
-        return new FloatLiteral(bcdiv((string) $this, (string) $by, self::PRECISION));
+        return new self(bcdiv((string) $this, (string) $by, self::PRECISION));
     }
 
-    public function equalTo(FloatLiteral $value): bool
+    public function equalTo(self $value): bool
     {
         return bccomp((string) $this, (string) $value, self::PRECISION) === 0;
     }

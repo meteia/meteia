@@ -10,7 +10,6 @@ use Meteia\Http\Host;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 use Meteia\ValueObjects\Identity\Resource;
 use Meteia\ValueObjects\Identity\Uri;
-use Override;
 
 class LocalStorage implements Storage
 {
@@ -38,14 +37,14 @@ class LocalStorage implements Storage
         return new StoredFile($this->canonicalUri($dest));
     }
 
-    private function onDiskDest(string $dest): FilesystemPath
-    {
-        return $this->applicationPublicDir->join('files', $dest);
-    }
-
-    #[Override]
+    #[\Override]
     public function delete(string $dest): void
     {
         // noop
+    }
+
+    private function onDiskDest(string $dest): FilesystemPath
+    {
+        return $this->applicationPublicDir->join('files', $dest);
     }
 }

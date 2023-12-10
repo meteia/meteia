@@ -14,7 +14,6 @@ use Meteia\MessageStreams\MessageSerializer;
 use Meteia\Performance\Timings;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
-use ReflectionClass;
 
 class PdoEventStream implements EventStream
 {
@@ -62,7 +61,7 @@ class PdoEventStream implements EventStream
     {
         // TODO: Use APCu or similar cache? (benchmark first, PHP OpCache might be enough)
         if (!isset($this->aggregateHashes[$target::class])) {
-            $rc = new ReflectionClass($target);
+            $rc = new \ReflectionClass($target);
             $hash = substr(hash_file('sha256', $rc->getFileName(), true), 0, 16);
             $this->aggregateHashes[$target::class] = $hash;
         }
@@ -123,9 +122,9 @@ class PdoEventStream implements EventStream
         }
         $replayDelta = (microtime(true) - $replayStart) * 1000;
         $this->timings->add($target::class . '.replay', $replayDelta);
-        $this->timings->add($target::class . '.replayCount', count($messageRows));
+        $this->timings->add($target::class . '.replayCount', \count($messageRows));
 
-        if ($replayDelta > 15 && count($messageRows) > 25) {
+        if ($replayDelta > 15 && \count($messageRows) > 25) {
             $lastMessageRow = end($messageRows);
             $this->createSnapshot($aggregateRootId, (int) $lastMessageRow->aggregate_sequence, $target);
         }

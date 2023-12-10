@@ -37,7 +37,7 @@ class CountrySpec extends ObjectBehavior
     public function getMatchers(): array
     {
         return [
-            'returnString' => function ($subject, $value) {
+            'returnString' => static function ($subject, $value) {
                 $subject = '' . $subject;
                 $value = '' . $value;
                 if ($value === $subject) {

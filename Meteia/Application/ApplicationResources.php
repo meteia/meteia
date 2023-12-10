@@ -23,7 +23,7 @@ class ApplicationResources
     ) {
         $commonLen = common_prefix_length([(string) $publicDir, (string) $manifest]);
         $relativeManifest = substr((string) $manifest, $commonLen);
-        $this->prefix = '/' . trim(dirname($relativeManifest), '/');
+        $this->prefix = '/' . trim(\dirname($relativeManifest), '/');
         if ($manifest->isReadable()) {
             $this->useManifest = true;
             $this->knownFiles = json_decode($manifest->read(), true, 512, JSON_THROW_ON_ERROR);
@@ -37,7 +37,7 @@ class ApplicationResources
 
     public function requireEntryModule(mixed $target, Head $head, bool $isReact = false): void
     {
-        $targetName = is_object($target) ? $target::class : $target;
+        $targetName = \is_object($target) ? $target::class : $target;
         $entry = '/' . str_replace('\\', '/', $targetName) . 'Entry.' . ($isReact ? 'tsx' : 'ts');
         $this->requireModule($entry, $head);
     }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Stringable;
-
-class Title implements Stringable
+class Title implements \Stringable
 {
     protected string $prefix;
 

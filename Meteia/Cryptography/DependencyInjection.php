@@ -6,7 +6,7 @@ use Meteia\Configuration\Configuration;
 use Meteia\Cryptography\MasterKey;
 
 return [
-    MasterKey::class => function (Configuration $configuration): MasterKey {
+    MasterKey::class => static function (Configuration $configuration): MasterKey {
         // $encoded = base64_decode();
         // SODIUM_CRYPTO_KDF_KEYBYTES
 

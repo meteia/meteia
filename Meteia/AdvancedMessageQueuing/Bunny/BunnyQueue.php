@@ -10,7 +10,6 @@ use Bunny\Message;
 use Meteia\AdvancedMessageQueuing\Contracts\MessageHandler;
 use Meteia\AdvancedMessageQueuing\Contracts\Queue;
 use Psr\Log\LoggerInterface;
-use Throwable;
 
 readonly class BunnyQueue implements Queue
 {
@@ -25,7 +24,7 @@ readonly class BunnyQueue implements Queue
         $this->rmq->consume(function (Message $message, Channel $channel, Client $bunny) use ($queueName, $messageHandler): void {
             try {
                 $messageHandler->handleMessageFromQueue($message->content, $queueName);
-            } catch (Throwable $t) {
+            } catch (\Throwable $t) {
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), [
                     'queueName' => $queueName,

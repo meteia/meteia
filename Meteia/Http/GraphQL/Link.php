@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Http\GraphQL;
 
-use Exception;
 use GraphQL\Type\Definition\ObjectType;
 use Meteia\Http\EndpointMap;
 use Meteia\Http\NamedEndpoint;
@@ -26,7 +25,7 @@ class Link extends ObjectType
     public function for(string $endpoint): array
     {
         if (!is_subclass_of($endpoint, NamedEndpoint::class)) {
-            throw new Exception('Invalid endpoint');
+            throw new \Exception('Invalid endpoint');
         }
 
         return [

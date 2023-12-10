@@ -4,22 +4,16 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Identity;
 
-use Exception;
-use Iterator;
 use Meteia\Cryptography\Hash;
 use Meteia\Cryptography\SecretKey;
 use Meteia\ValueObjects\Primitive\StringLiteral;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RegexIterator;
-use SplFileObject;
 
 class FilesystemPath extends StringLiteral
 {
     public function __construct(...$paths)
     {
-        $paths = array_map(fn ($path) => rtrim(strval($path), DIRECTORY_SEPARATOR), $paths);
-        $value = implode(DIRECTORY_SEPARATOR, $paths);
+        $paths = array_map(static fn ($path) => rtrim((string) $path, \DIRECTORY_SEPARATOR), $paths);
+        $value = implode(\DIRECTORY_SEPARATOR, $paths);
 
         parent::__construct($value);
     }
@@ -45,13 +39,13 @@ class FilesystemPath extends StringLiteral
         return substr($filename, $extensionIdx);
     }
 
-    public function find(string ...$regex): Iterator
+    public function find(string ...$regex): \Iterator
     {
         $basePath = $this->realpath();
         $regex = '#' . $basePath->join(...$regex) . '$#';
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator((string) $basePath));
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator((string) $basePath));
 
-        return new RegexIterator($iterator, $regex, RegexIterator::MATCH);
+        return new \RegexIterator($iterator, $regex, \RegexIterator::MATCH);
     }
 
     public function hash(string $algo, SecretKey $hmacKey = null): Hash
@@ -73,15 +67,16 @@ class FilesystemPath extends StringLiteral
     }
 
     /**
-     * @return Iterator<int, string>
+     * @return \Iterator<int, string>
      */
-    public function lines(int $start = 0, int $end = null): Iterator
+    public function lines(int $start = 0, int $end = null): \Iterator
     {
-        $file = new SplFileObject((string) $this);
+        $file = new \SplFileObject((string) $this);
         $file->seek($start);
         $lineNumber = $start;
         while ($file->valid() && (!$end || $lineNumber <= $end)) {
-            $lineNumber++;
+            ++$lineNumber;
+
             yield $lineNumber => rtrim($file->getCurrentLine());
             $file->next();
         }
@@ -91,7 +86,7 @@ class FilesystemPath extends StringLiteral
     {
         $resource = fopen((string) $this, 'r');
         if ($resource === false) {
-            throw new Exception('Unable to open file: ' . $this);
+            throw new \Exception('Unable to open file: ' . $this);
         }
 
         return new Resource($resource);
@@ -112,14 +107,14 @@ class FilesystemPath extends StringLiteral
         return new static(realpath((string) $this));
     }
 
-    public function withoutPrefix(FilesystemPath $prefix): self
+    public function withoutPrefix(self $prefix): self
     {
-        return new self(trim(str_replace((string) $prefix, '', (string) $this), DIRECTORY_SEPARATOR));
+        return new self(trim(str_replace((string) $prefix, '', (string) $this), \DIRECTORY_SEPARATOR));
     }
 
     public function write(string $content): void
     {
-        $dirname = dirname((string) $this);
+        $dirname = \dirname((string) $this);
         if (!is_dir($dirname)) {
             mkdir($dirname, 0o777, true);
         }

@@ -87,7 +87,7 @@ class ImmutableURI extends StringLiteral implements URI
     public function withPath($path)
     {
         $parts = explode('/', (string) $path);
-        $parts = array_filter($parts, fn ($i) => $i !== '');
+        $parts = array_filter($parts, static fn ($i) => $i !== '');
         $path = '/' . implode('/', $parts);
 
         return new static($this->getZendUri()->setPath($path));
@@ -105,7 +105,7 @@ class ImmutableURI extends StringLiteral implements URI
      */
     public function withQuery($query)
     {
-        if (is_array($query)) {
+        if (\is_array($query)) {
             $query = array_map('strval', $query);
         }
 

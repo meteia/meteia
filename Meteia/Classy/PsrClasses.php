@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace Meteia\Classy;
 
-use Generator;
-use IteratorAggregate;
 use Meteia\ValueObjects\Identity\FilesystemPath;
-use Stringable;
 
-readonly class PsrClasses implements IteratorAggregate
+readonly class PsrClasses implements \IteratorAggregate
 {
     public function __construct(
         private FilesystemPath $baseDirectory,
-        private string|Stringable $namespacePrefix,
+        private string|\Stringable $namespacePrefix,
         private array $regex,
     ) {
     }
 
-    public function getIterator(): Generator
+    public function getIterator(): \Generator
     {
         $searchRoot = $this->baseDirectory->join($this->namespacePrefix)->realpath();
         foreach ($searchRoot->find(...$this->regex) as $file) {
@@ -36,7 +33,7 @@ readonly class PsrClasses implements IteratorAggregate
     private function fileToClassName($file): string
     {
         $className = str_replace('.php', '', $file);
-        $className = str_replace(DIRECTORY_SEPARATOR, '\\', $className);
+        $className = str_replace(\DIRECTORY_SEPARATOR, '\\', $className);
         $className = trim($className, '\\');
 
         return trim($this->namespacePrefix . '\\' . $className, '\\');

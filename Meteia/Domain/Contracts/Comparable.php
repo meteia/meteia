@@ -19,7 +19,7 @@ interface Comparable
      *
      * @return int
      */
-    public function compareTo(Comparable $other);
+    public function compareTo(self $other);
 
     public function toNative();
 }

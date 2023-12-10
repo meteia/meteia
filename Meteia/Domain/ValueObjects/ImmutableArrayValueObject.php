@@ -16,20 +16,10 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
 
     public function __construct(protected array $values = [])
     {
-        if (!is_array($values)) {
+        if (!\is_array($values)) {
             throw new InvalidValueObjectException($values, ['array']);
         }
         $this->guardType($values);
-    }
-
-    public function compareTo(Comparable $other)
-    {
-        return count(array_diff($this->toNative(), $other->toNative()));
-    }
-
-    public function toNative()
-    {
-        return $this->values;
     }
 
     public function __toString()
@@ -37,19 +27,20 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         return implode(', ', $this->values);
     }
 
+    public function compareTo(Comparable $other)
+    {
+        return \count(array_diff($this->toNative(), $other->toNative()));
+    }
+
+    public function toNative()
+    {
+        return $this->values;
+    }
+
     public function getIterator()
     {
         foreach ($this->values as $key => $values) {
             yield $key => $values;
-        }
-    }
-
-    protected function guardType($values): void
-    {
-        foreach ($values as $value) {
-            if (!is_a($value, static::TYPE)) {
-                throw new InvalidValueObjectException($value::class, [static::TYPE]);
-            }
         }
     }
 
@@ -61,7 +52,7 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         return new static($copy);
     }
 
-    public function merge(ImmutableArrayValueObject $other)
+    public function merge(self $other)
     {
         return new static(array_merge($this->values, $other->values));
     }
@@ -73,7 +64,7 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
 
     public function count()
     {
-        return count($this->values);
+        return \count($this->values);
     }
 
     public function offsetExists($offset)
@@ -99,5 +90,14 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
     public function jsonSerialize()
     {
         return $this->toNative();
+    }
+
+    protected function guardType($values): void
+    {
+        foreach ($values as $value) {
+            if (!is_a($value, static::TYPE)) {
+                throw new InvalidValueObjectException($value::class, [static::TYPE]);
+            }
+        }
     }
 }

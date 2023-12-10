@@ -13,9 +13,9 @@ class FrameFilterMeteia implements FrameFilter
         }
 
         $paths = [
-            implode(DIRECTORY_SEPARATOR, ['vendor']),
-            implode(DIRECTORY_SEPARATOR, ['dulce', 'functions']),
-            implode(DIRECTORY_SEPARATOR, ['Meteia', 'Dulce']),
+            implode(\DIRECTORY_SEPARATOR, ['vendor']),
+            implode(\DIRECTORY_SEPARATOR, ['dulce', 'functions']),
+            implode(\DIRECTORY_SEPARATOR, ['Meteia', 'Dulce']),
         ];
 
         foreach ($paths as $path) {

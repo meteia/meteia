@@ -19,6 +19,11 @@ class ColorRGB
         $this->blue = $blue;
     }
 
+    public function __toString()
+    {
+        return '#' . $this->asHex();
+    }
+
     public function asHex()
     {
         return str_pad(dechex($this->red), 2, '0') . str_pad(dechex($this->green), 2, '0') . str_pad(dechex($this->blue), 2, '0');
@@ -27,10 +32,5 @@ class ColorRGB
     public function asInteger()
     {
         return hexdec($this->asHex());
-    }
-
-    public function __toString()
-    {
-        return '#' . $this->asHex();
     }
 }

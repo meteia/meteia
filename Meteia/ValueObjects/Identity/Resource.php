@@ -14,7 +14,7 @@ class Resource
      */
     public function __construct(private readonly mixed $resource)
     {
-        assert(is_resource($resource));
+        \assert(\is_resource($resource));
     }
 
     public function close(): void
@@ -52,12 +52,12 @@ class Resource
         rewind($this->resource);
         $content = stream_get_contents($this->resource);
 
-        return strlen($content);
+        return \strlen($content);
     }
 
     public function writeStream(FilesystemPath $destination): void
     {
-        $dirname = dirname((string) $destination);
+        $dirname = \dirname((string) $destination);
         if (!is_dir($dirname)) {
             mkdir($dirname, 0o777, true);
         }

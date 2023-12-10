@@ -13,13 +13,18 @@ abstract class IntegerLiteral extends PrimitiveValueObject
 
     public function __construct($value)
     {
-        $value = \filter_var($value, FILTER_VALIDATE_INT);
+        $value = filter_var($value, FILTER_VALIDATE_INT);
 
         if ($value === false) {
             throw new ValueObjectInvalid($value, ['int']);
         }
 
         $this->value = $value;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->value;
     }
 
     public function equalTo($integer): bool
@@ -40,10 +45,5 @@ abstract class IntegerLiteral extends PrimitiveValueObject
     public function asInteger(): int
     {
         return (int) $this->value;
-    }
-
-    public function __toString(): string
-    {
-        return (string) $this->value;
     }
 }

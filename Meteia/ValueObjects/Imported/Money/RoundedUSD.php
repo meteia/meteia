@@ -16,13 +16,13 @@ class RoundedUSD implements RoundedMoney
         $this->amount = (string) $amount;
     }
 
-    public function equalTo(RoundedUSD $amount): bool
-    {
-        return bccomp($this->amount, (string) $amount, 15) === 0;
-    }
-
     public function __toString()
     {
         return $this->amount;
+    }
+
+    public function equalTo(self $amount): bool
+    {
+        return bccomp($this->amount, (string) $amount, 15) === 0;
     }
 }

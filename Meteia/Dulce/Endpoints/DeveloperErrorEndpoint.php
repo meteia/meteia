@@ -10,7 +10,6 @@ use Meteia\Http\Responses\HtmlResponse;
 use Meteia\Http\Responses\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Throwable;
 
 class DeveloperErrorEndpoint implements ErrorEndpoint
 {
@@ -20,12 +19,12 @@ class DeveloperErrorEndpoint implements ErrorEndpoint
     ) {
     }
 
-    public function response(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
+    public function response(\Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         if (str_contains($request->getHeaderLine('Accept'), 'application/json')) {
             return new JsonResponse([
                 'message' => $throwable->getMessage(),
-                'stackTrace' => array_values(array_map(fn ($frame) => implode(':', [$frame->file, $frame->line]), $this->stackTrace->for($throwable)->stackFrames())),
+                'stackTrace' => array_values(array_map(static fn ($frame) => implode(':', [$frame->file, $frame->line]), $this->stackTrace->for($throwable)->stackFrames())),
             ]);
         }
 

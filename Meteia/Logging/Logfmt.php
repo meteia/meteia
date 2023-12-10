@@ -13,21 +13,21 @@ class Logfmt
         $lineData['level'] = $level;
         $lineData['msg'] = $message;
 
-        $lineData = array_map(function ($k, $v) {
+        $lineData = array_map(static function ($k, $v) {
             // ASCII printable only
             $k = preg_replace('/[^\x20-\x7E]/', '', $k);
 
-            if (strlen($k) <= 0) {
+            if ($k === '') {
                 // FIXME: Feels messy
                 return '';
             }
-            if (is_bool($v)) {
+            if (\is_bool($v)) {
                 return $k . '=' . ($v ? 'true' : 'false');
             }
-            if (is_float($v)) {
+            if (\is_float($v)) {
                 return $k . '=' . round($v, 4);
             }
-            if (is_string($v) && preg_match('/[ "]/', $v)) {
+            if (\is_string($v) && preg_match('/[ "]/', $v)) {
                 return sprintf('%s="%s"', $k, $v);
             }
 

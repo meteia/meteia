@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Meteia\Htmx;
 
 use Meteia\Library\StringCase;
-use Stringable;
 
-class HtmxAttributes implements Stringable
+class HtmxAttributes implements \Stringable
 {
     /** @noinspection PhpPropertyOnlyWrittenInspection */
     public function __construct(
@@ -47,10 +46,10 @@ class HtmxAttributes implements Stringable
 
     public function __toString(): string
     {
-        $attrs = array_filter(get_object_vars($this), fn ($val) => !empty($val));
+        $attrs = array_filter(get_object_vars($this), static fn ($val) => !empty($val));
         $attrs = array_map(
-            function ($k, $v) {
-                if (is_bool($v) && $v) {
+            static function ($k, $v) {
+                if (\is_bool($v) && $v) {
                     return $k;
                 }
 

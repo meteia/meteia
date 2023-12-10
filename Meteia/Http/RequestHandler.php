@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Http;
 
-use Exception;
 use Meteia\DependencyInjection\Container;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -44,9 +43,9 @@ class RequestHandler implements RequestHandlerInterface, MiddlewareInterface
         /** @var MiddlewareInterface $middleware */
         $middleware = array_shift($this->middleware);
         if ($middleware === null) {
-            throw new Exception('Request was not handled by any middleware');
+            throw new \Exception('Request was not handled by any middleware');
         }
-        if (is_string($middleware)) {
+        if (\is_string($middleware)) {
             $middleware = $this->container->get($middleware);
         }
 

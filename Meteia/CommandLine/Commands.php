@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\CommandLine;
 
-use Exception;
-use Generator;
-use IteratorAggregate;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Application\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
@@ -17,11 +14,10 @@ use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Throwable;
 
 use function Meteia\Http\Functions\send;
 
-class Commands implements IteratorAggregate
+class Commands implements \IteratorAggregate
 {
     public function __construct(
         private readonly Container $container,
@@ -30,7 +26,7 @@ class Commands implements IteratorAggregate
     ) {
     }
 
-    public function getIterator(): Generator
+    public function getIterator(): \Generator
     {
         $classes = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, ['.+', 'CommandLine', '.*\.php']);
         $commandClassnames = new ClassesImplementing($classes, Command::class);
@@ -46,18 +42,20 @@ class Commands implements IteratorAggregate
                         $this->container->set(OutputInterface::class, $output);
                         $command = $this->container->get($commandClassname);
                         if (!method_exists($command, 'execute')) {
-                            throw new Exception('Command is missing required execute() method');
+                            throw new \Exception('Command is missing required execute() method');
                         }
                         $this->container->call([$command, 'execute']);
-                    } catch (Throwable $throwable) {
-                        $this->container->set(Throwable::class, $throwable);
+                    } catch (\Throwable $throwable) {
+                        $this->container->set(\Throwable::class, $throwable);
                         $errorEndpoint = $this->container->get(ConsoleErrorEndpoint::class);
+
                         /** @var ResponseInterface $response */
                         $response = $this->container->call([$errorEndpoint, 'response'], [$throwable]);
                         send($response);
                     }
                 },
             );
+
             yield $command;
         }
     }
@@ -67,7 +65,7 @@ class Commands implements IteratorAggregate
         $commandNameParts = explode('\\', trim($className, '\\'));
         $commandNameParts = array_filter(
             $commandNameParts,
-            fn ($part) => !in_array($part, ['CommandLine', 'Meteia', (string) $this->applicationNamespace], true),
+            fn ($part) => !\in_array($part, ['CommandLine', 'Meteia', (string) $this->applicationNamespace], true),
         );
 
         return implode(':', $commandNameParts);

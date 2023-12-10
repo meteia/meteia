@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
-use Exception;
-
 trait DeferredResolve
 {
     /** @var array */
@@ -62,11 +60,11 @@ trait DeferredResolve
             return null;
         }
 
-        return is_array($this->mergedArgs[$string]) ? array_unique($this->mergedArgs[$string]) : [$this->mergedArgs[$string]];
+        return \is_array($this->mergedArgs[$string]) ? array_unique($this->mergedArgs[$string]) : [$this->mergedArgs[$string]];
     }
 
     private function load(): array
     {
-        throw new Exception('load() must be implemented by the using class');
+        throw new \Exception('load() must be implemented by the using class');
     }
 }

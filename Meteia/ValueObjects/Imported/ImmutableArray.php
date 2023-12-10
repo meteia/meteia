@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\Yeso\ValueObjects;
 
-use ArrayAccess;
-use Countable;
-use IteratorAggregate;
 use Meteia\Yeso\Exceptions\ArrayTypeNotDefined;
 use Meteia\Yeso\Exceptions\ImproperType;
 use Meteia\Yeso\Exceptions\ObjectMutationProhibited;
-use Traversable;
 
-abstract class ImmutableArray implements IteratorAggregate, Countable, ArrayAccess
+abstract class ImmutableArray implements \IteratorAggregate, \Countable, \ArrayAccess
 {
     public const TYPE = ArrayTypeNotDefined::class;
 
@@ -44,14 +40,14 @@ abstract class ImmutableArray implements IteratorAggregate, Countable, ArrayAcce
         return new static(array_merge($this->values, $array));
     }
 
-    public function appendTraversable(Traversable $traversable): self
+    public function appendTraversable(\Traversable $traversable): self
     {
         return $this->appendArray(iterator_to_array($traversable));
     }
 
     public function count()
     {
-        return count($this->values);
+        return \count($this->values);
     }
 
     public function offsetExists($offset)

@@ -9,7 +9,7 @@ use Symfony\Component\Serializer\Serializer;
 
 class RequestBody
 {
-    private string|null $content = null;
+    private null|string $content = null;
 
     public function __construct(
         private readonly ServerRequestInterface $request,
@@ -19,7 +19,7 @@ class RequestBody
 
     public function content(): string
     {
-        if (is_null($this->content)) {
+        if ($this->content === null) {
             $body = $this->request->getBody();
             if ($body->isSeekable()) {
                 $body->rewind();

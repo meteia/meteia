@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Database\CommandLine;
 
-use Exception;
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Meteia\Library\StringCase;
@@ -35,10 +34,10 @@ class NewMigration implements Command
         $id = date('YmdHis');
 
         $isIdempotent = $this->input->getArgument(self::ARG_TYPE);
-        if (!in_array(strtolower($isIdempotent), ['i', 'idempotent', 'ni', 'non-idempotent'], true)) {
-            throw new Exception('Valid migration type are: i (idempotent) or ni (non-idempotent)');
+        if (!\in_array(strtolower($isIdempotent), ['i', 'idempotent', 'ni', 'non-idempotent'], true)) {
+            throw new \Exception('Valid migration type are: i (idempotent) or ni (non-idempotent)');
         }
-        $isIdempotent = in_array(strtolower($isIdempotent), ['i', 'idempotent'], true);
+        $isIdempotent = \in_array(strtolower($isIdempotent), ['i', 'idempotent'], true);
         $migrationType = $isIdempotent ? 'i' : 'ni';
 
         $filename = $this->input->getArgument(self::ARG_NAME);
@@ -47,7 +46,7 @@ class NewMigration implements Command
         $filename = mb_substr($filename, 0, 63);
         $filename = implode('.', [$id, $migrationType, $filename]);
         $target = $this->applicationPath->join('migrations', $filename);
-        $template = <<<SQL
+        $template = <<<'SQL'
             -- writing your migration in an idempotent fashion is advised (where possible, ALTER for example can't be for MYSQL)
 
             SQL;

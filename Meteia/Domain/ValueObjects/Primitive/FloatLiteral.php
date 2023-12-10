@@ -13,7 +13,7 @@ class FloatLiteral extends ImmutablePrimitiveValueObject
 
     public function __construct($value)
     {
-        if (\filter_var($value, FILTER_VALIDATE_FLOAT) === false) {
+        if (filter_var($value, FILTER_VALIDATE_FLOAT) === false) {
             throw new InvalidValueObjectException($value, ['float']);
         }
 

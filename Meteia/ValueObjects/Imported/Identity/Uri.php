@@ -14,17 +14,17 @@ class Uri extends StringLiteral
         parent::__construct((string) $uri);
     }
 
-    public function withFragment($fragment): Uri
+    public function withFragment($fragment): self
     {
         return new static((string) $this->getZendUri()->setFragment($fragment));
     }
 
-    public function withHost($host): Uri
+    public function withHost($host): self
     {
         return new static((string) $this->getZendUri()->setHost($host));
     }
 
-    public function withPath($path): Uri
+    public function withPath($path): self
     {
         if (!str_starts_with((string) $path, '/')) {
             $path = '/' . (string) $path;
@@ -33,24 +33,24 @@ class Uri extends StringLiteral
         return new static((string) $this->getZendUri()->setPath($path));
     }
 
-    public function withPort($port): Uri
+    public function withPort($port): self
     {
         return new static((string) $this->getZendUri()->setPort($port));
     }
 
-    public function withQueryArray(array $query): Uri
+    public function withQueryArray(array $query): self
     {
         $query = array_map('strval', $query);
 
         return new static((string) $this->getZendUri()->setQuery($query));
     }
 
-    public function withQueryString(string $query): Uri
+    public function withQueryString(string $query): self
     {
         return new static((string) $this->getZendUri()->setQuery($query));
     }
 
-    public function withScheme($scheme): Uri
+    public function withScheme($scheme): self
     {
         return new static((string) $this->getZendUri()->setScheme($scheme));
     }

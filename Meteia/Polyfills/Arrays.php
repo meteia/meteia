@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Polyfills;
 
-use Exception;
-use stdClass;
-
 /**
  * @source: http://stackoverflow.com/a/15973172
+ *
+ * @param mixed $input
  */
 function array_cartesian($input)
 {
@@ -55,7 +54,7 @@ function array_end(array $a)
 function array_reorder(array $toSort, array $order, callable $comparedValue)
 {
     $targetOrder = array_flip($order);
-    usort($toSort, function ($a, $b) use ($targetOrder, $comparedValue) {
+    usort($toSort, static function ($a, $b) use ($targetOrder, $comparedValue) {
         $left = $targetOrder[$comparedValue($a)];
         $right = $targetOrder[$comparedValue($b)];
 
@@ -67,29 +66,32 @@ function array_reorder(array $toSort, array $order, callable $comparedValue)
 
 /**
  * @source: http://stackoverflow.com/a/21650726/31341
+ *
+ * @param mixed $array
  */
 function array_to_object($array)
 {
-    $resultObj = new stdClass();
+    $resultObj = new \stdClass();
     $resultArr = [];
     $hasIntKeys = false;
     $hasStrKeys = false;
     foreach ($array as $k => $v) {
         if (!$hasIntKeys) {
-            $hasIntKeys = is_int($k);
+            $hasIntKeys = \is_int($k);
         }
         if (!$hasStrKeys) {
-            $hasStrKeys = is_string($k);
+            $hasStrKeys = \is_string($k);
         }
         if ($hasIntKeys && $hasStrKeys) {
-            $e = new Exception('Current level has both integer and string keys, thus it is impossible to keep array or convert to object');
+            $e = new \Exception('Current level has both integer and string keys, thus it is impossible to keep array or convert to object');
             $e->vars = ['level' => $array];
+
             throw $e;
         }
         if ($hasStrKeys) {
-            $resultObj->{$k} = is_array($v) ? array_to_object($v) : $v;
+            $resultObj->{$k} = \is_array($v) ? array_to_object($v) : $v;
         } else {
-            $resultArr[$k] = is_array($v) ? array_to_object($v) : $v;
+            $resultArr[$k] = \is_array($v) ? array_to_object($v) : $v;
         }
     }
 

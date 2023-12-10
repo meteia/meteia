@@ -90,7 +90,7 @@ class StreetSpec extends ObjectBehavior
     public function getMatchers(): array
     {
         return [
-            'haveValue' => function ($subject, $value) {
+            'haveValue' => static function ($subject, $value) {
                 $string = '';
 
                 foreach ($subject as $maybe) {
@@ -103,14 +103,14 @@ class StreetSpec extends ObjectBehavior
 
                 return false;
             },
-            'returnStreet' => function ($subject, $value) {
+            'returnStreet' => static function ($subject, $value) {
                 $subject = '' . $subject;
                 $value = '' . $value;
                 if ($value === $subject) {
                     return true;
-                } else {
-                    throw new FailureException(sprintf('Message with subject "%s" and value "%s".', $subject, $value));
                 }
+
+                throw new FailureException(sprintf('Message with subject "%s" and value "%s".', $subject, $value));
             },
         ];
     }

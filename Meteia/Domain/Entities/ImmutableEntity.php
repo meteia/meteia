@@ -11,7 +11,7 @@ class ImmutableEntity implements Entity
 {
     public function __set($key, $value): void
     {
-        throw new ImmutableEntityException("Unable to set '$key' as " . get_class($this) . ' is immutable.');
+        throw new ImmutableEntityException("Unable to set '{$key}' as " . static::class . ' is immutable.');
     }
 
     public function jsonSerialize()

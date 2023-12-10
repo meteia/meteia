@@ -14,7 +14,6 @@ use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\DomainEventHandler;
 use Meteia\MessageStreams\MessageSerializer;
 use Psr\Log\LoggerInterface;
-use Throwable;
 
 class EventBus implements MessageHandler
 {
@@ -39,7 +38,7 @@ class EventBus implements MessageHandler
 
     public function consumeFor(string $eventHandler): void
     {
-        assert(is_subclass_of($eventHandler, DomainEventHandler::class));
+        \assert(is_subclass_of($eventHandler, DomainEventHandler::class));
         $this->queue->consume($this->queueNameFromEventHandler($eventHandler), $this);
     }
 
@@ -52,13 +51,14 @@ class EventBus implements MessageHandler
     {
         try {
             $domainEvent = $this->messageSerializer->unserialize($body);
-            assert(is_subclass_of($domainEvent, DomainEvent::class));
+            \assert(is_subclass_of($domainEvent, DomainEvent::class));
             $domainEventHandlerClass = $this->eventHandlerFromQueueName($this->applicationNamespace, $queueName);
+
             /** @var DomainEventHandler $domainEventHandler */
             $domainEventHandler = $this->container->get($domainEventHandlerClass);
-            assert(is_subclass_of($domainEventHandler, DomainEventHandler::class));
+            \assert(is_subclass_of($domainEventHandler, DomainEventHandler::class));
             $this->container->call([$domainEventHandler, 'on'], [$domainEvent]);
-        } catch (Throwable $t) {
+        } catch (\Throwable $t) {
             $this->log->critical($t->getMessage(), [
                 'queueName' => $queueName,
                 'file' => $t->getFile(),

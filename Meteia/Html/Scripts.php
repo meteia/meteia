@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Meteia\Html;
 
 use Meteia\Html\Elements\Script;
-use Stringable;
 
-class Scripts implements Stringable
+class Scripts implements \Stringable
 {
     private array $scripts = [];
 

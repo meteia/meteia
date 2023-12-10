@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-use Stringable;
-
-class Metadata implements Stringable
+class Metadata implements \Stringable
 {
     private array $tags = [];
 
@@ -15,7 +13,7 @@ class Metadata implements Stringable
         return implode('', $this->tags);
     }
 
-    public function include(Stringable $view): void
+    public function include(\Stringable $view): void
     {
         $this->tags[] = $view;
     }

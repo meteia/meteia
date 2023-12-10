@@ -4,26 +4,14 @@ declare(strict_types=1);
 
 namespace Meteia\Domain\ValueObjects\Primitive;
 
-use JsonSerializable;
 use Meteia\Domain\Contracts\Comparable;
 use Meteia\Domain\ValueObjects\ImmutablePrimitiveValueObject;
 
-class Boolean extends ImmutablePrimitiveValueObject implements Comparable, JsonSerializable
+class Boolean extends ImmutablePrimitiveValueObject implements Comparable, \JsonSerializable
 {
     public function __construct($value)
     {
-        $this->value = \filter_var($value, FILTER_VALIDATE_BOOLEAN);
-    }
-
-    public function compareTo(Comparable $other)
-    {
-        if ($this->toNative() === $other->toNative()) {
-            return 0;
-        } elseif ($this->toNative() < $other->toNative()) {
-            return -1;
-        } else {
-            return 1;
-        }
+        $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     public function __toString()
@@ -35,9 +23,21 @@ class Boolean extends ImmutablePrimitiveValueObject implements Comparable, JsonS
         return 'FALSE';
     }
 
+    public function compareTo(Comparable $other)
+    {
+        if ($this->toNative() === $other->toNative()) {
+            return 0;
+        }
+        if ($this->toNative() < $other->toNative()) {
+            return -1;
+        }
+
+        return 1;
+    }
+
     public function isTrue()
     {
-        return boolval($this->value);
+        return (bool) $this->value;
     }
 
     public function isFalse()
@@ -48,10 +48,10 @@ class Boolean extends ImmutablePrimitiveValueObject implements Comparable, JsonS
     public function Not()
     {
         if ($this->isTrue()) {
-            return new Boolean(false);
+            return new self(false);
         }
 
-        return new Boolean(true);
+        return new self(true);
     }
 
     public function jsonSerialize()

@@ -22,16 +22,16 @@ class Uuid extends PrimitiveValueObject
             }
         }
 
-        $this->value = strval($value);
-    }
-
-    public function equalTo(Uuid $other)
-    {
-        return hash_equals(strtolower($this->value), strtolower($this->value));
+        $this->value = (string) $value;
     }
 
     public function __toString()
     {
         return $this->value;
+    }
+
+    public function equalTo(self $other)
+    {
+        return hash_equals(strtolower($this->value), strtolower($this->value));
     }
 }

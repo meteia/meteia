@@ -22,7 +22,7 @@ class Timings
 
     public function all(): array
     {
-        return array_map_assoc(fn ($k, $v) => [$k => round($v, 4)], $this->timings);
+        return array_map_assoc(static fn ($k, $v) => [$k => round($v, 4)], $this->timings);
     }
 
     public function measure(string $category, callable $c)
@@ -47,8 +47,7 @@ class Timings
     private function filteredCategory(string $category): string
     {
         $category = trim($category);
-        $category = str_replace('\\', '.', $category);
 
-        return $category;
+        return str_replace('\\', '.', $category);
     }
 }

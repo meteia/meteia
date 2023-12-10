@@ -20,7 +20,7 @@ trait WithMagicMethod
     private function with($key, $value): self
     {
         $copy = clone $this;
-        $copy->$key = $value;
+        $copy->{$key} = $value;
 
         return $copy;
     }

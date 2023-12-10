@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL\ClientAwareErrors;
 
-use Exception;
 use GraphQL\Error\ClientAware;
 
-class Unauthorized extends Exception implements ClientAware
+class Unauthorized extends \Exception implements ClientAware
 {
     public function __construct()
     {

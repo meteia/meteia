@@ -10,6 +10,6 @@ class FileHash extends Hash
 {
     public static function fromHash(Hash $hash): self
     {
-        return new FileHash($hash->value);
+        return new self($hash->value);
     }
 }

@@ -17,7 +17,7 @@ class NamedEndpoints
 
     public function __construct(array $endpoints = [])
     {
-        $endpoints = array_filter($endpoints, fn (string $endpoint) => class_implements($endpoint));
+        $endpoints = array_filter($endpoints, static fn (string $endpoint) => class_implements($endpoint));
         $this->endpoints = array_map_assoc(fn (int $idx, string $endpoint) => [
             $this->classBasedName($endpoint) => $endpoint,
         ], $endpoints);

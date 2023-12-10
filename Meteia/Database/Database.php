@@ -5,23 +5,17 @@ declare(strict_types=1);
 namespace Meteia\Database;
 
 use Aura\Sql\ExtendedPdo;
-use BackedEnum;
-use DateTime;
-use DateTimeInterface;
-use Exception;
 use Meteia\Cryptography\Hash;
 use Meteia\ValueObjects\Identity\UniqueId;
-use PDOException;
-use Stringable;
 
 class Database extends ExtendedPdo
 {
     public function delete(string $table, array $whereBindings): void
     {
-        if (count($whereBindings) === 0) {
-            throw new Exception('Missing where bindings for delete');
+        if (\count($whereBindings) === 0) {
+            throw new \Exception('Missing where bindings for delete');
         }
-        $whereColumn = implode(' AND ', array_map(fn ($column) => "`$column`=:$column", array_keys($whereBindings)));
+        $whereColumn = implode(' AND ', array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)));
         $query = sprintf('DELETE FROM `%s` WHERE %s', $table, $whereColumn);
         $bindings = $this->prepareBindings($whereBindings);
         $this->perform($query, $bindings);
@@ -29,12 +23,12 @@ class Database extends ExtendedPdo
 
     public function insert(string $table, array $bindings): void
     {
-        if (count($bindings) === 0) {
-            throw new Exception('Missing where bindings for insert');
+        if (\count($bindings) === 0) {
+            throw new \Exception('Missing where bindings for insert');
         }
 
-        $columns = implode(', ', array_map(fn ($column) => "`$column`", array_keys($bindings)));
-        $columnBindings = implode(', ', array_map(fn ($column) => ":$column", array_keys($bindings)));
+        $columns = implode(', ', array_map(static fn ($column) => "`{$column}`", array_keys($bindings)));
+        $columnBindings = implode(', ', array_map(static fn ($column) => ":{$column}", array_keys($bindings)));
 
         $query = sprintf('INSERT INTO `%s` (%s) VALUES (%s)', $table, $columns, $columnBindings);
         $bindings = $this->prepareBindings($bindings);
@@ -48,11 +42,11 @@ class Database extends ExtendedPdo
 
     public function select(string $table, array $whereBindings): array
     {
-        if (count($whereBindings) === 0) {
-            throw new Exception('Missing where bindings for select');
+        if (\count($whereBindings) === 0) {
+            throw new \Exception('Missing where bindings for select');
         }
 
-        $whereColumn = implode(' AND ', array_map(fn ($column) => "`$column` = :$column", array_keys($whereBindings)));
+        $whereColumn = implode(' AND ', array_map(static fn ($column) => "`{$column}` = :{$column}", array_keys($whereBindings)));
         $query = sprintf('SELECT * FROM `%s` WHERE %s', $table, $whereColumn);
         $bindings = $this->prepareBindings($whereBindings);
 
@@ -61,12 +55,12 @@ class Database extends ExtendedPdo
 
     public function update(string $table, array $setBindings, array $whereBindings): void
     {
-        if (count($setBindings) === 0 || count($whereBindings) === 0) {
-            throw new Exception('Missing set and/or where bindings for update');
+        if (\count($setBindings) === 0 || \count($whereBindings) === 0) {
+            throw new \Exception('Missing set and/or where bindings for update');
         }
 
-        $setColumns = implode(', ', array_map(fn ($column) => "`$column`=:$column", array_keys($setBindings)));
-        $whereColumn = implode(' AND ', array_map(fn ($column) => "`$column`=:$column", array_keys($whereBindings)));
+        $setColumns = implode(', ', array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($setBindings)));
+        $whereColumn = implode(' AND ', array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)));
         $query = sprintf('UPDATE `%s` SET %s WHERE %s', $table, $setColumns, $whereColumn);
         $bindings = $this->prepareBindings([...$setBindings, ...$whereBindings]);
         $this->fetchAffected($query, $bindings);
@@ -76,9 +70,9 @@ class Database extends ExtendedPdo
     {
         try {
             $this->insert($table, [...$setBindings, ...$whereBindings]);
-        } catch (PDOException $exception) {
-            $setBindings = array_filter($setBindings, fn ($key) => !array_key_exists($key, $whereBindings), ARRAY_FILTER_USE_KEY);
-            if (count($setBindings) === 0) {
+        } catch (\PDOException $exception) {
+            $setBindings = array_filter($setBindings, static fn ($key) => !\array_key_exists($key, $whereBindings), ARRAY_FILTER_USE_KEY);
+            if (\count($setBindings) === 0) {
                 // Nothing to update
                 return;
             }
@@ -93,10 +87,10 @@ class Database extends ExtendedPdo
 
     private function prepareBoundValue(mixed $value): mixed
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return array_map($this->prepareBoundValue(...), $value);
         }
-        if (!is_object($value)) {
+        if (!\is_object($value)) {
             return $value;
         }
         if ($value instanceof UniqueId) {
@@ -105,16 +99,16 @@ class Database extends ExtendedPdo
         if ($value instanceof Hash) {
             return $value->binary();
         }
-        if ($value instanceof BackedEnum) {
+        if ($value instanceof \BackedEnum) {
             return $value->value;
         }
-        if ($value instanceof DateTime) {
+        if ($value instanceof \DateTime) {
             return $value->format(MySQL::DATE);
         }
-        if ($value instanceof DateTimeInterface) {
+        if ($value instanceof \DateTimeInterface) {
             return $value->format(MySQL::DATETIME);
         }
-        if ($value instanceof Stringable) {
+        if ($value instanceof \Stringable) {
             return (string) $value;
         }
 

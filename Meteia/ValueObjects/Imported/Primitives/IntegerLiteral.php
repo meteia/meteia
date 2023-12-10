@@ -13,47 +13,47 @@ class IntegerLiteral extends PrimitiveValueObject
 
     public function __construct($value)
     {
-        $filteredValue = \filter_var($value, FILTER_VALIDATE_INT);
+        $filteredValue = filter_var($value, FILTER_VALIDATE_INT);
 
         if ($filteredValue === false) {
-            throw new ImproperType(gettype($value), ['int']);
+            throw new ImproperType(\gettype($value), ['int']);
         }
 
         $this->value = $filteredValue;
     }
 
-    public function equalTo(IntegerLiteral $value): bool
+    public function __toString()
+    {
+        return (string) $this->value;
+    }
+
+    public function equalTo(self $value): bool
     {
         return bccomp((string) $this, (string) $value, self::PRECISION) === 0;
     }
 
-    public function add(IntegerLiteral $value): IntegerLiteral
+    public function add(self $value): self
     {
-        return new IntegerLiteral(bcadd((string) $this, (string) $value, self::PRECISION));
+        return new self(bcadd((string) $this, (string) $value, self::PRECISION));
     }
 
-    public function subtract(IntegerLiteral $value): IntegerLiteral
+    public function subtract(self $value): self
     {
-        return new IntegerLiteral(bcsub((string) $this, (string) $value, self::PRECISION));
+        return new self(bcsub((string) $this, (string) $value, self::PRECISION));
     }
 
-    public function divideBy(IntegerLiteral $by): IntegerLiteral
+    public function divideBy(self $by): self
     {
-        return new IntegerLiteral(bcdiv((string) $this, (string) $by, self::PRECISION));
+        return new self(bcdiv((string) $this, (string) $by, self::PRECISION));
     }
 
-    public function multiplyBy(IntegerLiteral $by): IntegerLiteral
+    public function multiplyBy(self $by): self
     {
-        return new IntegerLiteral(bcmul((string) $this, (string) $by, self::PRECISION));
+        return new self(bcmul((string) $this, (string) $by, self::PRECISION));
     }
 
     public function asFloat(): FloatLiteral
     {
         return new FloatLiteral($this->value);
-    }
-
-    public function __toString()
-    {
-        return strval($this->value);
     }
 }

@@ -10,7 +10,7 @@ class BooleanLiteral extends PrimitiveValueObject
 {
     public function __construct($value)
     {
-        $this->value = \filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     public function isTrue(): bool
@@ -23,8 +23,8 @@ class BooleanLiteral extends PrimitiveValueObject
         return $this->value === false;
     }
 
-    public function not(): BooleanLiteral
+    public function not(): self
     {
-        return new BooleanLiteral(!$this->value);
+        return new self(!$this->value);
     }
 }

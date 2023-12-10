@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL\Types;
 
-use DateTimeZone;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
@@ -25,7 +24,7 @@ class DateTime extends ScalarType implements Resolver
 
     public function data($root, array $args, RequestContext $requestContext): string
     {
-        $date = new \DateTime($root, new DateTimeZone('UTC'));
+        $date = new \DateTime($root, new \DateTimeZone('UTC'));
 
         return $date->format($args['format']);
     }
@@ -41,7 +40,7 @@ class DateTime extends ScalarType implements Resolver
 
     public function parseValue($value)
     {
-        $date = new \DateTime($value, new DateTimeZone('UTC'));
+        $date = new \DateTime($value, new \DateTimeZone('UTC'));
 
         return $date->format(\DateTime::ATOM);
     }

@@ -13,10 +13,8 @@ use Meteia\Events\EventId;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\ProcessId;
-use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\Serializer;
-use Throwable;
 
 readonly class BunnyEventBus implements EventBus
 {
@@ -31,7 +29,7 @@ readonly class BunnyEventBus implements EventBus
     ) {
     }
 
-    #[Override]
+    #[\Override]
     public function publishEvent(Event $event): void
     {
         $payload = $this->serializer->serialize($event, 'json');
@@ -49,7 +47,7 @@ readonly class BunnyEventBus implements EventBus
         ]);
     }
 
-    #[Override]
+    #[\Override]
     public function registerEventHandler(string $eventClassName, string $eventHandlerClassName, callable $eventHandler): void
     {
         $exchangeName = $this->exchangeNameForEvent($eventClassName);
@@ -82,17 +80,17 @@ readonly class BunnyEventBus implements EventBus
             $causationId = CausationId::fromToken($message->headers['causation-id']);
             $processId = ProcessId::fromToken($message->headers['process-id']);
             $this->log->info('Received Event', [
-                    'queueName' => $queueName,
-                    'eventId' => $eventId,
-                    'correlationId' => $correlationId,
-                    'causationId' => $causationId,
-                    'processId' => $processId,
-                ]);
+                'queueName' => $queueName,
+                'eventId' => $eventId,
+                'correlationId' => $correlationId,
+                'causationId' => $causationId,
+                'processId' => $processId,
+            ]);
 
             try {
                 $event = $this->serializer->deserialize($message->content, $eventClassName, 'json');
                 $eventHandler($event, $eventId, $correlationId, $causationId, $processId);
-            } catch (Throwable $t) {
+            } catch (\Throwable $t) {
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), [
                     'queueName' => $queueName,
@@ -102,7 +100,7 @@ readonly class BunnyEventBus implements EventBus
         }, $queueName);
     }
 
-    #[Override]
+    #[\Override]
     public function run(): void
     {
         $this->client->run();

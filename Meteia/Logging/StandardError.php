@@ -12,7 +12,7 @@ class StandardError extends AbstractLogger
 
     public function __construct()
     {
-        $this->stderr = fopen('php://stderr', 'wb');
+        $this->stderr = fopen('php://stderr', 'w');
     }
 
     public function log($level, $message, array $context = []): void

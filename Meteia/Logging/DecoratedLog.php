@@ -10,7 +10,6 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\ProcessId;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
-use Stringable;
 
 class DecoratedLog extends AbstractLogger
 {
@@ -25,10 +24,10 @@ class DecoratedLog extends AbstractLogger
         readonly private ProcessId $processId,
         RepositoryPath $repositoryPath,
     ) {
-        $this->pathPrefix = trim((string) $repositoryPath, DIRECTORY_SEPARATOR);
+        $this->pathPrefix = trim((string) $repositoryPath, \DIRECTORY_SEPARATOR);
     }
 
-    public function log($level, string|Stringable $message, array $context = []): void
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         if (!isset($context['file'], $context['line'])) {
             $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -38,7 +37,7 @@ class DecoratedLog extends AbstractLogger
         }
 
         $context['source'] = str_replace($this->pathPrefix, '', $context['file'] ?? 'unknown');
-        $context['source'] = trim($context['source'], DIRECTORY_SEPARATOR);
+        $context['source'] = trim($context['source'], \DIRECTORY_SEPARATOR);
         $context['source'] .= ':' . $context['line'] ?? '0';
 
         unset($context['file'], $context['line']);

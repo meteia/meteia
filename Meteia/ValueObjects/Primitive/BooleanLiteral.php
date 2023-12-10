@@ -11,7 +11,16 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
 {
     public function __construct($value)
     {
-        $this->value = \filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    public function __toString()
+    {
+        if ($this->isTrue()) {
+            return 'TRUE';
+        }
+
+        return 'FALSE';
     }
 
     public function compareTo(Comparable $other)
@@ -27,15 +36,6 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
         return 1;
     }
 
-    public function __toString()
-    {
-        if ($this->isTrue()) {
-            return 'TRUE';
-        }
-
-        return 'FALSE';
-    }
-
     public function jsonSerialize()
     {
         return $this->isTrue();
@@ -43,7 +43,7 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
 
     public function isTrue()
     {
-        return boolval($this->value);
+        return (bool) $this->value;
     }
 
     public function isFalse()

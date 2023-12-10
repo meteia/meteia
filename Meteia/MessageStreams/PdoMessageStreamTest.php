@@ -9,20 +9,16 @@ use Aura\Sql\ExtendedPdoInterface;
 use Meteia\Domain\ValueObjects\AggregateRootId;
 use Meteia\MessageStreams\Contracts\Message;
 use Meteia\MessageStreams\Contracts\MessageStream;
-use TestCase;
 
 return;
-
 function db(): ExtendedPdoInterface
 {
-    $pdo = new ExtendedPdo('sqlite::memory:');
-
-    return $pdo;
+    return new ExtendedPdo('sqlite::memory:');
 }
 
 function init(ExtendedPdoInterface $pdo): PdoEventStream
 {
-    $query = <<<SQL
+    $query = <<<'SQL'
         CREATE TABLE message_streams (
             message_stream_id       BINARY(20)                         NOT NULL,
             message_stream_sequence BIGINT UNSIGNED                    NOT NULL,
@@ -57,8 +53,8 @@ function init(ExtendedPdoInterface $pdo): PdoEventStream
 //    }
 // }
 
-it('stores a stream on commit', function (): void {
-    /** @var TestCase $this */
+it('stores a stream on commit', static function (): void {
+    /** @var \TestCase $this */
 
     // Arrange
     $db = db();

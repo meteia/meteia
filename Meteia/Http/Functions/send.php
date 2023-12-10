@@ -24,7 +24,7 @@ function send(ResponseInterface $response): void
 
         foreach ($response->getHeaders() as $name => $values) {
             foreach ($values as $value) {
-                header("$name: $value", false);
+                header("{$name}: {$value}", false);
             }
         }
     }
@@ -39,7 +39,7 @@ function send(ResponseInterface $response): void
         echo $stream->read(1024 * 8);
     }
 
-    if (function_exists('fastcgi_finish_request')) {
+    if (\function_exists('fastcgi_finish_request')) {
         fastcgi_finish_request();
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
-use Generator;
 use GraphQL\Type\Definition\Type;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\DependencyInjection\Container;
@@ -18,12 +17,13 @@ class SchemaFields
     ) {
     }
 
-    public function implementing(string $interface): Generator
+    public function implementing(string $interface): \Generator
     {
         $classes = new ClassesImplementing($this->fieldClasses, $interface);
         foreach ($classes as $queryFieldClassName) {
             /** @var QueryField $field */
             $field = $this->container->get($queryFieldClassName);
+
             yield $this->fieldName($queryFieldClassName) => [
                 'type' => Type::nonNull($field),
                 'args' => method_exists($field, 'args') ? $field->args() : [],

@@ -7,9 +7,8 @@ namespace Meteia\Html\Elements;
 use Meteia\Html\Metadata;
 use Meteia\Html\Scripts;
 use Meteia\Html\Stylesheets;
-use Stringable;
 
-class Head implements Stringable
+class Head implements \Stringable
 {
     public function __construct(
         public Title $title,
@@ -23,10 +22,10 @@ class Head implements Stringable
     {
         return <<<EOF
             <head>
-              $this->title
-              $this->stylesheets
-              $this->metadata
-              $this->scripts
+              {$this->title}
+              {$this->stylesheets}
+              {$this->metadata}
+              {$this->scripts}
             </head>
             EOF;
     }

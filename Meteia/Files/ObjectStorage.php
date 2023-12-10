@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Files;
 
-use DateTime;
-use DateTimeZone;
-use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use League\MimeTypeDetection\ExtensionMimeTypeDetector;
@@ -19,7 +16,6 @@ use Meteia\Files\Configuration\SecretKey;
 use Meteia\Files\Contracts\Storage;
 use Meteia\ValueObjects\Identity\Resource;
 use Meteia\ValueObjects\Identity\Uri;
-use Override;
 
 class ObjectStorage implements Storage
 {
@@ -45,6 +41,7 @@ class ObjectStorage implements Storage
     public function exists(string $dest): bool
     {
         $client = new Client();
+
         try {
             $publicUri = $this->publicUri->withPath($dest);
 
@@ -54,7 +51,7 @@ class ObjectStorage implements Storage
         }
     }
 
-    #[Override]
+    #[\Override]
     public function delete(string $dest): void
     {
         // noop
@@ -69,7 +66,7 @@ class ObjectStorage implements Storage
 
         $hashedPayload = $src->hash('sha256')->hex();
 
-        $now = new DateTime('now', new DateTimeZone('utc'));
+        $now = new \DateTime('now', new \DateTimeZone('utc'));
         $scope = implode('/', [
             $now->format(self::DATE),
             $this->region,
@@ -80,7 +77,7 @@ class ObjectStorage implements Storage
         $contentType = $this->extensionMimeTypeDetector->detectMimeTypeFromFile($dest) ?? 'application/octet-stream';
         $contentLength = $src->size();
         if (!$contentLength) {
-            throw new Exception('Trying to upload an empty file?');
+            throw new \Exception('Trying to upload an empty file?');
         }
 
         $canonicalHeaders = [
@@ -114,20 +111,22 @@ class ObjectStorage implements Storage
         $signature = $this->sign($now, $stringToSign);
 
         $client = new Client();
+
         try {
             $client->request('PUT', (string) $canonicalUri, [
                 'headers' => [
                     'Authorization' => 'AWS4-HMAC-SHA256 ' . implode(', ', [
-                            sprintf('Credential=%s/%s', $this->accessKey, $scope),
-                            "SignedHeaders=$signedHeaders",
-                            "Signature=$signature",
-                        ]),
+                        sprintf('Credential=%s/%s', $this->accessKey, $scope),
+                        "SignedHeaders={$signedHeaders}",
+                        "Signature={$signature}",
+                    ]),
                     ...$canonicalHeaders,
                 ],
                 'body' => $src->resource(),
             ]);
         } catch (ClientException $e) {
             echo $e->getResponse()->getBody()->getContents() . PHP_EOL;
+
             throw $e;
         }
 
@@ -139,10 +138,10 @@ class ObjectStorage implements Storage
         ksort($headers);
         array_map(trim(...), $headers);
 
-        return implode("\n", array_map(fn ($key, $value) => sprintf('%s:%s', strtolower($key), trim((string) $value)), array_keys($headers), $headers)) . "\n";
+        return implode("\n", array_map(static fn ($key, $value) => sprintf('%s:%s', strtolower($key), trim((string) $value)), array_keys($headers), $headers)) . "\n";
     }
 
-    private function sign(DateTime $now, string $content): string
+    private function sign(\DateTime $now, string $content): string
     {
         $dateKey = hash_hmac('sha256', $now->format(self::DATE), 'AWS4' . $this->secretKey, true);
         $dateRegionKey = hash_hmac('sha256', (string) $this->region, $dateKey, true);

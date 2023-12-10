@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Logging;
 
-use DateTime;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 
-use function gettype;
-use function is_array;
-use function is_object;
 use function Polyfills\array_map_assoc;
 
 class RFC5424Formatted extends AbstractLogger
@@ -48,10 +44,10 @@ class RFC5424Formatted extends AbstractLogger
 
         return implode(' ', [
             // <PRI>VERSION
-            "<$priority>1",
+            "<{$priority}>1",
 
             // TIMESTAMP
-            date(DateTime::ATOM),
+            date(\DateTime::ATOM),
 
             // HOSTNAME
             gethostname() ?? '-',
@@ -74,8 +70,8 @@ class RFC5424Formatted extends AbstractLogger
     {
         $elements = array_map_assoc(function ($elementSourceId, $elementSourceParams) {
             $elementParams = array_map_assoc(function ($paramName, $paramValue) {
-                if (is_object($paramValue) || is_array($paramValue)) {
-                    $paramValue = '!' . gettype($paramValue) . '!';
+                if (\is_object($paramValue) || \is_array($paramValue)) {
+                    $paramValue = '!' . \gettype($paramValue) . '!';
                 }
 
                 return [$paramName => sprintf('%s="%s"', $paramName, $this->escapeParamValue((string) $paramValue))];
@@ -89,7 +85,7 @@ class RFC5424Formatted extends AbstractLogger
             ],
             'psr.log.context@17589' => $context,
         ]));
-        $structuredData = count($elements) ? implode('', $elements) . ' ' : '';
+        $structuredData = \count($elements) ? implode('', $elements) . ' ' : '';
 
         $lines = array_map('trim', explode(PHP_EOL, $message));
 

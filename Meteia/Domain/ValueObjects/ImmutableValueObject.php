@@ -11,19 +11,19 @@ abstract class ImmutableValueObject implements ValueObject
 {
     public function __get($key)
     {
-        if (isset($this->$key)) {
-            return $this->$key;
+        if (isset($this->{$key})) {
+            return $this->{$key};
         }
     }
 
     public function __set($key, $value): void
     {
-        throw new ImmutableValueObjectException(get_class($this) . ' is immutable');
+        throw new ImmutableValueObjectException(static::class . ' is immutable');
     }
 
     public function __isset($key)
     {
-        return isset($this->$key);
+        return isset($this->{$key});
     }
 
     public function __call($name, $arguments)
@@ -56,7 +56,7 @@ abstract class ImmutableValueObject implements ValueObject
     private function with($key, $value)
     {
         $copy = clone $this;
-        $copy->$key = $value;
+        $copy->{$key} = $value;
 
         return $copy;
     }

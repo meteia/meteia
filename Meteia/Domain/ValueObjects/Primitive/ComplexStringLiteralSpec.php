@@ -86,7 +86,7 @@ class ComplexStringLiteralSpec extends ObjectBehavior
     public function getMatchers(): array
     {
         return [
-            'haveValue' => function ($subject, $value) {
+            'haveValue' => static function ($subject, $value) {
                 $string = '';
 
                 foreach ($subject as $maybe) {
@@ -99,14 +99,14 @@ class ComplexStringLiteralSpec extends ObjectBehavior
 
                 return false;
             },
-            'returnComplexStringLiteral' => function ($subject, $value) {
+            'returnComplexStringLiteral' => static function ($subject, $value) {
                 $subject = '' . $subject;
                 $value = '' . $value;
                 if ($value === $subject) {
                     return true;
-                } else {
-                    throw new FailureException(sprintf('Message with subject "%s" and value "%s".', $subject, $value));
                 }
+
+                throw new FailureException(sprintf('Message with subject "%s" and value "%s".', $subject, $value));
             },
         ];
     }

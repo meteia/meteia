@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects;
 
-use JsonSerializable;
-
-abstract class PrimitiveValueObject implements JsonSerializable
+abstract class PrimitiveValueObject implements \JsonSerializable
 {
     protected mixed $value;
 

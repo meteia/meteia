@@ -14,11 +14,14 @@ class UUID extends ImmutablePrimitiveValueObject
         if ($value === null) {
             $value = \Ramsey\Uuid\Uuid::uuid4()->toString();
         } else {
-            $value = strval($value);
-            switch (strlen($value)) {
+            $value = (string) $value;
+
+            switch (\strlen($value)) {
                 case 16:
                     $value = bin2hex($value);
+
                     break;
+
                 case 32:
                     $new = substr($value, 0, 8);
                     $new .= '-' . substr($value, 8, 4);
@@ -26,10 +29,13 @@ class UUID extends ImmutablePrimitiveValueObject
                     $new .= '-' . substr($value, 16, 4);
                     $new .= '-' . substr($value, 20, 12);
                     $value = $new;
+
                     break;
+
                 case 36:
                     // UUID-formatted, no-op
                     break;
+
                 default:
                     throw new InvalidValueObjectException($value, ['UUID']);
             }
@@ -38,13 +44,13 @@ class UUID extends ImmutablePrimitiveValueObject
         $this->value = $value;
     }
 
-    public function equalTo(UUID $other)
-    {
-        return hash_equals(strtolower($this), strtolower($other));
-    }
-
     public function __toString()
     {
         return $this->value;
+    }
+
+    public function equalTo(self $other)
+    {
+        return hash_equals(strtolower($this), strtolower($other));
     }
 }

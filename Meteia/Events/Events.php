@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace Meteia\Events;
 
-use IteratorAggregate;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Application\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\Classy\PsrClasses;
 use Meteia\ValueObjects\Identity\FilesystemPath;
-use Override;
-use Traversable;
 
-readonly class Events implements IteratorAggregate
+readonly class Events implements \IteratorAggregate
 {
     public function __construct(
         private ApplicationPath $applicationPath,
@@ -21,8 +18,8 @@ readonly class Events implements IteratorAggregate
     ) {
     }
 
-    #[Override]
-    public function getIterator(): Traversable
+    #[\Override]
+    public function getIterator(): \Traversable
     {
         $meteiaClasses = new PsrClasses(new FilesystemPath(__DIR__, '..', '..'), 'Meteia', ['.+', 'Events', '.*\.php']);
         foreach (new ClassesImplementing($meteiaClasses, Event::class) as $class) {

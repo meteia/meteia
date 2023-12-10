@@ -14,23 +14,19 @@ use Meteia\MessageStreams\MessageSerializer;
 use Meteia\Performance\Timings;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
-use TestCase;
 
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertTrue;
 
 return;
-
 function db(): ExtendedPdoInterface
 {
-    $pdo = new ExtendedPdo('sqlite::memory:');
-
-    return $pdo;
+    return new ExtendedPdo('sqlite::memory:');
 }
 
 function init(ExtendedPdoInterface $pdo): PdoEventStream
 {
-    $query = <<<SQL
+    $query = <<<'SQL'
             CREATE TABLE events (
                 aggregate_root_id  BINARY(20)                         NOT NULL,
                 aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
@@ -76,8 +72,8 @@ function init(ExtendedPdoInterface $pdo): PdoEventStream
 //    }
 // }
 
-it('appends and', function (): void {
-    /** @var TestCase $this */
+it('appends and', static function (): void {
+    /** @var \TestCase $this */
 
     // Arrange
     $db = db();
@@ -103,8 +99,8 @@ it('appends and', function (): void {
     $tar->assertReplayed();
 });
 
-it('supports snapshots', function (): void {
-    /** @var TestCase $this */
+it('supports snapshots', static function (): void {
+    /** @var \TestCase $this */
 
     // Arrange
     $db = db();
@@ -167,6 +163,11 @@ class CountingAggregateRoot implements EventSourced
     ) {
     }
 
+    public function __wakeup(): void
+    {
+        $this->wakeupCalled = true;
+    }
+
     public function commitInto(UnitOfWorkContext $unitOfWorkContext): void
     {
     }
@@ -181,11 +182,6 @@ class CountingAggregateRoot implements EventSourced
         assertEquals($this->sequence + 1, $eventSequence);
         $this->sequence = $eventSequence;
         $this->actualEvents[] = $event;
-    }
-
-    public function __wakeup(): void
-    {
-        $this->wakeupCalled = true;
     }
 
     public function assertReplayed(): void

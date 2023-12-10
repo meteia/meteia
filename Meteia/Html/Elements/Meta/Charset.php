@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements\Meta;
 
-use Stringable;
-
-class Charset implements Stringable
+class Charset implements \Stringable
 {
     public function __construct(private readonly string $characterSet = 'UTF-8')
     {
@@ -15,7 +13,7 @@ class Charset implements Stringable
     public function __toString(): string
     {
         return <<<EOF
-            <meta charset="$this->characterSet">
+            <meta charset="{$this->characterSet}">
             EOF;
     }
 }

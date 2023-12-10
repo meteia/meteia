@@ -28,7 +28,7 @@ class Color extends ObjectType implements Resolver
 
     public function data(mixed $root, array $args, RequestContext $requestContext): object
     {
-        $color = is_string($root) ? $root : '10203040';
+        $color = \is_string($root) ? $root : '10203040';
         [$r, $g, $b, $a] = str_split(str_pad($color, 8, 'F'), 2);
 
         return (object) [

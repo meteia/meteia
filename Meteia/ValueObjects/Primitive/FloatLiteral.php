@@ -13,7 +13,7 @@ abstract class FloatLiteral extends PrimitiveValueObject
 
     public function __construct($value)
     {
-        if (\filter_var($value, FILTER_VALIDATE_FLOAT) === false) {
+        if (filter_var($value, FILTER_VALIDATE_FLOAT) === false) {
             throw new ValueObjectInvalid($value, ['float']);
         }
 
@@ -22,7 +22,7 @@ abstract class FloatLiteral extends PrimitiveValueObject
 
     public function __toString()
     {
-        return strval($this->value);
+        return (string) $this->value;
     }
 
     public function add($amount)

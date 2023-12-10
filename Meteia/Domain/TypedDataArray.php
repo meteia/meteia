@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
-use InvalidArgumentException;
 use Meteia\Domain\Contracts\TypedData;
 use Meteia\Domain\ValueObjects\Money\PreciseUSD;
 
@@ -69,16 +68,6 @@ class TypedDataArray implements TypedData
         return (string) $this->getOrThrow($name);
     }
 
-    private function getOrThrow(string $name)
-    {
-        $value = array_get($this->data, $name, self::NOT_FOUND);
-        if ($value === self::NOT_FOUND) {
-            throw new InvalidArgumentException();
-        }
-
-        return $value;
-    }
-
     public function preciseUSD(string $name, $default): PreciseUSD
     {
         $value = array_get($this->data, $name, (string) $default);
@@ -89,5 +78,15 @@ class TypedDataArray implements TypedData
     public function all(): array
     {
         return $this->data ?? [];
+    }
+
+    private function getOrThrow(string $name)
+    {
+        $value = array_get($this->data, $name, self::NOT_FOUND);
+        if ($value === self::NOT_FOUND) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $value;
     }
 }

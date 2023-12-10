@@ -37,14 +37,14 @@ class CountryCodeNameSpec extends ObjectBehavior
     public function getMatchers(): array
     {
         return [
-            'returnString' => function ($subject, $value) {
+            'returnString' => static function ($subject, $value) {
                 $subject = '' . $subject;
                 $value = '' . $value;
                 if ($value === $subject) {
                     return true;
-                } else {
-                    throw new FailureException(sprintf('Message with subject "%s" and value "%s".', $subject, $value));
                 }
+
+                throw new FailureException(sprintf('Message with subject "%s" and value "%s".', $subject, $value));
             },
         ];
     }

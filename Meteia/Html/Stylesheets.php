@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Meteia\Html;
 
 use Meteia\Html\Elements\Link;
-use Stringable;
 
-class Stylesheets implements Stringable
+class Stylesheets implements \Stringable
 {
     private array $stylesheets = [];
 

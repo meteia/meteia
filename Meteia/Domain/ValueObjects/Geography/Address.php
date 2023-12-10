@@ -17,11 +17,23 @@ class Address
 
     /**
      * Returns a new Address object.
+     *
+     * @param mixed $addressInformation
      */
     public function __construct($addressInformation)
     {
         $this->buildBasicElements($addressInformation);
         $this->buildComplexElements();
+    }
+
+    /**
+     * Returns a string representation of the StringLiteral in the format defined in the constructor.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getAddress();
     }
 
     public function getRecipient()
@@ -103,16 +115,6 @@ class Address
     }
 
     /**
-     * Returns a string representation of the StringLiteral in the format defined in the constructor.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getAddress();
-    }
-
-    /**
      * Function to build the more complex elements. Order can matter!
      */
     private function buildComplexElements(): void
@@ -141,6 +143,8 @@ class Address
     /**
      * Ensures that the minimal data is collected and that all values exsist.
      *
+     * @param mixed $data
+     *
      * @return array
      */
     private function buildBasicElements($data)
@@ -165,7 +169,7 @@ class Address
         ];
 
         foreach (array_replace($baseArray, $data) as $key => $value) {
-            if (array_key_exists($key, $baseArray)) {
+            if (\array_key_exists($key, $baseArray)) {
                 $value = new StringLiteral($value);
                 $this->replacements['%' . $key . '%'] = $value->trim();
                 unset($value);
@@ -180,12 +184,14 @@ class Address
 
     /**
      * since the zip separator is conditional on some other data, build it later.
+     *
+     * @param mixed $data
      */
     private function buildZipSeparator($data): void
     {
         if (isset($data['zip4separator'])) {
             $this->replacements['%zip4separator%'] = $data['zip4separator'];
-        } elseif (isset($data['zip4']) && strlen($data['zip4']) > 0) {
+        } elseif (isset($data['zip4']) && $data['zip4'] !== '') {
             $this->replacements['%zip4separator%'] = new StringLiteral('-');
         } else {
             $this->replacements['%zip4separator%'] = new StringLiteral('');
@@ -194,6 +200,8 @@ class Address
 
     /**
      * since the state separator is conditional on some other data, build it later.
+     *
+     * @param mixed $data
      */
     private function buildStateSeparator($data): void
     {

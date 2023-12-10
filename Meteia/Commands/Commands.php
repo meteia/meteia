@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace Meteia\Commands;
 
-use IteratorAggregate;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Application\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\Classy\PsrClasses;
 use Meteia\ValueObjects\Identity\FilesystemPath;
-use Override;
-use Traversable;
 
-readonly class Commands implements IteratorAggregate
+readonly class Commands implements \IteratorAggregate
 {
     public function __construct(
         private ApplicationPath $applicationPath,
@@ -21,8 +18,8 @@ readonly class Commands implements IteratorAggregate
     ) {
     }
 
-    #[Override]
-    public function getIterator(): Traversable
+    #[\Override]
+    public function getIterator(): \Traversable
     {
         $meteiaClasses = new PsrClasses(new FilesystemPath(__DIR__, '..', '..'), 'Meteia', ['.+', 'Commands', '.*\.php']);
         foreach (new ClassesImplementing($meteiaClasses, Command::class) as $class) {

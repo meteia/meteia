@@ -19,10 +19,8 @@ use Meteia\Events\EventBus;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\ProcessId;
-use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputDefinition;
-use Throwable;
 
 readonly class RunWorker implements CLICommand, CommandMessageHandler
 {
@@ -47,19 +45,19 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
         $this->container = ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions);
     }
 
-    #[Override]
+    #[\Override]
     public static function description(): string
     {
         return 'Run the command worker queue';
     }
 
-    #[Override]
+    #[\Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition();
     }
 
-    #[Override]
+    #[\Override]
     public function execute(): void
     {
         foreach ($this->commands as $command) {
@@ -70,7 +68,7 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
         $this->commandBus->run();
     }
 
-    #[Override]
+    #[\Override]
     public function handle(Command $command, CommandId $commandId, CorrelationId $correlationId, CausationId $causationId, ProcessId $processId): void
     {
         // TODO: Just how bad of an idea is this...
@@ -79,14 +77,14 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
         $commandContainer->set(CausationId::class, CausationId::fromHex($processId->hex()));
 
         try {
-            assert(method_exists($command, 'invoke'));
+            \assert(method_exists($command, 'invoke'));
             $commandContainer->call($command->invoke(...));
             //            $this->log->info('Command succeeded', ['command' => $command::class]);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $this->log->error('Command failed', ['exception' => $e]);
         }
-        unset($command);
-        unset($commandContainer);
+        unset($command, $commandContainer);
+
         gc_collect_cycles();
     }
 }

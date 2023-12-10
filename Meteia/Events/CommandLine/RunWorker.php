@@ -19,10 +19,8 @@ use Meteia\Events\EventToEventHandlersMap;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\ProcessId;
-use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputDefinition;
-use Throwable;
 
 readonly class RunWorker implements Command
 {
@@ -47,19 +45,19 @@ readonly class RunWorker implements Command
         $this->container = ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions);
     }
 
-    #[Override]
+    #[\Override]
     public static function description(): string
     {
         return 'Run the event worker queue';
     }
 
-    #[Override]
+    #[\Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition();
     }
 
-    #[Override]
+    #[\Override]
     public function execute(): void
     {
         foreach ($this->eventToEventHandlersMap as $event => $handlers) {
@@ -69,16 +67,18 @@ readonly class RunWorker implements Command
                     $commandContainer = clone $this->container;
                     $commandContainer->set(CorrelationId::class, $correlationId);
                     $commandContainer->set(CausationId::class, CausationId::fromHex($processId->hex()));
+
                     /** @var EventHandler $eventHandler */
                     $eventHandler = $commandContainer->get($handler);
+
                     try {
                         $eventHandler->handle($event);
                         //                        $this->log->info('Event succeeded', ['event' => $event::class, 'handler' => $handler]);
-                    } catch (Throwable $e) {
+                    } catch (\Throwable $e) {
                         $this->log->error('Event failed', ['exception' => $e]);
                     }
-                    unset($eventHandler);
-                    unset($commandContainer);
+                    unset($eventHandler, $commandContainer);
+
                     gc_collect_cycles();
                 });
             }

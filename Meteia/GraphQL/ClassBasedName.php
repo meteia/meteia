@@ -8,7 +8,7 @@ trait ClassBasedName
 {
     private function classBasedName($class = null)
     {
-        $names = explode('\\', $class ?? get_called_class());
+        $names = explode('\\', $class ?? static::class);
 
         // Always remove the first namespace
         array_shift($names);

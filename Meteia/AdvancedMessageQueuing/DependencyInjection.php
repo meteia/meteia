@@ -9,7 +9,7 @@ use Meteia\Configuration\Configuration;
 use React\EventLoop\LoopInterface;
 
 return [
-    Client::class => function (Configuration $config): Client {
+    Client::class => static function (Configuration $config): Client {
         $hostname = $config->string('RABBITMQ_HOST', '127.0.0.1');
         $port = $config->int('RABBITMQ_PORT', 5672);
         $username = $config->string('RABBITMQ_USERNAME', 'guest');
@@ -30,7 +30,7 @@ return [
             'keepAlive' => $keepAlive,
         ]);
     },
-    \Bunny\Async\Client::class => function (LoopInterface $loop, Configuration $config): Bunny\Async\Client {
+    \Bunny\Async\Client::class => static function (LoopInterface $loop, Configuration $config): Bunny\Async\Client {
         $hostname = $config->string('RABBITMQ_HOST', '127.0.0.1');
         $port = $config->int('RABBITMQ_PORT', 5672);
         $username = $config->string('RABBITMQ_USERNAME', 'guest');
@@ -51,10 +51,10 @@ return [
             'keepAlive' => $keepAlive,
         ]);
     },
-    Channel::class => function (Client $client): Channel {
+    Channel::class => static function (Client $client): Channel {
         $client->connect();
 
         return $client->channel();
     },
-    CommandsExchangeName::class => fn (Configuration $configuration): CommandsExchangeName => new CommandsExchangeName($configuration->string('METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME', 'commands')),
+    CommandsExchangeName::class => static fn (Configuration $configuration): CommandsExchangeName => new CommandsExchangeName($configuration->string('METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME', 'commands')),
 ];

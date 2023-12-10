@@ -11,7 +11,7 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Psr\Log\LoggerInterface;
 
 return [
-    LoggerInterface::class => function (CausationId $causationId, CorrelationId $correlationId, Meteia\ValueObjects\Identity\ProcessId $processId, RepositoryPath $repositoryPath) {
+    LoggerInterface::class => static function (CausationId $causationId, CorrelationId $correlationId, Meteia\ValueObjects\Identity\ProcessId $processId, RepositoryPath $repositoryPath) {
         // FIXME : Don't like how this is working out... hmm
         $output = (PHP_SAPI === 'cli') ? new StandardError() : new UdpSystemLog();
 

@@ -11,13 +11,13 @@ function html(string $raw): string
 
 function attributes(array $attributes): string
 {
-    if (count($attributes) === 0) {
+    if (\count($attributes) === 0) {
         return '';
     }
-    $attributes = array_filter($attributes, fn ($val) => !($val === null || $val === false));
+    $attributes = array_filter($attributes, static fn ($val) => !($val === null || $val === false));
     $attributes = array_map(
-        function ($k, $v) {
-            if (is_bool($v) && $v) {
+        static function ($k, $v) {
+            if (\is_bool($v) && $v) {
                 return $k;
             }
 
@@ -35,5 +35,5 @@ function el(string $name, array $attributes, string ...$children)
     $attributes = attributes($attributes);
     $children = implode(PHP_EOL, $children);
 
-    return "<$name $attributes>$children</$name>";
+    return "<{$name} {$attributes}>{$children}</{$name}>";
 }

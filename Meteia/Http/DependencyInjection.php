@@ -21,7 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 return [
-    ServerRequestInterface::class => function () {
+    ServerRequestInterface::class => static function () {
         $factory = new Psr17Factory();
         $creator = new ServerRequestCreator($factory, $factory, $factory, $factory);
 
@@ -31,7 +31,7 @@ return [
     EndpointMap::class => PsrEndpointMap::class,
     HomepageEndpoint::class => MissingHomepageEndpoint::class,
     RequestHandlerInterface::class => RequestHandler::class,
-    Scheme::class => function (): Scheme {
+    Scheme::class => static function (): Scheme {
         if (isset($_SERVER['HTTPS'])) {
             return new Scheme('https');
         }
@@ -42,12 +42,12 @@ return [
 
         return new Scheme('http');
     },
-    Host::class => function (Configuration $configuration, Scheme $scheme): Host {
+    Host::class => static function (Configuration $configuration, Scheme $scheme): Host {
         $host = $configuration->string('HTTP_HOST', $_SERVER['HTTP_HOST'] ?? 'example.com');
 
         return new Host($scheme . '://' . $host);
     },
-    CsrfSecretKey::class => function (Configuration $configuration): CsrfSecretKey {
+    CsrfSecretKey::class => static function (Configuration $configuration): CsrfSecretKey {
         $value = $configuration->string('METEIA_CSRF_SECRET_KEY', '');
         if ($value === '') {
             throw new \Exception('METEIA_CSRF_SECRET_KEY not set');
@@ -55,5 +55,5 @@ return [
 
         return CsrfSecretKey::fromToken($value);
     },
-    LogPath::class => fn (Configuration $configuration, RepositoryPath $repositoryPath): LogPath => new LogPath($configuration->string('METEIA_LOG_PATH', (string) $repositoryPath)),
+    LogPath::class => static fn (Configuration $configuration, RepositoryPath $repositoryPath): LogPath => new LogPath($configuration->string('METEIA_LOG_PATH', (string) $repositoryPath)),
 ];

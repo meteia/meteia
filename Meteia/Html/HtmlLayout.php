@@ -18,8 +18,8 @@ class HtmlLayout implements Layout
         return <<<EOF
             <!DOCTYPE html>
             <html>
-            $this->head
-            $this->body
+            {$this->head}
+            {$this->body}
             </html>
             EOF;
     }

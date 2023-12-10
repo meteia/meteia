@@ -16,7 +16,7 @@ class FrameFilters
      */
     public function __construct(array $filters = [])
     {
-        $this->filters = array_map(fn (FrameFilter $filter) => $filter, $filters);
+        $this->filters = array_map(static fn (FrameFilter $filter) => $filter, $filters);
     }
 
     public function filtered(array $frames): array

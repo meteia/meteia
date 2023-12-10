@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Database\Errors;
 
-use Exception;
-
-class FailedToUpdate extends Exception
+class FailedToUpdate extends \Exception
 {
     public function __construct(string $table, string $query = '', array $bindings = [])
     {

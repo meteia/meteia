@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-use Stringable;
-
-class CustomAttribute implements Stringable
+class CustomAttribute implements \Stringable
 {
     public function __construct(
         private readonly string $name,
-        private readonly string|Stringable|bool $value,
+        private readonly bool|string|\Stringable $value,
     ) {
     }
 

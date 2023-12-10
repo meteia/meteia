@@ -40,7 +40,7 @@ class ContentAddressableStorage
     {
         $hashString = $fileHash->base62();
         $fileExtension = trim(trim($fileExtension), '.');
-        if (strlen($fileExtension)) {
+        if (\strlen($fileExtension)) {
             $fileExtension = '.' . $fileExtension;
         }
 

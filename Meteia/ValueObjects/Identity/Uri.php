@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Identity;
 
-use JsonSerializable;
 use Psr\Http\Message\UriInterface;
 
-class Uri extends \Laminas\Diactoros\Uri implements UriInterface, JsonSerializable
+class Uri extends \Laminas\Diactoros\Uri implements UriInterface, \JsonSerializable
 {
     public function __construct(...$segments)
     {

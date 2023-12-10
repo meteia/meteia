@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace Meteia\Http\Cookies;
 
 use Assert\Assertion;
-use DateInterval;
-use DateTime;
 use Psr\Http\Message\UriInterface;
 
 class CookieAttributes
 {
     /**
-     * @var DateTime
+     * @var \DateTime
      */
     protected $expires = '';
 
     /**
-     * @var DateInterval
+     * @var \DateInterval
      */
     protected $maxAge = '';
 
@@ -46,6 +44,28 @@ class CookieAttributes
      */
     protected $sameSite = 'Lax';
 
+    public function __toString()
+    {
+        $kvParts = array_filter([
+            'Expires' => $this->expires ? $this->expires->format(DATE_RFC7231) : '',
+            'Max-Age' => $this->maxAge,
+            'Domain' => $this->domain,
+            'Path' => $this->path,
+            'SameSite' => $this->sameSite,
+        ]);
+
+        $kvParts = array_map(static fn ($key, $value) => $key . '=' . $value, array_keys($kvParts), $kvParts);
+
+        $flagParts = array_filter([
+            $this->secure,
+            $this->httpOnly,
+        ]);
+
+        $parts = array_merge($kvParts, $flagParts);
+
+        return implode('; ', $parts);
+    }
+
     public function withValue(string $value): self
     {
         $copy = clone $this;
@@ -54,7 +74,7 @@ class CookieAttributes
         return $copy;
     }
 
-    public function withExpires(DateTime $expires): self
+    public function withExpires(\DateTime $expires): self
     {
         // TODO: Validate
 
@@ -118,27 +138,5 @@ class CookieAttributes
         $copy->sameSite = $sameSite;
 
         return $copy;
-    }
-
-    public function __toString()
-    {
-        $kvParts = array_filter([
-            'Expires' => $this->expires ? $this->expires->format(DATE_RFC7231) : '',
-            'Max-Age' => $this->maxAge,
-            'Domain' => $this->domain,
-            'Path' => $this->path,
-            'SameSite' => $this->sameSite,
-        ]);
-
-        $kvParts = array_map(fn ($key, $value) => $key . '=' . $value, array_keys($kvParts), $kvParts);
-
-        $flagParts = array_filter([
-            $this->secure,
-            $this->httpOnly,
-        ]);
-
-        $parts = array_merge($kvParts, $flagParts);
-
-        return implode('; ', $parts);
     }
 }

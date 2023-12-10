@@ -12,7 +12,7 @@ use Meteia\GraphQL\SchemaFields;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
 return [
-    SchemaFields::class => function (ApplicationPath $applicationPath, ApplicationNamespace $namespace, Container $container): SchemaFields {
+    SchemaFields::class => static function (ApplicationPath $applicationPath, ApplicationNamespace $namespace, Container $container): SchemaFields {
         $meteiaPath = (new FilesystemPath(__DIR__, '..', '..'))->realpath();
         $meteiaClasses = new PsrClasses($meteiaPath, 'Meteia', ['.+', 'GraphQL', '.+\.php']);
 

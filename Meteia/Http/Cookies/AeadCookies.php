@@ -40,6 +40,7 @@ class AeadCookies
     public function decode(string $name, string $cookie, string $default, string $secret): string
     {
         $version = substr($cookie, 0, 2);
+
         switch ($version) {
             case self::VERSION_1:
                 return $this->decodeVersion1($name, $cookie, $default, $secret);

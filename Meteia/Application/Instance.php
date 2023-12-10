@@ -14,7 +14,6 @@ use Meteia\Http\Middleware\ServerTimingHeader;
 use Meteia\Performance\Timings;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Throwable;
 
 use function Meteia\Http\Functions\send;
 
@@ -48,10 +47,10 @@ readonly class Instance
 
         Dulce::onFatalError(
             $container,
-            function (Throwable $throwable) use ($applicationDefinitions): void {
+            function (\Throwable $throwable) use ($applicationDefinitions): void {
                 // A fresh container is needed to clear out any previous state, layout rendering in particular
                 $freshContainer = ContainerBuilder::build($this->path, $this->namespace, [
-                    Throwable::class => $throwable,
+                    \Throwable::class => $throwable,
                     ...$applicationDefinitions,
                 ]);
                 $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);

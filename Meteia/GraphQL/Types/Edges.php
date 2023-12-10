@@ -17,7 +17,7 @@ abstract class Edges extends ObjectType
                 ],
                 'node' => [
                     'type' => self::nonNull($nodeType),
-                    'resolve' => function ($root) {
+                    'resolve' => static function ($root) {
                         // We've already resolved the 'nodeType', so pass through the node
                         // without hitting any possible 'nodeType' resolver.
                         return $root->node;

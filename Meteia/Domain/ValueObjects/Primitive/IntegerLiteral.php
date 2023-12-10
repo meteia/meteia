@@ -13,13 +13,18 @@ class IntegerLiteral extends ImmutablePrimitiveValueObject
 
     public function __construct($value)
     {
-        $value = \filter_var($value, FILTER_VALIDATE_INT);
+        $value = filter_var($value, FILTER_VALIDATE_INT);
 
         if ($value === false) {
             throw new InvalidValueObjectException($value, ['int']);
         }
 
         $this->value = $value;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->value;
     }
 
     public function compareTo($integer)
@@ -34,16 +39,11 @@ class IntegerLiteral extends ImmutablePrimitiveValueObject
 
     public function add($integer)
     {
-        return new IntegerLiteral(bcadd((string) $this, (string) $integer, self::PRECISION));
+        return new self(bcadd((string) $this, (string) $integer, self::PRECISION));
     }
 
     public function asInteger()
     {
         return (int) $this->value;
-    }
-
-    public function __toString()
-    {
-        return strval($this->value);
     }
 }

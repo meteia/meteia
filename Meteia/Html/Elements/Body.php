@@ -6,14 +6,13 @@ namespace Meteia\Html\Elements;
 
 use Meteia\Html\Footer;
 use Meteia\Html\Header;
-use Stringable;
 
-class Body implements Stringable
+class Body implements \Stringable
 {
     public function __construct(
         public Header $header,
         public Footer $footer,
-        public Stringable|string $content = '',
+        public string|\Stringable $content = '',
         public string $className = '',
     ) {
     }
@@ -21,17 +20,17 @@ class Body implements Stringable
     public function __toString(): string
     {
         return <<<EOF
-            <body class="$this->className">
-            $this->header
+            <body class="{$this->className}">
+            {$this->header}
             <main>
-                $this->content
+                {$this->content}
             </main>
-            $this->footer
+            {$this->footer}
             </body>
             EOF;
     }
 
-    public function content(Stringable|string $content): void
+    public function content(string|\Stringable $content): void
     {
         $this->content = $content;
     }

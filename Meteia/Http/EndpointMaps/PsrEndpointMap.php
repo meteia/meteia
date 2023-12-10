@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Http\EndpointMaps;
 
-use Exception;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Http\Endpoint;
 use Meteia\Http\EndpointMap;
@@ -33,12 +32,12 @@ class PsrEndpointMap implements EndpointMap
     public function path(string $endpoint): string
     {
         if (!is_subclass_of($endpoint, Endpoint::class)) {
-            throw new Exception('Invalid Endpoint');
+            throw new \Exception('Invalid Endpoint');
         }
         $parts = explode('\\', $endpoint);
         array_shift($parts);
         array_splice($parts, 1, 1);
-        $segmentCount = count($parts);
+        $segmentCount = \count($parts);
         if ($parts[$segmentCount - 1] === 'Index') {
             array_pop($parts);
         } elseif ($segmentCount > 1 && $parts[$segmentCount - 1] === $parts[$segmentCount - 2]) {
@@ -47,9 +46,8 @@ class PsrEndpointMap implements EndpointMap
 
         $path = '/' . implode('/', $parts);
         $path = preg_replace('~(?<=\\w)([A-Z])~u', '-$1', $path);
-        $path = mb_strtolower($path);
 
-        return $path;
+        return mb_strtolower($path);
     }
 
     public function uri(string $endpoint): Uri

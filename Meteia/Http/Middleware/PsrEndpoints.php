@@ -29,7 +29,7 @@ class PsrEndpoints implements MiddlewareInterface
     {
         $endpoint = $this->timings->measure('endpoint.lookup', fn () => $this->endpoint($request));
 
-        return $this->timings->measure('endpoint.response', fn () => $endpoint->response($request));
+        return $this->timings->measure('endpoint.response', static fn () => $endpoint->response($request));
     }
 
     private function endpoint(ServerRequestInterface $request): Endpoint

@@ -11,7 +11,6 @@ use Meteia\MessageStreams\Contracts\MessageStream;
 use Meteia\MessageStreams\Exceptions\FailedToAppendMessage;
 use Meteia\Performance\Timings;
 use Meteia\ValueObjects\Identity\UniqueId;
-use ReflectionClass;
 
 class PdoMessageStream implements MessageStream
 {
@@ -51,7 +50,7 @@ class PdoMessageStream implements MessageStream
     {
         // TODO: Use APCu or similar cache? (benchmark first, PHP OpCache might be enough)
         if (!isset($this->snapshotVersions[$target::class])) {
-            $rc = new ReflectionClass($target);
+            $rc = new \ReflectionClass($target);
             $hash = substr(hash_file('sha256', $rc->getFileName()), 0, 32);
             $this->snapshotVersions[$target::class] = $hash;
         }
@@ -105,9 +104,9 @@ class PdoMessageStream implements MessageStream
         }
         $replayDelta = (microtime(true) - $replayStart) * 1000;
         $this->timings->add($target::class . '.replay', $replayDelta);
-        $this->timings->add($target::class . '.replayCount', count($messageRows));
+        $this->timings->add($target::class . '.replayCount', \count($messageRows));
 
-        if ($replayDelta > 15 && count($messageRows) > 25) {
+        if ($replayDelta > 15 && \count($messageRows) > 25) {
             $lastMessageRow = end($messageRows);
             $this->createSnapshot($messageStreamId, new MessageStreamSequence($lastMessageRow->message_stream_sequence), $target);
         }

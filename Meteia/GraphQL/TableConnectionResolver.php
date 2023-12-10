@@ -37,8 +37,8 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
             $compare = $cursorDirection === 'forward' ? '>' : '<';
 
             $cursorValues = $this->decodeCursor($cursor);
-            assert(count($cursorValues) === count($this->cursorOver));
-            $placeholders = str_repeat('?,', count($cursorValues) - 1) . '?';
+            \assert(\count($cursorValues) === \count($this->cursorOver));
+            $placeholders = str_repeat('?,', \count($cursorValues) - 1) . '?';
             $where[] = sprintf('(%s) %s (%s)', $cursorColumns, $compare, $placeholders);
             $bindings = array_merge($cursorValues, $bindings);
         }
@@ -46,6 +46,7 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
         foreach ($this->resolveWhereBindings($root, $args, $requestContext) as $column => $value) {
             if ($value === null) {
                 $where[] = sprintf('`%s` IS NULL', $column);
+
                 continue;
             }
             $where[] = sprintf('`%s` = :%s', $column, $column);
@@ -53,7 +54,7 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
         }
 
         $whereString = '';
-        if (count($where)) {
+        if (\count($where)) {
             $whereString = 'WHERE ' . implode(' AND ', $where);
         }
 
@@ -66,12 +67,12 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
         if ($cursorDirection === 'reverse') {
             $rows = array_reverse($rows);
         }
-        if (count($rows)) {
+        if (\count($rows)) {
             // FIXME: This seems pretty expensive just to fix column names... would it better in the query?
             // Maybe we could ask for mappings (maybe even static?) similar to how we do resolveWhereBindings
             // TODO: This probably should be a trait, or some place more reusable
-            $columnNameMap = array_map_assoc(fn ($i, $column) => [$column => lcfirst(implode('', array_map(ucfirst(...), explode('_', $column))))], array_keys($rows[0]));
-            $rows = array_map(fn ($row) => (object) array_map_assoc(fn ($column, $row) => [$columnNameMap[$column] => $row], $row), $rows);
+            $columnNameMap = array_map_assoc(static fn ($i, $column) => [$column => lcfirst(implode('', array_map(ucfirst(...), explode('_', $column))))], array_keys($rows[0]));
+            $rows = array_map(static fn ($row) => (object) array_map_assoc(static fn ($column, $row) => [$columnNameMap[$column] => $row], $row), $rows);
         }
 
         return $this->processedRows($rows, $args, $this->cursorOver);

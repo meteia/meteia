@@ -6,8 +6,6 @@ namespace Meteia\Dulce\Templates;
 
 use Meteia\Bluestone\PhpTemplate;
 
-use function array_slice;
-
 class FileFragment
 {
     use PhpTemplate;
@@ -22,7 +20,7 @@ class FileFragment
 
         $offset = (int) max(0, $this->line - ceil(11 / 2));
 
-        $lines = array_slice($lines, $offset, 11);
+        $lines = \array_slice($lines, $offset, 11);
 
         $output = [];
         foreach ($lines as $line) {

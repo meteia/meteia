@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
-use ErrorException;
-use Exception;
 use Meteia\GraphQL\Types\ConnectionField;
 use Tuupola\Base62;
 
@@ -18,21 +16,21 @@ trait ConnectionResolver
 
     protected function processedRows(array $rows, array $args, array $cursorColumns): object
     {
-        if (!$args || !count($args)) {
-            throw new Exception('A type that has ' . get_called_class() . ' as a field is likely not passing through default arguments.');
+        if (!$args || !\count($args)) {
+            throw new \Exception('A type that has ' . static::class . ' as a field is likely not passing through default arguments.');
         }
-        $hasNextPage = $this->hasNextPage(count($rows), $args);
+        $hasNextPage = $this->hasNextPage(\count($rows), $args);
         if (isset($args[ConnectionField::ARG_FIRST])) {
-            $rows = array_slice($rows, 0, $args[ConnectionField::ARG_FIRST]);
+            $rows = \array_slice($rows, 0, $args[ConnectionField::ARG_FIRST]);
         }
 
-        $hasPreviousPage = $this->hasPreviousPage(count($rows), $args);
+        $hasPreviousPage = $this->hasPreviousPage(\count($rows), $args);
         if (isset($args[ConnectionField::ARG_LAST])) {
-            if (count($rows) > $args[ConnectionField::ARG_LAST]) {
+            if (\count($rows) > $args[ConnectionField::ARG_LAST]) {
                 // Remove the extra row we used to determine pagination
                 array_pop($rows);
             }
-            $rows = array_slice($rows, 0, $args[ConnectionField::ARG_LAST]);
+            $rows = \array_slice($rows, 0, $args[ConnectionField::ARG_LAST]);
             $rows = array_reverse($rows);
         }
 
@@ -85,12 +83,22 @@ trait ConnectionResolver
         return false;
     }
 
+    protected function decodeCursor(string $cursor): array
+    {
+        if (static::$codec === null) {
+            static::$codec = new Base62();
+        }
+        $cursor = without_prefix($cursor, 'cur_');
+
+        return explode('|', static::$codec->decode($cursor));
+    }
+
     private function asEdge(object $row, array $cursorColumns): object
     {
         $cursorValues = [];
         foreach ($cursorColumns as $cursorColumn) {
             if (!isset($row->{$cursorColumn})) {
-                throw new ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
+                throw new \ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
             }
             $cursorValues[] = $row->{$cursorColumn};
         }
@@ -108,15 +116,5 @@ trait ConnectionResolver
         }
 
         return 'cur_' . static::$codec->encode(implode('|', $cursorData));
-    }
-
-    protected function decodeCursor(string $cursor): array
-    {
-        if (static::$codec === null) {
-            static::$codec = new Base62();
-        }
-        $cursor = without_prefix($cursor, 'cur_');
-
-        return explode('|', static::$codec->decode($cursor));
     }
 }

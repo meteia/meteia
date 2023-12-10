@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Dulce;
 
-use ErrorException;
 use Meteia\Dulce\ErrorClassifications\ErrorClassification;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Throwable;
 
 class Dulce
 {
@@ -20,7 +18,7 @@ class Dulce
 
     public static function onFatalError(ContainerInterface|InvokerInterface $container, callable $callback): void
     {
-        register_shutdown_function(function (...$args) use ($container, $callback): void {
+        register_shutdown_function(static function (...$args) use ($container, $callback): void {
             /** @var self $errorHandler */
             $errorHandler = $container->get(Dulce::class);
             $errorHandler->onShutdown($callback);
@@ -31,20 +29,20 @@ class Dulce
         //    $args[] = $callback;
         //    $errorHandler->onError(...$args);
         // });
-        set_exception_handler(function (Throwable $throwable) use ($callback): void {
+        set_exception_handler(static function (\Throwable $throwable) use ($callback): void {
             $callback($throwable);
         });
     }
 
     private function onError(int $errno, string $errstr, string $errfile, int $errline, callable $callback): void
     {
-        $error = new ErrorException($errstr, $errno, 1, $errfile, $errline);
+        $error = new \ErrorException($errstr, $errno, 1, $errfile, $errline);
         if ($this->errorClassification->isFatal($errno)) {
             $this->onThrowable($error, $callback);
         }
     }
 
-    private function onThrowable(Throwable $throwable, callable $callback): void
+    private function onThrowable(\Throwable $throwable, callable $callback): void
     {
         $this->logger->error($throwable->getMessage(), [
             'file' => $throwable->getFile(),
@@ -60,7 +58,7 @@ class Dulce
             return;
         }
 
-        $thrownError = new ErrorException($error['message'], $error['type'], 1, $error['file'], $error['line']);
+        $thrownError = new \ErrorException($error['message'], $error['type'], 1, $error['file'], $error['line']);
         if ($this->errorClassification->isFatal($error['type'])) {
             $this->onThrowable($thrownError, $callback);
         }

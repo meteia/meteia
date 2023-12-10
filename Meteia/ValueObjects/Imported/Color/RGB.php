@@ -18,9 +18,9 @@ class RGB
 
     public function __construct(int $red, int $green, int $blue)
     {
-        $this->red = intval($red);
-        $this->green = intval($green);
-        $this->blue = intval($blue);
+        $this->red = (int) $red;
+        $this->green = (int) $green;
+        $this->blue = (int) $blue;
     }
 
     public function asHex(): string
@@ -30,6 +30,6 @@ class RGB
 
     public function asNumber(): int
     {
-        return intval(hexdec($this->asHex()));
+        return (int) hexdec($this->asHex());
     }
 }

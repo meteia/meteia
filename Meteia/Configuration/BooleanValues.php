@@ -13,7 +13,7 @@ class BooleanValues
 
     public function boolean(mixed $value): bool
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             return $value;
         }
 

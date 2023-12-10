@@ -6,7 +6,6 @@ use Meteia\Domain\TypedDataArray;
 use Meteia\Domain\ValueObjects\Money\PreciseUSD;
 
 return;
-
 it('returns values', function (): void {
     // Arrange
     $expected = [

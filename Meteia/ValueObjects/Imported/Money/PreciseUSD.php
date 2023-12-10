@@ -30,28 +30,28 @@ class PreciseUSD implements PreciseMoney
         return new RoundedUSD(BC::round($this->amount, $precision));
     }
 
-    public function equalTo(PreciseUSD $amount)
+    public function equalTo(self $amount)
     {
         return bccomp($this->amount, (string) $amount, static::PRECISION) === 0;
     }
 
-    public function add(PreciseUSD $amount)
+    public function add(self $amount)
     {
-        return new PreciseUSD(bcadd($this->amount, (string) $amount, PreciseUSD::PRECISION));
+        return new self(bcadd($this->amount, (string) $amount, self::PRECISION));
     }
 
-    public function subtract(PreciseUSD $amount)
+    public function subtract(self $amount)
     {
-        return new PreciseUSD(bcsub($this->amount, (string) $amount, PreciseUSD::PRECISION));
+        return new self(bcsub($this->amount, (string) $amount, self::PRECISION));
     }
 
     public function multiplyBy($value)
     {
-        return new PreciseUSD(bcmul($this->amount, (string) $value, PreciseUSD::PRECISION));
+        return new self(bcmul($this->amount, (string) $value, self::PRECISION));
     }
 
     public function divideBy($value)
     {
-        return new PreciseUSD(bcdiv($this->amount, (string) $value, PreciseUSD::PRECISION));
+        return new self(bcdiv($this->amount, (string) $value, self::PRECISION));
     }
 }

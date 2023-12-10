@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Library;
 
-use Exception;
-use RuntimeException;
-use Transliterator;
-
 abstract class StringCase
 {
     public static function camel(string $string): string
@@ -34,7 +30,7 @@ abstract class StringCase
     {
         $string = preg_replace('~(?<=\\w)([A-Z])~u', '_$1', $string);
         if ($string === null) {
-            throw new Exception('preg_replace failed during replacement');
+            throw new \Exception('preg_replace failed during replacement');
         }
 
         return mb_strtolower($string);
@@ -54,7 +50,7 @@ abstract class StringCase
             ':: [:Nonspacing Mark:] Remove;',
             ':: NFC;',
         ]);
-        $transliterator = Transliterator::createFromRules($rules, Transliterator::FORWARD);
+        $transliterator = \Transliterator::createFromRules($rules, \Transliterator::FORWARD);
         $normalized = $transliterator->transliterate($string);
 
         $replacements = [
@@ -70,7 +66,7 @@ abstract class StringCase
             $replaced = preg_replace($pattern, $replacement, $urlized);
 
             if ($replaced === null) {
-                throw new RuntimeException(sprintf('preg_replace returned null for value "%s"', $urlized));
+                throw new \RuntimeException(sprintf('preg_replace returned null for value "%s"', $urlized));
             }
 
             $urlized = $replaced;

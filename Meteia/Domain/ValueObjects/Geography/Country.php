@@ -24,6 +24,16 @@ class Country
     }
 
     /**
+     * Returns country name as native string.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName()->string();
+    }
+
+    /**
      * Returns country code.
      *
      * @return string
@@ -41,18 +51,7 @@ class Country
     public function getName()
     {
         $code = $this->getCode();
-        $name = CountryCodeName::getName($code);
 
-        return $name;
-    }
-
-    /**
-     * Returns country name as native string.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getName()->string();
+        return CountryCodeName::getName($code);
     }
 }
