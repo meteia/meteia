@@ -9,18 +9,18 @@ use IteratorAggregate;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 use Stringable;
 
-class PsrClasses implements IteratorAggregate
+readonly class PsrClasses implements IteratorAggregate
 {
     public function __construct(
-        private readonly FilesystemPath $baseDirectory,
-        private readonly string|Stringable $namespacePrefix,
-        private readonly array $regex,
+        private FilesystemPath $baseDirectory,
+        private string|Stringable $namespacePrefix,
+        private array $regex,
     ) {
     }
 
     public function getIterator(): Generator
     {
-        $searchRoot = $this->baseDirectory->join($this->namespacePrefix);
+        $searchRoot = $this->baseDirectory->join($this->namespacePrefix)->realpath();
         foreach ($searchRoot->find(...$this->regex) as $file) {
             $file = new FilesystemPath($file);
             $withoutPrefix = (string) $file->withoutPrefix($searchRoot);
