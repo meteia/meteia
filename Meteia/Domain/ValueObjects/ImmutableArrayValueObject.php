@@ -10,19 +10,16 @@ use Meteia\Domain\Contracts\PrimitiveValueObject;
 use Meteia\Domain\Exceptions\ImmutableValueObjectException;
 use Meteia\Domain\Exceptions\InvalidValueObjectException;
 
-abstract class ImmutableArrayValueObject implements PrimitiveValueObject, ArrayValueObject
+abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObject, ArrayValueObject
 {
     public const TYPE = 'ArrayTypeNotDefined';
 
-    protected $values;
-
-    public function __construct(array $values = [])
+    public function __construct(protected array $values = [])
     {
         if (!is_array($values)) {
             throw new InvalidValueObjectException($values, ['array']);
         }
         $this->guardType($values);
-        $this->values = $values;
     }
 
     public function compareTo(Comparable $other)
