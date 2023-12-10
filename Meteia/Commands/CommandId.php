@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Domain;
+namespace Meteia\Commands;
 
 use Meteia\ValueObjects\Identity\UniqueId;
 
-class CommandId extends UniqueId
+readonly class CommandId extends UniqueId
 {
     public static function prefix(): string
     {

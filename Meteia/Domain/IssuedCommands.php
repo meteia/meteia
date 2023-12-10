@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Domain;
 
 use DateTimeInterface;
-use Meteia\Domain\Contracts\Command;
+use Meteia\Commands\Command;
 use Meteia\Domain\ValueObjects\AggregateRootId;
 
 class IssuedCommands

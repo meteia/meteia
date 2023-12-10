@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Meteia\Domain;
 
 use DateTime;
+use Meteia\Commands\Command;
 use Meteia\Domain\Contracts\AggregateRoot;
-use Meteia\Domain\Contracts\Command;
 use Meteia\Domain\Transitional\RabbitMQCommandExchange;
 use Meteia\Domain\ValueObjects\AggregateRootId;
 use Meteia\EventSourcing\EventSourcing;
 
-class CommandMessage
+readonly class CommandMessage
 {
     public function __construct(
         public AggregateRootId $aggregateRootId,

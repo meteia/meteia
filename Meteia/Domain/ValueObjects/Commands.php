@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain\ValueObjects;
 
-use Meteia\Domain\Contracts\Command;
+use Meteia\Commands\Command;
 
 class Commands extends ImmutableArrayValueObject
 {

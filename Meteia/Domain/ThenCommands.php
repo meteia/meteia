@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
-use Meteia\Domain\Contracts\Command;
+use Meteia\Commands\Command;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
 use Meteia\Domain\ValueObjects\ImmutableCommands;
 

@@ -6,7 +6,7 @@ namespace Meteia\Domain;
 
 use Meteia\Domain\ValueObjects\ImmutableArrayValueObject;
 
-class CommandMessages extends ImmutableArrayValueObject
+readonly class CommandMessages extends ImmutableArrayValueObject
 {
-    public const TYPE = CommandMessage::class;
+    public const string TYPE = CommandMessage::class;
 }
