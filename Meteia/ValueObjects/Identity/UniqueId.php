@@ -7,20 +7,18 @@ namespace Meteia\ValueObjects\Identity;
 use Exception;
 use JsonSerializable;
 use Meteia\ValueObjects\Contracts\HasPrefix;
-use Stringable;
 use Tuupola\Base62;
 
-abstract class UniqueId implements HasPrefix, Stringable, JsonSerializable
+abstract readonly class UniqueId implements HasPrefix, JsonSerializable
 {
-    protected const EPOCH = 1577836800;
-    protected const LEN_ENCODED = 27;
-    protected const LEN_RANDOM = 16;
-    protected const LEN_TIMESTAMP = 4;
-    protected const PREFIX = '!!!';
+    protected const int EPOCH = 1577836800;
+    protected const int LEN_ENCODED = 27;
+    protected const int LEN_RANDOM = 16;
+    protected const int LEN_TIMESTAMP = 4;
 
-    public readonly string $token;
+    public string $token;
 
-    public function __construct(readonly string $bytes)
+    public function __construct(private string $bytes)
     {
         assert(
             strlen($bytes) === static::LEN_TIMESTAMP + static::LEN_RANDOM,
