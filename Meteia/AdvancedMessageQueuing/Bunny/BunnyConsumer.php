@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\RabbitMQ\Bunny;
+namespace Meteia\AdvancedMessageQueuing\Bunny;
 
 readonly class BunnyConsumer
 {

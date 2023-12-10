@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Meteia\RabbitMQ\Bunny;
+namespace Meteia\AdvancedMessageQueuing\Bunny;
 
 use Bunny\Channel;
 use Bunny\Client;
 use Bunny\Message;
-use Meteia\RabbitMQ\Contracts\MessageHandler;
-use Meteia\RabbitMQ\Contracts\Queue;
+use Meteia\AdvancedMessageQueuing\Contracts\MessageHandler;
+use Meteia\AdvancedMessageQueuing\Contracts\Queue;
 use Psr\Log\LoggerInterface;
 use Throwable;
 

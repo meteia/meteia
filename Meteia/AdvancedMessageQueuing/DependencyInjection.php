@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 use Bunny\Channel;
 use Bunny\Client;
+use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\Configuration\Configuration;
-use Meteia\RabbitMQ\Bunny\BunnyExchange;
-use Meteia\RabbitMQ\Bunny\BunnyQueue;
-use Meteia\RabbitMQ\Contracts\Exchange;
-use Meteia\RabbitMQ\Contracts\Queue;
 use React\EventLoop\LoopInterface;
 
 return [
@@ -59,6 +56,5 @@ return [
 
         return $client->channel();
     },
-    Exchange::class => BunnyExchange::class,
-    Queue::class => BunnyQueue::class,
+    CommandsExchangeName::class => fn (Configuration $configuration): CommandsExchangeName => new CommandsExchangeName($configuration->string('METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME', 'commands')),
 ];

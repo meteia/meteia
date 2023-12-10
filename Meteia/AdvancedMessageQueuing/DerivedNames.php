@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\RabbitMQ;
+namespace Meteia\AdvancedMessageQueuing;
 
 use Meteia\Application\ApplicationNamespace;
 
