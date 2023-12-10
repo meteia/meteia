@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Files\DomainEvents;
+namespace Meteia\Files\Events;
 
-use Meteia\Domain\DomainEvent;
+use Meteia\Events\Event;
 
-readonly class FileUploaded implements DomainEvent
+readonly class FileUploaded implements Event
 {
     public function __construct(
         public string $filename,
