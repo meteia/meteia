@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Meteia\EventSourcing;
 
 use Exception;
+use Meteia\Commands\Command;
 use Meteia\Domain\CommandMessage;
 use Meteia\Domain\CommandMessages;
-use Meteia\Domain\Contracts\Command;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
 use Meteia\Domain\ValueObjects\AggregateRootId;

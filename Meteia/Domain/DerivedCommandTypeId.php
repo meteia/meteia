@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use Meteia\Commands\CommandId;
+
 trait DerivedCommandTypeId
 {
     public static function commandTypeId(): CommandId

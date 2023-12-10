@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain\Transitional;
 
-use Meteia\RabbitMQ\Contracts\Message;
+use Meteia\AdvancedMessageQueuing\Contracts\Message;
 
 class RabbitMQCommandMessage implements Message
 {

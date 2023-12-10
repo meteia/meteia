@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Meteia\EventSourcing;
 
 use DI\Container;
+use Meteia\AdvancedMessageQueuing\Contracts\Exchange;
+use Meteia\AdvancedMessageQueuing\Contracts\MessageHandler;
+use Meteia\AdvancedMessageQueuing\Contracts\Queue;
+use Meteia\AdvancedMessageQueuing\DerivedNames;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\DomainEventHandler;
 use Meteia\MessageStreams\MessageSerializer;
-use Meteia\RabbitMQ\Contracts\Exchange;
-use Meteia\RabbitMQ\Contracts\MessageHandler;
-use Meteia\RabbitMQ\Contracts\Queue;
-use Meteia\RabbitMQ\DerivedNames;
 use Psr\Log\LoggerInterface;
 use Throwable;
 

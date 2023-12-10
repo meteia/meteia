@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Domain\Transitional;
 
-use Meteia\Domain\Contracts\Command;
+use Meteia\AdvancedMessageQueuing\Contracts\Exchange;
+use Meteia\Commands\Command;
 use Meteia\Domain\Contracts\PublishesCommands;
 use Meteia\MessageStreams\MessageSerializer;
-use Meteia\RabbitMQ\Contracts\Exchange;
 
 class RabbitMQCommandExchange implements PublishesCommands
 {
