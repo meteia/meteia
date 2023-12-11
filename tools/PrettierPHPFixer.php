@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use PhpCsFixer\Fixer\FixerInterface;
+use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\Tokenizer\Tokens;
 
 /**
@@ -52,7 +53,7 @@ final class PrettierPHPFixer implements FixerInterface
     #[\Override]
     public function getDefinition(): PhpCsFixer\FixerDefinition\FixerDefinitionInterface
     {
-        return new \PhpCsFixer\FixerDefinition\FixerDefinition('Format PHP files with prettier', [], null, null);
+        return new FixerDefinition('Format PHP files with prettier', [], null, null);
     }
 
     private function applyFix(SplFileInfo $file, Tokens $tokens): void
@@ -60,10 +61,9 @@ final class PrettierPHPFixer implements FixerInterface
         $executable = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'node_modules', '.bin', 'prettier']);
         $cmd = implode(' ', [$executable, $file]);
         exec($cmd, $prettierOutput, $resultCode);
-        if ($resultCode !== 0) {
-            throw new \Exception('Prettier failed to run on ' . $file . PHP_EOL . implode(PHP_EOL, $prettierOutput));
+        if ($resultCode === 0) {
+            $code = implode(PHP_EOL, $prettierOutput);
+            $tokens->setCode($code);
         }
-        $code = implode(PHP_EOL, $prettierOutput);
-        $tokens->setCode($code);
     }
 }
