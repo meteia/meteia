@@ -16,11 +16,10 @@ $prettierPhpFixer = new PrettierPHPFixer();
 $config = new Config();
 
 return $config
-    ->registerCustomFixers([
-        $prettierPhpFixer,
-    ])
+    ->registerCustomFixers([$prettierPhpFixer])
     ->setRiskyAllowed(true)
     ->setRules([
+        $prettierPhpFixer->getName() => true,
         '@PHP80Migration:risky' => true,
         '@PHP83Migration' => true,
         '@PhpCsFixer' => true,
@@ -32,5 +31,4 @@ return $config
         'trailing_comma_in_multiline' => ['elements' => ['arrays', 'arguments', 'match', 'parameters']],
         'yoda_style' => ['equal' => false, 'identical' => false, 'less_and_greater' => false],
     ])
-    ->setFinder($finder)
-;
+    ->setFinder($finder);

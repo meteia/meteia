@@ -14,8 +14,11 @@ class XChaCha20Poly1305
     {
     }
 
-    public function decrypt(string $ciphertext, string $associatedData, SecretKey $secret): XChaCha20Poly1305DecryptionResult
-    {
+    public function decrypt(
+        string $ciphertext,
+        string $associatedData,
+        SecretKey $secret,
+    ): XChaCha20Poly1305DecryptionResult {
         $ciphertext = $this->codec->decode($ciphertext);
 
         $nonce = mb_substr($ciphertext, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES, '8bit');
@@ -28,14 +31,19 @@ class XChaCha20Poly1305
             $secret->randomBytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES),
         );
         if ($plaintext === false) {
-            throw new DecryptionFailed('Either 1) ciphertext or associated data has been modified or 2) the secret is incorrect');
+            throw new DecryptionFailed(
+                'Either 1) ciphertext or associated data has been modified or 2) the secret is incorrect',
+            );
         }
 
         return new XChaCha20Poly1305DecryptionResult($plaintext);
     }
 
-    public function encrypt(string $plaintext, string $associatedData, SecretKey $secret = null): XChaCha20Poly1305EncryptionResult
-    {
+    public function encrypt(
+        string $plaintext,
+        string $associatedData,
+        SecretKey $secret = null,
+    ): XChaCha20Poly1305EncryptionResult {
         if (!$secret) {
             $secret = SecretKey::random();
         }

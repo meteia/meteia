@@ -33,9 +33,9 @@ class Connection
         $headers = [];
         $headers[] = 'Accept: application/json';
         $headers[] = 'Authorization: Basic ' . $credentials;
-        curl_setopt($session, CURLOPT_HTTPHEADER, $headers);  // Add headers
+        curl_setopt($session, CURLOPT_HTTPHEADER, $headers); // Add headers
 
-        curl_setopt($session, CURLOPT_HTTPGET, true);  // HTTP GET
+        curl_setopt($session, CURLOPT_HTTPGET, true); // HTTP GET
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
         $server_output = curl_exec($session);
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
@@ -78,7 +78,7 @@ class Connection
         curl_setopt($session, CURLOPT_HTTPHEADER, $headers);
 
         curl_setopt($session, CURLOPT_POST, true); // HTTP POST
-        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);  // Receive server response
+        curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
         $server_output = curl_exec($session); // Let's do this!
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
         curl_close($session); // Clean up
@@ -119,7 +119,7 @@ class Connection
         curl_setopt($session, CURLOPT_HTTPHEADER, $headers);
 
         curl_setopt($session, CURLOPT_POST, true); // HTTP POST
-        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);  // Receive server response
+        curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
         $server_output = curl_exec($session); // Let's do this!
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
         curl_close($session);

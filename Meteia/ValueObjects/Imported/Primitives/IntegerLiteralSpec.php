@@ -50,6 +50,9 @@ class IntegerLiteralSpec extends ObjectBehavior
 
     public function it_can_be_cast_as_a_float(): void
     {
-        $this->asFloat()->equalTo(new FloatLiteral(23))->shouldEqual(true);
+        $this->asFloat()
+            ->equalTo(new FloatLiteral(23))
+            ->shouldEqual(true)
+        ;
     }
 }

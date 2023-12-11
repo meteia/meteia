@@ -16,9 +16,5 @@ use Meteia\Http\Middleware\ParseBody;
     $publicDir = new ApplicationPublicDir(__DIR__, '..', 'public');
 
     $application = new Instance($namespace, $path, $publicDir);
-    $application->run(
-        [
-            ParseBody::class,
-        ],
-    );
+    $application->run([ParseBody::class]);
 })();

@@ -32,11 +32,7 @@ final class PrettierPHPFixer implements FixerInterface
     #[\Override]
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
-        if (
-            $tokens->count() > 0
-            && $this->isCandidate($tokens)
-            && $this->supports($file)
-        ) {
+        if ($tokens->count() > 0 && $this->isCandidate($tokens) && $this->supports($file)) {
             $this->applyFix($file, $tokens);
         }
     }
@@ -56,21 +52,13 @@ final class PrettierPHPFixer implements FixerInterface
     #[\Override]
     public function getDefinition(): PhpCsFixer\FixerDefinition\FixerDefinitionInterface
     {
-        return new \PhpCsFixer\FixerDefinition\FixerDefinition(
-            'Format PHP files with prettier',
-            [],
-            null,
-            null,
-        );
+        return new \PhpCsFixer\FixerDefinition\FixerDefinition('Format PHP files with prettier', [], null, null);
     }
 
     private function applyFix(SplFileInfo $file, Tokens $tokens): void
     {
-        $cmd = implode(' ', [
-            'node',
-            'node_modules/prettier/bin/prettier.cjs',
-            $file
-        ]);
+        $executable = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'node_modules', '.bin', 'prettier']);
+        $cmd = implode(' ', [$executable, $file]);
         exec($cmd, $prettierOutput, $resultCode);
         if ($resultCode !== 0) {
             throw new \Exception('Prettier failed to run on ' . $file . PHP_EOL . implode(PHP_EOL, $prettierOutput));

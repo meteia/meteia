@@ -8,9 +8,8 @@ use Meteia\ValueObjects\Identity\Uri;
 
 class StoredFile
 {
-    public function __construct(
-        public readonly Uri $publicUri,
-    ) {
+    public function __construct(public readonly Uri $publicUri)
+    {
     }
 
     public function __toString(): string

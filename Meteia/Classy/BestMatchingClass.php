@@ -11,7 +11,10 @@ class BestMatchingClass
     public function in(string $name, string $implementing, array $postFixes = []): string
     {
         $pathParts = explode('\\', trim($name, '\\'));
-        $contentAndPathNames = array_map(static fn ($part) => '\\' . $part, [$pathParts[1], ...\array_slice($pathParts, 3)]);
+        $contentAndPathNames = array_map(static fn ($part) => '\\' . $part, [
+            $pathParts[1],
+            ...\array_slice($pathParts, 3),
+        ]);
         $postFixes = array_merge($postFixes, [''], $contentAndPathNames);
 
         // FIXME: Might be better to search shorter to longest? Bisect?

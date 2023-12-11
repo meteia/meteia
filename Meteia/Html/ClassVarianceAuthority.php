@@ -12,7 +12,11 @@ class ClassVarianceAuthority implements ClassName
 
     public function use(array $props): string
     {
-        $activeVariants = array_map(fn ($variantName, $variant) => implode(' ', $this->variants[$variantName][$variant] ?? []), array_keys($props), $props);
+        $activeVariants = array_map(
+            fn ($variantName, $variant) => implode(' ', $this->variants[$variantName][$variant] ?? []),
+            array_keys($props),
+            $props,
+        );
 
         return implode(' ', [...$this->core, ...$activeVariants]);
     }

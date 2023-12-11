@@ -15,7 +15,10 @@ class Database extends ExtendedPdo
         if (\count($whereBindings) === 0) {
             throw new \Exception('Missing where bindings for delete');
         }
-        $whereColumn = implode(' AND ', array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)));
+        $whereColumn = implode(
+            ' AND ',
+            array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)),
+        );
         $query = sprintf('DELETE FROM `%s` WHERE %s', $table, $whereColumn);
         $bindings = $this->prepareBindings($whereBindings);
         $this->perform($query, $bindings);
@@ -46,7 +49,10 @@ class Database extends ExtendedPdo
             throw new \Exception('Missing where bindings for select');
         }
 
-        $whereColumn = implode(' AND ', array_map(static fn ($column) => "`{$column}` = :{$column}", array_keys($whereBindings)));
+        $whereColumn = implode(
+            ' AND ',
+            array_map(static fn ($column) => "`{$column}` = :{$column}", array_keys($whereBindings)),
+        );
         $query = sprintf('SELECT * FROM `%s` WHERE %s', $table, $whereColumn);
         $bindings = $this->prepareBindings($whereBindings);
 
@@ -59,8 +65,14 @@ class Database extends ExtendedPdo
             throw new \Exception('Missing set and/or where bindings for update');
         }
 
-        $setColumns = implode(', ', array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($setBindings)));
-        $whereColumn = implode(' AND ', array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)));
+        $setColumns = implode(
+            ', ',
+            array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($setBindings)),
+        );
+        $whereColumn = implode(
+            ' AND ',
+            array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)),
+        );
         $query = sprintf('UPDATE `%s` SET %s WHERE %s', $table, $setColumns, $whereColumn);
         $bindings = $this->prepareBindings([...$setBindings, ...$whereBindings]);
         $this->fetchAffected($query, $bindings);
@@ -71,7 +83,11 @@ class Database extends ExtendedPdo
         try {
             $this->insert($table, [...$setBindings, ...$whereBindings]);
         } catch (\PDOException $exception) {
-            $setBindings = array_filter($setBindings, static fn ($key) => !\array_key_exists($key, $whereBindings), ARRAY_FILTER_USE_KEY);
+            $setBindings = array_filter(
+                $setBindings,
+                static fn ($key) => !\array_key_exists($key, $whereBindings),
+                ARRAY_FILTER_USE_KEY,
+            );
             if (\count($setBindings) === 0) {
                 // Nothing to update
                 return;

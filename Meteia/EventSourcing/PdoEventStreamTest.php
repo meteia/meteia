@@ -80,19 +80,10 @@ it('appends and', static function (): void {
     $messageStream = init($db);
     $agid = TestAggregateRootId::random();
     $event = new TestDomainEvent();
-    $tar = new CountingAggregateRoot([
-        $event,
-    ]);
+    $tar = new CountingAggregateRoot([$event]);
 
     // Act
-    $messageStream->append(
-        $agid,
-        0,
-        EventTypeId::random(),
-        $event,
-        CausationId::random(),
-        CorrelationId::random(),
-    );
+    $messageStream->append($agid, 0, EventTypeId::random(), $event, CausationId::random(), CorrelationId::random());
     $messageStream->replay($agid, $tar);
 
     // Assert
@@ -158,9 +149,8 @@ class CountingAggregateRoot implements EventSourced
 
     private bool $wakeupCalled = false;
 
-    public function __construct(
-        private array $expectedEvents,
-    ) {
+    public function __construct(private array $expectedEvents)
+    {
     }
 
     public function __wakeup(): void
@@ -172,11 +162,8 @@ class CountingAggregateRoot implements EventSourced
     {
     }
 
-    public function handleEventMessage(
-        AggregateRootId $aggregateRootId,
-        DomainEvent $event,
-        int $eventSequence,
-    ): void {
+    public function handleEventMessage(AggregateRootId $aggregateRootId, DomainEvent $event, int $eventSequence): void
+    {
         // FIXME: Better way to force snapshots
         usleep(1000);
         assertEquals($this->sequence + 1, $eventSequence);

@@ -34,13 +34,17 @@ readonly class BunnyEventBus implements EventBus
     {
         $payload = $this->serializer->serialize($event, 'json');
         $exchangeName = $this->exchangeNameForEvent($event::class);
-        $this->channel->publish($payload, [
-            'message-id' => (string) EventId::random(),
-            'content-type' => 'application/json',
-            'correlation-id' => (string) $this->correlationId,
-            'causation-id' => (string) $this->causationId,
-            'process-id' => (string) $this->processId,
-        ], $exchangeName);
+        $this->channel->publish(
+            $payload,
+            [
+                'message-id' => (string) EventId::random(),
+                'content-type' => 'application/json',
+                'correlation-id' => (string) $this->correlationId,
+                'causation-id' => (string) $this->causationId,
+                'process-id' => (string) $this->processId,
+            ],
+            $exchangeName,
+        );
         $this->log->info('Published Event', [
             'event' => $event::class,
             'exchange' => $exchangeName,
@@ -48,8 +52,11 @@ readonly class BunnyEventBus implements EventBus
     }
 
     #[\Override]
-    public function registerEventHandler(string $eventClassName, string $eventHandlerClassName, callable $eventHandler): void
-    {
+    public function registerEventHandler(
+        string $eventClassName,
+        string $eventHandlerClassName,
+        callable $eventHandler,
+    ): void {
         $exchangeName = $this->exchangeNameForEvent($eventClassName);
         $queueName = $this->queueNameForEventHandler($eventHandlerClassName);
         $this->log->info('Registering Event Handler', [
@@ -74,7 +81,11 @@ readonly class BunnyEventBus implements EventBus
             'exchange' => $exchangeName,
         ]);
 
-        $this->channel->consume(function (Message $message, Channel $channel, Client $bunny) use ($eventClassName, $queueName, $eventHandler): void {
+        $this->channel->consume(function (Message $message, Channel $channel, Client $bunny) use (
+            $eventClassName,
+            $queueName,
+            $eventHandler,
+        ): void {
             $eventId = EventId::fromToken($message->headers['message-id']);
             $correlationId = CorrelationId::fromToken($message->headers['correlation-id']);
             $causationId = CausationId::fromToken($message->headers['causation-id']);

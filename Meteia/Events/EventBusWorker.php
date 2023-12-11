@@ -10,5 +10,11 @@ use Meteia\ValueObjects\Identity\ProcessId;
 
 interface EventBusWorker
 {
-    public function __invoke(Event $event, EventId $eventId, CorrelationId $correlationId, CausationId $causationId, ProcessId $processId): void;
+    public function __invoke(
+        Event $event,
+        EventId $eventId,
+        CorrelationId $correlationId,
+        CausationId $causationId,
+        ProcessId $processId,
+    ): void;
 }

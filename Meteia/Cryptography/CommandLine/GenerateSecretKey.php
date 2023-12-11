@@ -11,9 +11,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateSecretKey implements Command
 {
-    public function __construct(
-        private readonly OutputInterface $output,
-    ) {
+    public function __construct(private readonly OutputInterface $output)
+    {
     }
 
     public static function description(): string

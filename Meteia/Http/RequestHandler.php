@@ -14,9 +14,8 @@ class RequestHandler implements RequestHandlerInterface, MiddlewareInterface
 {
     private $middleware = [];
 
-    public function __construct(
-        private Container $container,
-    ) {
+    public function __construct(private Container $container)
+    {
     }
 
     public function append(MiddlewareInterface|string ...$middleware): self

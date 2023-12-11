@@ -83,7 +83,9 @@ function array_to_object($array)
             $hasStrKeys = \is_string($k);
         }
         if ($hasIntKeys && $hasStrKeys) {
-            $e = new \Exception('Current level has both integer and string keys, thus it is impossible to keep array or convert to object');
+            $e = new \Exception(
+                'Current level has both integer and string keys, thus it is impossible to keep array or convert to object',
+            );
             $e->vars = ['level' => $array];
 
             throw $e;
@@ -95,5 +97,5 @@ function array_to_object($array)
         }
     }
 
-    return ($hasStrKeys) ? $resultObj : $resultArr;
+    return $hasStrKeys ? $resultObj : $resultArr;
 }

@@ -11,10 +11,8 @@ class TypedRequestPath
 {
     private array $path;
 
-    public function __construct(
-        private readonly BooleanValues $booleanValues,
-        ServerRequestInterface $sri,
-    ) {
+    public function __construct(private readonly BooleanValues $booleanValues, ServerRequestInterface $sri)
+    {
         $this->path = explode('/', $sri->getUri()->getPath());
         $this->path = array_filter($this->path);
     }

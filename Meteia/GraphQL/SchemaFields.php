@@ -11,10 +11,8 @@ use Meteia\GraphQL\Contracts\QueryField;
 
 class SchemaFields
 {
-    public function __construct(
-        private readonly Container $container,
-        private readonly iterable $fieldClasses,
-    ) {
+    public function __construct(private readonly Container $container, private readonly iterable $fieldClasses)
+    {
     }
 
     public function implementing(string $interface): \Generator

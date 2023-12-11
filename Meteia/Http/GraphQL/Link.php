@@ -10,9 +10,8 @@ use Meteia\Http\NamedEndpoint;
 
 class Link extends ObjectType
 {
-    public function __construct(
-        private readonly EndpointMap $endpointMap,
-    ) {
+    public function __construct(private readonly EndpointMap $endpointMap)
+    {
         parent::__construct([
             'fields' => [
                 'text' => self::nonNull(self::string()),

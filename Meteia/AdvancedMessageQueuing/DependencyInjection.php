@@ -56,5 +56,9 @@ return [
 
         return $client->channel();
     },
-    CommandsExchangeName::class => static fn (Configuration $configuration): CommandsExchangeName => new CommandsExchangeName($configuration->string('METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME', 'commands')),
+    CommandsExchangeName::class => static fn (
+        Configuration $configuration,
+    ): CommandsExchangeName => new CommandsExchangeName(
+        $configuration->string('METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME', 'commands'),
+    ),
 ];

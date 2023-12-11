@@ -23,8 +23,12 @@ class PdoMessageStream implements MessageStream
     ) {
     }
 
-    public function append(UniqueId $messageStreamId, MessageStreamSequence $messageStreamSequence, MessageTypeId $messageTypeId, Message $message): void
-    {
+    public function append(
+        UniqueId $messageStreamId,
+        MessageStreamSequence $messageStreamSequence,
+        MessageTypeId $messageTypeId,
+        Message $message,
+    ): void {
         $query = '
             INSERT INTO message_streams (message_stream_id, message_stream_sequence, message_type_id, message)
             VALUE (UNHEX(:messageStreamId), :messageStreamSequence, UUID_TO_BIN(:messageTypeId), :message);
@@ -108,14 +112,21 @@ class PdoMessageStream implements MessageStream
 
         if ($replayDelta > 15 && \count($messageRows) > 25) {
             $lastMessageRow = end($messageRows);
-            $this->createSnapshot($messageStreamId, new MessageStreamSequence($lastMessageRow->message_stream_sequence), $target);
+            $this->createSnapshot(
+                $messageStreamId,
+                new MessageStreamSequence($lastMessageRow->message_stream_sequence),
+                $target,
+            );
         }
 
         return $target;
     }
 
-    private function createSnapshot(UniqueId $messageStreamId, MessageStreamSequence $messageStreamSequence, $target): void
-    {
+    private function createSnapshot(
+        UniqueId $messageStreamId,
+        MessageStreamSequence $messageStreamSequence,
+        $target,
+    ): void {
         $this->timings->add($target::class . '.snapshotUpdate', 1);
         $query = '
             INSERT INTO message_stream_snapshots (message_stream_id, message_stream_sequence, snapshot_version, snapshot)

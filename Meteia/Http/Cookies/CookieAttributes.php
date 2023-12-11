@@ -56,10 +56,7 @@ class CookieAttributes
 
         $kvParts = array_map(static fn ($key, $value) => $key . '=' . $value, array_keys($kvParts), $kvParts);
 
-        $flagParts = array_filter([
-            $this->secure,
-            $this->httpOnly,
-        ]);
+        $flagParts = array_filter([$this->secure, $this->httpOnly]);
 
         $parts = array_merge($kvParts, $flagParts);
 

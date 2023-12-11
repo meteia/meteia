@@ -8,9 +8,8 @@ class ReflectionContainer implements Container
 {
     private array $cache = [];
 
-    public function __construct(
-        private array $definitions = [],
-    ) {
+    public function __construct(private array $definitions = [])
+    {
         $this->definitions[Container::class] = $this;
     }
 

@@ -69,8 +69,13 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
     }
 
     #[\Override]
-    public function handle(Command $command, CommandId $commandId, CorrelationId $correlationId, CausationId $causationId, ProcessId $processId): void
-    {
+    public function handle(
+        Command $command,
+        CommandId $commandId,
+        CorrelationId $correlationId,
+        CausationId $causationId,
+        ProcessId $processId,
+    ): void {
         // TODO: Just how bad of an idea is this...
         $commandContainer = clone $this->container;
         $commandContainer->set(CorrelationId::class, $correlationId);

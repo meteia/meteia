@@ -22,21 +22,16 @@ return [
 
         $errorPage = $configuration->string('ERRORS_ENDPOINT', 'public');
 
-        switch (strtolower($errorPage)) {
-            case 'console':
-                return $container->get(ConsoleErrorEndpoint::class);
-
-            case 'developer':
-                return $container->get(DeveloperErrorEndpoint::class);
-        }
-
-        return $container->get(DeveloperErrorEndpoint::class);
+        return match (strtolower($errorPage)) {
+            'console' => $container->get(ConsoleErrorEndpoint::class),
+            default => $container->get(DeveloperErrorEndpoint::class),
+        };
     },
-    EditorUri::class => static fn (Configuration $configuration): EditorUri => new EditorUri($configuration->string('ERRORS_EDITOR_URI', 'phpstorm://open')),
+    EditorUri::class => static fn (Configuration $configuration): EditorUri => new EditorUri(
+        $configuration->string('ERRORS_EDITOR_URI', 'phpstorm://open'),
+    ),
     FrameFilters::class => static function (): FrameFilters {
         // FIXME: This feels ugly, not sure how I want to handle this
-        return new FrameFilters([
-            new FrameFilterMeteia(),
-        ]);
+        return new FrameFilters([new FrameFilterMeteia()]);
     },
 ];

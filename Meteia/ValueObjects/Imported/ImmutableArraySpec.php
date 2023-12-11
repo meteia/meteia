@@ -85,7 +85,13 @@ class ImmutableArraySpec extends ObjectBehavior
     public function it_can_be_merged_with_another_array(): void
     {
         $this->appendArray([new \stdClass()])->shouldHaveCount(1);
-        $this->appendArray([new \stdClass()])->appendArray([new \stdClass()])->shouldHaveCount(2);
-        $this->appendArray([new \stdClass()])->appendTraversable(new ImmutableArrayStub([new \stdClass()]))->shouldHaveCount(2);
+        $this->appendArray([new \stdClass()])
+            ->appendArray([new \stdClass()])
+            ->shouldHaveCount(2)
+        ;
+        $this->appendArray([new \stdClass()])
+            ->appendTraversable(new ImmutableArrayStub([new \stdClass()]))
+            ->shouldHaveCount(2)
+        ;
     }
 }

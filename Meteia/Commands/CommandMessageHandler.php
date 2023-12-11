@@ -10,5 +10,11 @@ use Meteia\ValueObjects\Identity\ProcessId;
 
 interface CommandMessageHandler
 {
-    public function handle(Command $command, CommandId $commandId, CorrelationId $correlationId, CausationId $causationId, ProcessId $processId): void;
+    public function handle(
+        Command $command,
+        CommandId $commandId,
+        CorrelationId $correlationId,
+        CausationId $causationId,
+        ProcessId $processId,
+    ): void;
 }

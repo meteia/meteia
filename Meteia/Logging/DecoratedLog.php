@@ -18,10 +18,10 @@ class DecoratedLog extends AbstractLogger
     private string $pathPrefix;
 
     public function __construct(
-        readonly private LoggerInterface $log,
-        readonly private CorrelationId $correlationId,
-        readonly private CausationId $causationId,
-        readonly private ProcessId $processId,
+        private readonly LoggerInterface $log,
+        private readonly CorrelationId $correlationId,
+        private readonly CausationId $causationId,
+        private readonly ProcessId $processId,
         RepositoryPath $repositoryPath,
     ) {
         $this->pathPrefix = trim((string) $repositoryPath, \DIRECTORY_SEPARATOR);
@@ -41,11 +41,10 @@ class DecoratedLog extends AbstractLogger
         $context['source'] .= ':' . $context['line'] ?? '0';
 
         unset($context['file'], $context['line']);
-        $this->log->log($level, implode(' -> ', [
-            $this->correlationId,
-            $this->causationId,
-            $this->processId,
-            $message,
-        ]), $context);
+        $this->log->log(
+            $level,
+            implode(' -> ', [$this->correlationId, $this->causationId, $this->processId, $message]),
+            $context,
+        );
     }
 }

@@ -56,11 +56,13 @@ class NewMigration implements Command
 
     public static function inputDefinition(): InputDefinition
     {
-        return new InputDefinition(
-            [
-                new InputArgument(self::ARG_TYPE, InputArgument::REQUIRED, 'either i (idempotent) or ni (non-idempotent); non-idempotent migration errors are ignored'),
-                new InputArgument(self::ARG_NAME, InputArgument::REQUIRED, 'migration filename name'),
-            ],
-        );
+        return new InputDefinition([
+            new InputArgument(
+                self::ARG_TYPE,
+                InputArgument::REQUIRED,
+                'either i (idempotent) or ni (non-idempotent); non-idempotent migration errors are ignored',
+            ),
+            new InputArgument(self::ARG_NAME, InputArgument::REQUIRED, 'migration filename name'),
+        ]);
     }
 }

@@ -33,9 +33,18 @@ class PreciseUSDSpec extends ObjectBehavior
 
     public function it_rounds_to_correct_precisions(): void
     {
-        $this->round(0)->__toString()->shouldBeLike('3');
-        $this->round(1)->__toString()->shouldBeLike('3.1');
-        $this->round(2)->__toString()->shouldBeLike('3.14');
+        $this->round(0)
+            ->__toString()
+            ->shouldBeLike('3')
+        ;
+        $this->round(1)
+            ->__toString()
+            ->shouldBeLike('3.1')
+        ;
+        $this->round(2)
+            ->__toString()
+            ->shouldBeLike('3.14')
+        ;
     }
 
     public function it_can_be_compared(): void

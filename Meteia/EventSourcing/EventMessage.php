@@ -42,10 +42,6 @@ class EventMessage
      */
     public function applyTo(AggregateRoot $target): void
     {
-        $target->handleEventMessage(
-            $this->aggregateRootId,
-            $this->event,
-            $this->sequence,
-        );
+        $target->handleEventMessage($this->aggregateRootId, $this->event, $this->sequence);
     }
 }

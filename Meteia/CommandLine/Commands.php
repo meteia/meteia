@@ -28,33 +28,35 @@ class Commands implements \IteratorAggregate
 
     public function getIterator(): \Generator
     {
-        $classes = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, ['.+', 'CommandLine', '.*\.php']);
+        $classes = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, [
+            '.+',
+            'CommandLine',
+            '.*\.php',
+        ]);
         $commandClassnames = new ClassesImplementing($classes, Command::class);
         foreach ($commandClassnames as $commandClassname) {
             $commandName = $this->commandName($commandClassname);
             $command = new \Symfony\Component\Console\Command\Command($commandName);
             $command->setDefinition($commandClassname::inputDefinition());
             $command->setDescription($commandClassname::description());
-            $command->setCode(
-                function (InputInterface $input, OutputInterface $output) use ($commandClassname): void {
-                    try {
-                        $this->container->set(InputInterface::class, $input);
-                        $this->container->set(OutputInterface::class, $output);
-                        $command = $this->container->get($commandClassname);
-                        if (!method_exists($command, 'execute')) {
-                            throw new \Exception('Command is missing required execute() method');
-                        }
-                        $this->container->call([$command, 'execute']);
-                    } catch (\Throwable $throwable) {
-                        $this->container->set(\Throwable::class, $throwable);
-                        $errorEndpoint = $this->container->get(ConsoleErrorEndpoint::class);
-
-                        /** @var ResponseInterface $response */
-                        $response = $this->container->call([$errorEndpoint, 'response'], [$throwable]);
-                        send($response);
+            $command->setCode(function (InputInterface $input, OutputInterface $output) use ($commandClassname): void {
+                try {
+                    $this->container->set(InputInterface::class, $input);
+                    $this->container->set(OutputInterface::class, $output);
+                    $command = $this->container->get($commandClassname);
+                    if (!method_exists($command, 'execute')) {
+                        throw new \Exception('Command is missing required execute() method');
                     }
-                },
-            );
+                    $this->container->call([$command, 'execute']);
+                } catch (\Throwable $throwable) {
+                    $this->container->set(\Throwable::class, $throwable);
+                    $errorEndpoint = $this->container->get(ConsoleErrorEndpoint::class);
+
+                    /** @var ResponseInterface $response */
+                    $response = $this->container->call([$errorEndpoint, 'response'], [$throwable]);
+                    send($response);
+                }
+            });
 
             yield $command;
         }

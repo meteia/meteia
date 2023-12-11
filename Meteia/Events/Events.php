@@ -25,7 +25,11 @@ readonly class Events implements \IteratorAggregate
         foreach (new ClassesImplementing($meteiaClasses, Event::class) as $class) {
             yield $class;
         }
-        $appClasses = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, ['.+', 'Events', '.*\.php']);
+        $appClasses = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, [
+            '.+',
+            'Events',
+            '.*\.php',
+        ]);
         foreach (new ClassesImplementing($appClasses, Event::class) as $class) {
             yield $class;
         }

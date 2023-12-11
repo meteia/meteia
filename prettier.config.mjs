@@ -1,4 +1,5 @@
-{
+export default {
+  "plugins": ["@prettier/plugin-php"],
   "singleQuote": true,
   "jsxSingleQuote": true,
   "tabWidth": 2,
@@ -6,10 +7,11 @@
     {
       "files": "*.php",
       "options": {
-        "phpVersion": "8.3",
+        "phpVersion": "8.2",
         "tabWidth": 4,
-        "printWidth": 120
+        "printWidth": 120,
+        "singleQuote": true,
       }
     }
   ]
-}
+};

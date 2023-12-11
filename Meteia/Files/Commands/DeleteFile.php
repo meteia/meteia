@@ -12,9 +12,8 @@ use Psr\Log\LoggerInterface;
 
 readonly class DeleteFile implements Command
 {
-    public function __construct(
-        public string $path,
-    ) {
+    public function __construct(public string $path)
+    {
     }
 
     public function invoke(LoggerInterface $log, Storage $storage, EventBus $eventBus): void

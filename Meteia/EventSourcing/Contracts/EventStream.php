@@ -12,10 +12,7 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 
 interface EventStream
 {
-    public function replay(
-        AggregateRootId $aggregateRootId,
-        EventSourced $target,
-    ): EventSourced;
+    public function replay(AggregateRootId $aggregateRootId, EventSourced $target): EventSourced;
 
     public function append(
         AggregateRootId $aggregateRootId,

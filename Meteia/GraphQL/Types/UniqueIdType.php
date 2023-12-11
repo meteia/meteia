@@ -16,10 +16,12 @@ class UniqueIdType extends ScalarType implements Resolver
 {
     use ClassBasedName;
 
-    public function __construct(
-        private readonly string $uniqueIdClass,
-    ) {
-        \assert(is_subclass_of($uniqueIdClass, UniqueId::class), $uniqueIdClass . ' does not implement ' . UniqueId::class);
+    public function __construct(private readonly string $uniqueIdClass)
+    {
+        \assert(
+            is_subclass_of($uniqueIdClass, UniqueId::class),
+            $uniqueIdClass . ' does not implement ' . UniqueId::class,
+        );
         parent::__construct([
             'name' => $this->classBasedName($uniqueIdClass),
         ]);
@@ -62,6 +64,6 @@ class UniqueIdType extends ScalarType implements Resolver
             return $root->id;
         }
 
-        return new $this->uniqueIdClass($root->id ?? $args['id'] ?? $root);
+        return new $this->uniqueIdClass($root->id ?? ($args['id'] ?? $root));
     }
 }

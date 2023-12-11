@@ -12,10 +12,7 @@ class SealedCookie extends Cookie
     public function open(XChaCha20Poly1305 $XChaCha20Poly1305, SecretKey $secret): OpenedCookie
     {
         [$ciphertext, $associatedData] = explode('_', $this->value, 2);
-        $ad = implode('_', array_filter([
-            $this->name,
-            $associatedData,
-        ]));
+        $ad = implode('_', array_filter([$this->name, $associatedData]));
 
         $result = $XChaCha20Poly1305->decrypt($ciphertext, $ad, $secret);
 

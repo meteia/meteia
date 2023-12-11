@@ -73,9 +73,6 @@ it('serialize/unserialize UserId', function (): void {
     $after = $ms->unserialize($mid);
 
     // Assert
-    $this->assertEquals(
-        $before->token(),
-        $after->token(),
-    );
+    $this->assertEquals($before->token(), $after->token());
     $this->assertEquals($before::class, $after::class);
 });

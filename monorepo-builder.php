@@ -6,9 +6,7 @@ use Symplify\MonorepoBuilder\ComposerJsonManipulator\ValueObject\ComposerJsonSec
 use Symplify\MonorepoBuilder\Config\MBConfig;
 
 return static function (MBConfig $config): void {
-    $config->packageDirectories([
-        implode(DIRECTORY_SEPARATOR, [__DIR__, 'Meteia']),
-    ]);
+    $config->packageDirectories([implode(DIRECTORY_SEPARATOR, [__DIR__, 'Meteia'])]);
 
     $config->dataToAppend([
         ComposerJsonSection::REQUIRE_DEV => [

@@ -118,7 +118,9 @@ class AddressSpec extends ObjectBehavior
             'floorIdentifier' => '2',
         ];
         $this->beConstructedWith($baseArray);
-        $this->format(AddressFormat::MULTI_LINE_ADDRESS)->shouldReturnString('1101 N. Wilmot Rd Ste 233;Floor 2;Tucson* AZ 85712#5159;United States');
+        $this->format(AddressFormat::MULTI_LINE_ADDRESS)->shouldReturnString(
+            '1101 N. Wilmot Rd Ste 233;Floor 2;Tucson* AZ 85712#5159;United States',
+        );
     }
 
     /**

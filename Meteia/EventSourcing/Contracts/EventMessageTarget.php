@@ -9,9 +9,5 @@ use Meteia\Domain\ValueObjects\AggregateRootId;
 
 interface EventMessageTarget
 {
-    public function handleEventMessage(
-        AggregateRootId $aggregateRootId,
-        DomainEvent $event,
-        int $eventSequence,
-    );
+    public function handleEventMessage(AggregateRootId $aggregateRootId, DomainEvent $event, int $eventSequence);
 }

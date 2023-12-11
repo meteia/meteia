@@ -11,9 +11,8 @@ readonly class FormPostBody implements ServerRequestBody
 {
     private array $data;
 
-    public function __construct(
-        ServerRequestInterface $request,
-    ) {
+    public function __construct(ServerRequestInterface $request)
+    {
         $this->data = $request->getParsedBody();
     }
 

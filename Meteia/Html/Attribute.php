@@ -6,9 +6,7 @@ namespace Meteia\Html;
 
 class Attribute
 {
-    public function __construct(
-        public string $name,
-        public bool|string|\Stringable $value,
-    ) {
+    public function __construct(public string $name, public bool|string|\Stringable $value)
+    {
     }
 }

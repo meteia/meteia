@@ -135,9 +135,9 @@ class Address
 
     private function buildLineBreakElement($baseElement)
     {
-        return $this->replacements['%' . $baseElement . '%']->trim()->isEmpty() ?
-            new StringLiteral('') :
-            $this->replacements['%' . $baseElement . '%'] . $this->replacements['%lineBreak%'];
+        return $this->replacements['%' . $baseElement . '%']->trim()->isEmpty()
+            ? new StringLiteral('')
+            : $this->replacements['%' . $baseElement . '%'] . $this->replacements['%lineBreak%'];
     }
 
     /**

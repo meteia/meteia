@@ -113,7 +113,12 @@ class Migrate implements Command
     {
         return new InputDefinition([
             new InputOption(self::ARG_DEV, '', InputOption::VALUE_NONE, 'apply without marking as ran'),
-            new InputOption(self::ARG_RESET, '', InputOption::VALUE_NONE, 'reset migration table (dangerous option if all migrations are not idempotent)'),
+            new InputOption(
+                self::ARG_RESET,
+                '',
+                InputOption::VALUE_NONE,
+                'reset migration table (dangerous option if all migrations are not idempotent)',
+            ),
         ]);
     }
 }

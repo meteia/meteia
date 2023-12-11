@@ -13,10 +13,8 @@ use Meteia\ValueObjects\Identity\Uri;
 
 class PsrEndpointMap implements EndpointMap
 {
-    public function __construct(
-        private readonly ApplicationNamespace $namespace,
-        private readonly Host $host,
-    ) {
+    public function __construct(private readonly ApplicationNamespace $namespace, private readonly Host $host)
+    {
     }
 
     public function classNameFor(string $path): string

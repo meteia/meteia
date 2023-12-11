@@ -11,19 +11,16 @@ use Symfony\Component\Console\Input\InputDefinition;
 
 readonly class TestWorker implements Command
 {
-    public function __construct(
-        private CommandBus $commandBus,
-    ) {
+    public function __construct(private CommandBus $commandBus)
+    {
     }
 
     #[\Override]
     public function execute(): void
     {
-        while (true) {
-            $this->commandBus->publishCommand(
-                new DeleteFile('/dev/null'),
-            );
-        }
+        //        while (true) {
+        $this->commandBus->publishCommand(new DeleteFile('/dev/null'));
+        //        }
     }
 
     #[\Override]

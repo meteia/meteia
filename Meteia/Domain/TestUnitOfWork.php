@@ -23,7 +23,7 @@ class TestUnitOfWork implements UnitOfWork
     public function caused(EventMessages $eventMessages): void
     {
         foreach ($eventMessages as $eventMessage) {
-            $this->actual[] = $eventMessage->event::class;
+            $this->actual[] = get_class($eventMessage->event);
         }
     }
 

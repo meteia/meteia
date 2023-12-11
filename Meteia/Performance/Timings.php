@@ -33,7 +33,7 @@ class Timings
         $result = $c();
         $endTime = hrtime(true);
         --$this->timeDepth;
-        $duration = (($endTime - $startTime) / 1000000) - $this->childDurations;
+        $duration = ($endTime - $startTime) / 1000000 - $this->childDurations;
         $this->childDurations += $duration;
         if ($this->timeDepth === 0) {
             $this->childDurations = 0;

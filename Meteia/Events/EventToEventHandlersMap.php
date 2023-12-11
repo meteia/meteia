@@ -6,10 +6,8 @@ namespace Meteia\Events;
 
 readonly class EventToEventHandlersMap implements \IteratorAggregate
 {
-    public function __construct(
-        public Events $events,
-        public EventHandlers $eventHandlers,
-    ) {
+    public function __construct(public Events $events, public EventHandlers $eventHandlers)
+    {
     }
 
     #[\Override]
@@ -19,7 +17,10 @@ readonly class EventToEventHandlersMap implements \IteratorAggregate
         foreach ($this->events as $event) {
             $normalizedEvent = $this->normalizedEvent($event);
 
-            yield $event => array_filter($eventHandlers, fn (string $eventHandler) => $normalizedEvent === $this->normalizedEventHandler($eventHandler));
+            yield $event => array_filter(
+                $eventHandlers,
+                fn (string $eventHandler) => $normalizedEvent === $this->normalizedEventHandler($eventHandler),
+            );
         }
     }
 

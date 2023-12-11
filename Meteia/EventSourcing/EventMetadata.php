@@ -10,9 +10,7 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 
 class EventMetadata extends ImmutableValueObject
 {
-    public function __construct(
-        public CausationId $causationId,
-        public CorrelationId $correlationId,
-    ) {
+    public function __construct(public CausationId $causationId, public CorrelationId $correlationId)
+    {
     }
 }

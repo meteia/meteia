@@ -12,10 +12,7 @@ trait FromDatabase
 
     public static function fromDatabase(object $row): static
     {
-        $parameters = array_map(
-            static fn (callable $make) => $make($row),
-            static::constructorDatabaseColumnNames(),
-        );
+        $parameters = array_map(static fn (callable $make) => $make($row), static::constructorDatabaseColumnNames());
 
         return new static(...$parameters);
     }
@@ -29,34 +26,31 @@ trait FromDatabase
                 throw new \Exception('Missing Constructor');
             }
 
-            static::$parameterCache[static::class] = array_map(
-                static function (\ReflectionParameter $parameter) {
-                    $columnName = StringCase::snake($parameter->getName());
-                    $expectedType = $parameter->getType();
-                    $expectedTypeClass = $expectedType->getName();
-                    if (!$expectedType->isBuiltin() && $expectedType instanceof \ReflectionNamedType) {
-                        return static function (object $row) use ($columnName, $expectedTypeClass) {
-                            if (!isset($row->{$columnName})) {
-                                return null;
-                            }
-                            if (is_subclass_of($expectedTypeClass, \BackedEnum::class)) {
-                                return $expectedTypeClass::from($row->{$columnName});
-                            }
+            static::$parameterCache[static::class] = array_map(static function (\ReflectionParameter $parameter) {
+                $columnName = StringCase::snake($parameter->getName());
+                $expectedType = $parameter->getType();
+                $expectedTypeClass = $expectedType->getName();
+                if (!$expectedType->isBuiltin() && $expectedType instanceof \ReflectionNamedType) {
+                    return static function (object $row) use ($columnName, $expectedTypeClass) {
+                        if (!isset($row->{$columnName})) {
+                            return null;
+                        }
+                        if (is_subclass_of($expectedTypeClass, \BackedEnum::class)) {
+                            return $expectedTypeClass::from($row->{$columnName});
+                        }
 
-                            return new $expectedTypeClass($row->{$columnName});
-                        };
-                    }
-                    if ($expectedTypeClass === 'bool') {
-                        return static fn (object $row) => (bool) $row->{$columnName};
-                    }
-                    if ($expectedTypeClass === 'array') {
-                        return static fn (object $row) => json_decode($row->{$columnName}, true);
-                    }
+                        return new $expectedTypeClass($row->{$columnName});
+                    };
+                }
+                if ($expectedTypeClass === 'bool') {
+                    return static fn (object $row) => (bool) $row->{$columnName};
+                }
+                if ($expectedTypeClass === 'array') {
+                    return static fn (object $row) => json_decode($row->{$columnName}, true);
+                }
 
-                    return static fn (object $row) => $row->{$columnName};
-                },
-                $constructor->getParameters(),
-            );
+                return static fn (object $row) => $row->{$columnName};
+            }, $constructor->getParameters());
         }
 
         return static::$parameterCache[static::class];

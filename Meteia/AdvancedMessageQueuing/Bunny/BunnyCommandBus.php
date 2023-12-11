@@ -37,13 +37,18 @@ readonly class BunnyCommandBus implements CommandBus
     public function publishCommand(Command $command): void
     {
         $payload = $this->serializer->serialize($command, 'json');
-        $this->channel->publish($payload, [
-            'message-id' => (string) CommandId::random(),
-            'content-type' => 'application/json',
-            'correlation-id' => (string) $this->correlationId,
-            'causation-id' => (string) $this->causationId,
-            'process-id' => (string) $this->processId,
-        ], $this->exchangeName, $this->queueNameForCommand($command::class));
+        $this->channel->publish(
+            $payload,
+            [
+                'message-id' => (string) CommandId::random(),
+                'content-type' => 'application/json',
+                'correlation-id' => (string) $this->correlationId,
+                'causation-id' => (string) $this->causationId,
+                'process-id' => (string) $this->processId,
+            ],
+            $this->exchangeName,
+            $this->queueNameForCommand($command::class),
+        );
         $this->log->info('Published Command', [
             'command' => $command::class,
             'exchange' => $this->exchangeName,
@@ -61,9 +66,17 @@ readonly class BunnyCommandBus implements CommandBus
         $this->log->info('Command Queue Declared', ['queue' => $queueName, 'status' => $ok ? 'ok' : 'failed']);
 
         $ok = $this->channel->queueBind(queue: $queueName, exchange: $this->exchangeName, routingKey: $queueName);
-        $this->log->info('Command Queue Bound', ['queue' => $queueName, 'exchange' => $this->exchangeName, 'status' => $ok ? 'ok' : 'failed']);
+        $this->log->info('Command Queue Bound', [
+            'queue' => $queueName,
+            'exchange' => $this->exchangeName,
+            'status' => $ok ? 'ok' : 'failed',
+        ]);
 
-        $this->channel->consume(function (Message $message, Channel $channel, Client $bunny) use ($commandClassName, $queueName, $handler): void {
+        $this->channel->consume(function (Message $message, Channel $channel, Client $bunny) use (
+            $commandClassName,
+            $queueName,
+            $handler,
+        ): void {
             $commandId = CommandId::fromToken($message->headers['message-id']);
             $correlationId = CorrelationId::fromToken($message->headers['correlation-id']);
             $causationId = CausationId::fromToken($message->headers['causation-id']);

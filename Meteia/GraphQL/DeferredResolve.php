@@ -60,7 +60,9 @@ trait DeferredResolve
             return null;
         }
 
-        return \is_array($this->mergedArgs[$string]) ? array_unique($this->mergedArgs[$string]) : [$this->mergedArgs[$string]];
+        return \is_array($this->mergedArgs[$string])
+            ? array_unique($this->mergedArgs[$string])
+            : [$this->mergedArgs[$string]];
     }
 
     private function load(): array

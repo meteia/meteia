@@ -34,21 +34,14 @@ trait EventSourcing
 
     public function causes(DomainEvent $event): void
     {
-        $eventMessage = new EventMessage(
-            $this->aggregateRootId(),
-            $event,
-            $this->__eventSequence + 1,
-        );
+        $eventMessage = new EventMessage($this->aggregateRootId(), $event, $this->__eventSequence + 1);
         $eventMessage->applyTo($this);
         $this->__pendingEventMessages[] = $eventMessage;
     }
 
     public function wantsTo(Command $command): void
     {
-        $commandMessage = new CommandMessage(
-            $this->aggregateRootId(),
-            $command,
-        );
+        $commandMessage = new CommandMessage($this->aggregateRootId(), $command);
         $this->__pendingCommandMessages[] = $commandMessage;
     }
 
@@ -60,11 +53,8 @@ trait EventSourcing
         $this->__pendingCommandMessages = [];
     }
 
-    public function handleEventMessage(
-        AggregateRootId $aggregateRootId,
-        DomainEvent $event,
-        int $eventSequence,
-    ): void {
+    public function handleEventMessage(AggregateRootId $aggregateRootId, DomainEvent $event, int $eventSequence): void
+    {
         if ($eventSequence <= $this->__eventSequence) {
             throw new \Exception('Event version is older than the aggregates version.');
         }
@@ -98,9 +88,8 @@ trait EventSourcing
         \call_user_func_array([$this, $method], $args);
     }
 
-    public function handleCommandMessage(
-        Command $command,
-    ): void {
+    public function handleCommandMessage(Command $command): void
+    {
         $aggName = substr($this::class, strrpos($this::class, '\\') + 1);
         $eventName = substr($command::class, strrpos($command::class, '\\') + 1);
         $method = $eventName;

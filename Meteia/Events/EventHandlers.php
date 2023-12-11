@@ -21,11 +21,19 @@ readonly class EventHandlers implements \IteratorAggregate
     #[\Override]
     public function getIterator(): \Traversable
     {
-        $meteiaClasses = new PsrClasses(new FilesystemPath(__DIR__, '..', '..'), 'Meteia', ['.+', 'EventHandlers', '.*\.php']);
+        $meteiaClasses = new PsrClasses(new FilesystemPath(__DIR__, '..', '..'), 'Meteia', [
+            '.+',
+            'EventHandlers',
+            '.*\.php',
+        ]);
         foreach (new ClassesImplementing($meteiaClasses, EventHandler::class) as $class) {
             yield $class;
         }
-        $appClasses = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, ['.+', 'EventHandlers', '.*\.php']);
+        $appClasses = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, [
+            '.+',
+            'EventHandlers',
+            '.*\.php',
+        ]);
         foreach (new ClassesImplementing($appClasses, EventHandler::class) as $class) {
             yield $class;
         }

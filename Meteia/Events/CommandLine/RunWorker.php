@@ -63,7 +63,13 @@ readonly class RunWorker implements Command
         foreach ($this->eventToEventHandlersMap as $event => $handlers) {
             foreach ($handlers as $handler) {
                 $this->log->info('Registering event handler', ['event' => $event, 'handler' => $handler]);
-                $this->eventBus->registerEventHandler($event, $handler, function (Event $event, EventId $eventId, CorrelationId $correlationId, CausationId $causationId, ProcessId $processId) use ($handler): void {
+                $this->eventBus->registerEventHandler($event, $handler, function (
+                    Event $event,
+                    EventId $eventId,
+                    CorrelationId $correlationId,
+                    CausationId $causationId,
+                    ProcessId $processId,
+                ) use ($handler): void {
                     $commandContainer = clone $this->container;
                     $commandContainer->set(CorrelationId::class, $correlationId);
                     $commandContainer->set(CausationId::class, CausationId::fromHex($processId->hex()));

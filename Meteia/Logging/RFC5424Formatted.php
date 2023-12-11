@@ -40,7 +40,7 @@ class RFC5424Formatted extends AbstractLogger
 
     private function prefixed(string $level, string $message): string
     {
-        $priority = (23 * 8) + self::SEVERITY[strtoupper($level)];
+        $priority = 23 * 8 + self::SEVERITY[strtoupper($level)];
 
         return implode(' ', [
             // <PRI>VERSION
@@ -68,23 +68,28 @@ class RFC5424Formatted extends AbstractLogger
 
     private function formated(string $level, string $message, array $context): string
     {
-        $elements = array_map_assoc(function ($elementSourceId, $elementSourceParams) {
-            $elementParams = array_map_assoc(function ($paramName, $paramValue) {
-                if (\is_object($paramValue) || \is_array($paramValue)) {
-                    $paramValue = '!' . \gettype($paramValue) . '!';
-                }
+        $elements = array_map_assoc(
+            function ($elementSourceId, $elementSourceParams) {
+                $elementParams = array_map_assoc(function ($paramName, $paramValue) {
+                    if (\is_object($paramValue) || \is_array($paramValue)) {
+                        $paramValue = '!' . \gettype($paramValue) . '!';
+                    }
 
-                return [$paramName => sprintf('%s="%s"', $paramName, $this->escapeParamValue((string) $paramValue))];
-            }, $elementSourceParams);
-            $element = sprintf('[%s %s]', $elementSourceId, implode(' ', $elementParams));
+                    return [
+                        $paramName => sprintf('%s="%s"', $paramName, $this->escapeParamValue((string) $paramValue)),
+                    ];
+                }, $elementSourceParams);
+                $element = sprintf('[%s %s]', $elementSourceId, implode(' ', $elementParams));
 
-            return [$elementSourceId => $element];
-        }, array_filter([
-            'Meteia.log@30452' => [
-                'seq' => $this->msgNumber++,
-            ],
-            'psr.log.context@17589' => $context,
-        ]));
+                return [$elementSourceId => $element];
+            },
+            array_filter([
+                'Meteia.log@30452' => [
+                    'seq' => $this->msgNumber++,
+                ],
+                'psr.log.context@17589' => $context,
+            ]),
+        );
         $structuredData = \count($elements) ? implode('', $elements) . ' ' : '';
 
         $lines = array_map('trim', explode(PHP_EOL, $message));

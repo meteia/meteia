@@ -65,7 +65,7 @@ class FilesystemPath extends StringLiteral
         $files = new \RecursiveIteratorIterator($inner, \RecursiveIteratorIterator::CHILD_FIRST);
 
         foreach ($files as $fileInfo) {
-            $action = ($fileInfo->isDir() ? 'rmdir' : 'unlink');
+            $action = $fileInfo->isDir() ? 'rmdir' : 'unlink';
             if (!@$action($fileInfo->getRealPath())) {
                 return false; // Abort due to the failure.
             }

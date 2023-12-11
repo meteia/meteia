@@ -12,10 +12,8 @@ use Meteia\EventSourcing\EventSourcing;
 
 readonly class CommandMessage
 {
-    public function __construct(
-        public AggregateRootId $aggregateRootId,
-        public Command $command,
-    ) {
+    public function __construct(public AggregateRootId $aggregateRootId, public Command $command)
+    {
     }
 
     public function publishTo(RabbitMQCommandExchange $rabbitMQExchange): void
@@ -25,11 +23,7 @@ readonly class CommandMessage
 
     public function appendTo(IssuedCommands $issuedCommands): void
     {
-        $issuedCommands->append(
-            $this->aggregateRootId,
-            $this->command,
-            new \DateTime(),
-        );
+        $issuedCommands->append($this->aggregateRootId, $this->command, new \DateTime());
     }
 
     /**

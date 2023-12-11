@@ -6,9 +6,8 @@ namespace Meteia\DependencyInjection\Fixtures;
 
 class Factory
 {
-    public function __construct(
-        private InnerDependency $innerDependency,
-    ) {
+    public function __construct(private InnerDependency $innerDependency)
+    {
     }
 
     public function create(string $requiredString): FactoryOutput

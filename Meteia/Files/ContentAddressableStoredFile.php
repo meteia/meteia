@@ -8,10 +8,8 @@ use Meteia\ValueObjects\Identity\Uri;
 
 class ContentAddressableStoredFile
 {
-    public function __construct(
-        public readonly FileHash $fileHash,
-        public readonly Uri $publicUri,
-    ) {
+    public function __construct(public readonly FileHash $fileHash, public readonly Uri $publicUri)
+    {
     }
 
     public function __toString(): string

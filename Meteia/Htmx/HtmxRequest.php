@@ -8,9 +8,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class HtmxRequest
 {
-    public function __construct(
-        private readonly ServerRequestInterface $request,
-    ) {
+    public function __construct(private readonly ServerRequestInterface $request)
+    {
     }
 
     public function isBoosted(): bool

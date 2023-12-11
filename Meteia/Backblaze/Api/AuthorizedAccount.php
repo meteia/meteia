@@ -30,8 +30,7 @@ class AuthorizedAccount
     {
         dd('TODO');
         $request = new Request('POST', '', [
-            'headers' => [
-            ],
+            'headers' => [],
         ]);
 
         $response = $this->client->send($request);
@@ -41,8 +40,7 @@ class AuthorizedAccount
     {
         dd('TODO');
         $request = new Request('GET', '', [
-            'headers' => [
-            ],
+            'headers' => [],
         ]);
 
         $response = $this->client->send($request);

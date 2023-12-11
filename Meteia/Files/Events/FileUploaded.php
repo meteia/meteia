@@ -8,8 +8,7 @@ use Meteia\Events\Event;
 
 readonly class FileUploaded implements Event
 {
-    public function __construct(
-        public string $filename,
-    ) {
+    public function __construct(public string $filename)
+    {
     }
 }
