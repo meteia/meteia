@@ -51,10 +51,16 @@ return [
             'keepAlive' => $keepAlive,
         ]);
     },
-    Channel::class => static function (Client $client): Channel {
-        $client->connect();
+    Channel::class => static function (Psr\Log\LoggerInterface $log, Client $client): Channel {
+        try {
+            $client->connect();
 
-        return $client->channel();
+            return $client->channel();
+        } catch (\Throwable $e) {
+            $log->warning('Failed to connect to RabbitMQ: ' . $e->getMessage(), ['exception' => $e]);
+
+            exit(1);
+        }
     },
     CommandsExchangeName::class => static fn (
         Configuration $configuration,
