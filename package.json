@@ -1,12 +1,12 @@
 {
   "devDependencies": {
+    "@prettier/plugin-php": "^0.21.0",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
     "eslint": "^8.55.0",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-react": "^7.33.2",
-    "sort-json": "^2.0.1",
-    "@prettier/plugin-php": "^0.21.0",
-    "prettier": "^3.1.1"
+    "prettier": "^3.1.1",
+    "sort-json": "^2.0.1"
   }
 }
