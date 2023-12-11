@@ -6,6 +6,6 @@ namespace Meteia\Http\Csrf;
 
 use Meteia\Cryptography\SecretKey;
 
-class CsrfSecretKey extends SecretKey
+readonly class CsrfSecretKey extends SecretKey
 {
 }

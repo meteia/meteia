@@ -6,6 +6,6 @@ namespace Meteia\Http\Cookies;
 
 use Meteia\Cryptography\SecretKey;
 
-class CookieSecret extends SecretKey
+readonly class CookieSecret extends SecretKey
 {
 }

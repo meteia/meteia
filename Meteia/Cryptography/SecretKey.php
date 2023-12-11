@@ -6,11 +6,11 @@ namespace Meteia\Cryptography;
 
 use Meteia\ValueObjects\Identity\UniqueId;
 
-class SecretKey extends UniqueId
+readonly class SecretKey extends UniqueId
 {
-    protected const LEN_ENCODED = 43;
-    protected const LEN_RANDOM = 32;
-    protected const LEN_TIMESTAMP = 0;
+    protected const int LEN_ENCODED = 43;
+    protected const int LEN_RANDOM = 32;
+    protected const int LEN_TIMESTAMP = 0;
 
     public static function prefix(): string
     {

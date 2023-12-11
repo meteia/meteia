@@ -6,6 +6,6 @@ namespace Meteia\Files\Configuration;
 
 use Meteia\Cryptography\SecretKey;
 
-class ContentAddressableStorageSecretKey extends SecretKey
+readonly class ContentAddressableStorageSecretKey extends SecretKey
 {
 }
