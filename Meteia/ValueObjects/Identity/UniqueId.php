@@ -16,7 +16,7 @@ abstract readonly class UniqueId implements HasPrefix, \JsonSerializable
 
     public string $token;
 
-    public function __construct(private string $bytes)
+    public function __construct(public string $bytes)
     {
         \assert(
             \strlen($bytes) === static::LEN_TIMESTAMP + static::LEN_RANDOM,
