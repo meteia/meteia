@@ -1,11 +1,12 @@
 {
-  "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
     "eslint": "^8.55.0",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-react": "^7.33.2",
-    "prettier": "^2.8.8",
-    "sort-json": "^2.0.1"
+    "sort-json": "^2.0.1",
+    "@prettier/plugin-php": "^0.21.0",
+    "prettier": "^3.1.1"
   }
 }

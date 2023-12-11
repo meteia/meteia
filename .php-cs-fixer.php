@@ -5,15 +5,20 @@ declare(strict_types=1);
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
+require_once implode(DIRECTORY_SEPARATOR, [__DIR__, 'tools', 'PrettierPHPFixer.php']);
+
 $finder = Finder::create()
     ->ignoreDotFiles(false)
     ->ignoreVCSIgnored(true)
     ->in(__DIR__)
 ;
-
+$prettierPhpFixer = new PrettierPHPFixer();
 $config = new Config();
 
 return $config
+    ->registerCustomFixers([
+        $prettierPhpFixer,
+    ])
     ->setRiskyAllowed(true)
     ->setRules([
         '@PHP80Migration:risky' => true,
