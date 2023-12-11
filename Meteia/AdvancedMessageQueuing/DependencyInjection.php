@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Bunny\Channel;
 use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
+use Meteia\Application\ApplicationNamespace;
 use Meteia\Configuration\Configuration;
 use React\EventLoop\LoopInterface;
 
@@ -64,7 +65,8 @@ return [
     },
     CommandsExchangeName::class => static fn (
         Configuration $configuration,
+        ApplicationNamespace $applicationNamespace,
     ): CommandsExchangeName => new CommandsExchangeName(
-        $configuration->string('METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME', 'commands'),
+        $configuration->string('METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME', $applicationNamespace . '.Commands'),
     ),
 ];
