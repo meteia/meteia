@@ -6,7 +6,7 @@ namespace Meteia\EventSourcing;
 
 use Meteia\ValueObjects\Identity\UniqueId;
 
-class EventTypeId extends UniqueId
+readonly class EventTypeId extends UniqueId
 {
     public static function prefix(): string
     {

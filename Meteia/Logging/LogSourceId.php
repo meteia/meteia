@@ -6,7 +6,7 @@ namespace Meteia\Logging;
 
 use Meteia\ValueObjects\Identity\UniqueId;
 
-class LogSourceId extends UniqueId
+readonly class LogSourceId extends UniqueId
 {
     public static function prefix(): string
     {
