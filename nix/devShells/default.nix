@@ -100,7 +100,7 @@ in {
         shellHooks = ''
           ln -sf ${leftHook} lefthook.yml
           ln -sf ${taskConfigFile} Taskfile.yml
-          ln -sf ${vscodeSettings} .vscode/settings.json
+          # ln -sf ${vscodeSettings} .vscode/settings.json
           lefthook install
         '';
       };
