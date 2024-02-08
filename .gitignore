@@ -6,3 +6,5 @@
 /vendor/
 composer.lock
 package-lock.json
+Taskfile.yml
+lefthook.yml
