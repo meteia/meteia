@@ -5,6 +5,8 @@
       "name": "Jason R. McNeil"
     }
   ],
+  "license": "MIT",
+  "description": "An opinionated PHP framework for building web applications.",
   "autoload": {
     "files": [
       "Meteia/Dulce/Functions/dd.php",
@@ -54,6 +56,5 @@
     "friendsofphp/php-cs-fixer": "*",
     "phpunit/phpunit": "*",
     "roave/security-advisories": "dev-master"
-  },
-  "version": "0.1.0"
+  }
 }
