@@ -4,16 +4,27 @@ declare(strict_types=1);
 
 namespace Meteia\Configuration;
 
+use Dotenv\Dotenv;
 use Meteia\Configuration\Errors\UnexpectedType;
 
-class EnvironmentConfiguration implements Configuration
+readonly class EnvironmentConfiguration implements Configuration
 {
-    private const BOOLEAN_VALUES_FALSE = ['false', 'off', 'no', 'n', '0'];
-    private const BOOLEAN_VALUES_TRUE = ['true', 'on', 'yes', 'y', '1'];
+    private const array BOOLEAN_VALUES_FALSE = ['false', 'off', 'no', 'n', '0'];
+    private const array BOOLEAN_VALUES_TRUE = ['true', 'on', 'yes', 'y', '1'];
+
+    private array $env;
+
+    public function __construct()
+    {
+        $this->env = match (isset($_ENV['APP_ENV_FILE'])) {
+            true => Dotenv::parse(file_get_contents($_ENV['APP_ENV_FILE'])),
+            default => $_ENV,
+        };
+    }
 
     public function boolean(string $name, bool $default): bool
     {
-        $value = $_ENV[$name] ?? null;
+        $value = $this->env[$name] ?? null;
         if ($value === null) {
             return $default;
         }
@@ -30,7 +41,7 @@ class EnvironmentConfiguration implements Configuration
 
     public function float(string $name, float $default): float
     {
-        $value = $_ENV[$name] ?? null;
+        $value = $this->env[$name] ?? null;
         if ($value === null) {
             return $default;
         }
@@ -43,7 +54,7 @@ class EnvironmentConfiguration implements Configuration
 
     public function int(string $name, int $default): int
     {
-        $value = $_ENV[$name] ?? null;
+        $value = $this->env[$name] ?? null;
         if ($value === null) {
             return $default;
         }
@@ -57,7 +68,7 @@ class EnvironmentConfiguration implements Configuration
 
     public function string(string $name, string $default): string
     {
-        $value = $_ENV[$name] ?? null;
+        $value = $this->env[$name] ?? null;
         if ($value === null) {
             return $default;
         }
