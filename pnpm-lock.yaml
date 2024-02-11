@@ -17,18 +17,12 @@ devDependencies:
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
-  eslint-plugin-json:
-    specifier: ^3.1.0
-    version: 3.1.0
   eslint-plugin-react:
     specifier: ^7.33.2
     version: 7.33.2(eslint@8.56.0)
   prettier:
     specifier: ^3.2.5
     version: 3.2.5
-  sort-json:
-    specifier: ^2.0.1
-    version: 2.0.1
 
 packages:
 
@@ -493,16 +487,6 @@ packages:
       object-keys: 1.1.1
     dev: true
 
-  /detect-indent@5.0.0:
-    resolution: {integrity: sha512-rlpvsxUtM0PQvy9iZe640/IWwWYyBsTApREbA1pHOpmOUIl9MkP/U4z7vTtg4Oaojvqhxt7sdufnT0EzGaR31g==}
-    engines: {node: '>=4'}
-    dev: true
-
-  /detect-newline@2.1.0:
-    resolution: {integrity: sha512-CwffZFvlJffUg9zZA0uqrjQayUTC8ob94pnr5sFwaVv3IOmkfUHcWH+jXaQK3askE51Cqe8/9Ql/0uXNwqZ8Zg==}
-    engines: {node: '>=0.10.0'}
-    dev: true
-
   /dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
@@ -622,14 +606,6 @@ packages:
   /escape-string-regexp@4.0.0:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
-    dev: true
-
-  /eslint-plugin-json@3.1.0:
-    resolution: {integrity: sha512-MrlG2ynFEHe7wDGwbUuFPsaT2b1uhuEFhJ+W1f1u+1C2EkXmTYJp4B1aAdQQ8M+CC3t//N/oRKiIVw14L2HR1g==}
-    engines: {node: '>=12.0'}
-    dependencies:
-      lodash: 4.17.21
-      vscode-json-languageservice: 4.2.1
     dev: true
 
   /eslint-plugin-react@7.33.2(eslint@8.56.0):
@@ -1195,10 +1171,6 @@ packages:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
     dev: true
 
-  /jsonc-parser@3.2.1:
-    resolution: {integrity: sha512-AilxAyFOAcK5wA1+LeaySVBrHsGQvUFCDWXKpZjzaL0PqW+xfBOttn8GNtWKFWqneyMZj41MWF9Kl6iPWLwgOA==}
-    dev: true
-
   /jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
@@ -1236,10 +1208,6 @@ packages:
 
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-    dev: true
-
-  /lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: true
 
   /loose-envify@1.4.0:
@@ -1280,10 +1248,6 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     dependencies:
       brace-expansion: 2.0.1
-    dev: true
-
-  /minimist@1.2.8:
-    resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
     dev: true
 
   /ms@2.1.2:
@@ -1590,15 +1554,6 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /sort-json@2.0.1:
-    resolution: {integrity: sha512-s8cs2bcsQCzo/P2T/uoU6Js4dS/jnX8+4xunziNoq9qmSpZNCrRIAIvp4avsz0ST18HycV4z/7myJ7jsHWB2XQ==}
-    hasBin: true
-    dependencies:
-      detect-indent: 5.0.0
-      detect-newline: 2.1.0
-      minimist: 1.2.8
-    dev: true
-
   /string.prototype.matchall@4.0.10:
     resolution: {integrity: sha512-rGXbGmOEosIQi6Qva94HUjgPs9vKW+dkG7Y8Q5O2OYkWL6wFaTRZO8zM4mhP94uX55wgyrXzfS2aGtGzUL7EJQ==}
     dependencies:
@@ -1751,32 +1706,6 @@ packages:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
     dependencies:
       punycode: 2.3.1
-    dev: true
-
-  /vscode-json-languageservice@4.2.1:
-    resolution: {integrity: sha512-xGmv9QIWs2H8obGbWg+sIPI/3/pFgj/5OWBhNzs00BkYQ9UaB2F6JJaGB/2/YOZJ3BvLXQTC4Q7muqU25QgAhA==}
-    dependencies:
-      jsonc-parser: 3.2.1
-      vscode-languageserver-textdocument: 1.0.11
-      vscode-languageserver-types: 3.17.5
-      vscode-nls: 5.2.0
-      vscode-uri: 3.0.8
-    dev: true
-
-  /vscode-languageserver-textdocument@1.0.11:
-    resolution: {integrity: sha512-X+8T3GoiwTVlJbicx/sIAF+yuJAqz8VvwJyoMVhwEMoEKE/fkDmrqUgDMyBECcM2A2frVZIUj5HI/ErRXCfOeA==}
-    dev: true
-
-  /vscode-languageserver-types@3.17.5:
-    resolution: {integrity: sha512-Ld1VelNuX9pdF39h2Hgaeb5hEZM2Z3jUrrMgWQAu82jMtZp7p3vJT3BzToKtZI7NgQssZje5o0zryOrhQvzQAg==}
-    dev: true
-
-  /vscode-nls@5.2.0:
-    resolution: {integrity: sha512-RAaHx7B14ZU04EU31pT+rKz2/zSl7xMsfIZuo8pd+KZO6PXtQmpevpq3vxvWNcrGbdmhM/rr5Uw5Mz+NBfhVng==}
-    dev: true
-
-  /vscode-uri@3.0.8:
-    resolution: {integrity: sha512-AyFQ0EVmsOZOlAnxoFOGOq1SQDWAB7C6aqMGS23svWAllfOaxbuFvcT8D1i8z3Gyn8fraVeZNNmN6e9bxxXkKw==}
     dev: true
 
   /which-boxed-primitive@1.0.2:
