@@ -7,6 +7,7 @@ namespace Meteia\AdvancedMessageQueuing\Bunny;
 use Bunny\Channel;
 use Bunny\Client;
 use Bunny\Message;
+use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\Commands\Command;
 use Meteia\Commands\CommandBus;
@@ -92,19 +93,40 @@ readonly class BunnyCommandBus implements CommandBus
             try {
                 $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
                 $handler->handle($command, $commandId, $correlationId, $causationId, $processId);
+                $channel->ack($message);
             } catch (\Throwable $t) {
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), [
                     'queueName' => $queueName,
                 ]);
             }
-            $channel->ack($message);
         }, $queueName);
     }
 
     #[\Override]
     public function run(): void
     {
+        $shutdownExchangeName = 'CommandWorkers.Shutdown';
+        $this->channel->exchangeDeclare($shutdownExchangeName, exchangeType: 'fanout', durable: true);
+        $this->log->info('Declared Exchange', [
+            'exchange' => $shutdownExchangeName,
+        ]);
+
+        /** @var MethodQueueDeclareOkFrame $result */
+        $result = $this->channel->queueDeclare(exclusive: true);
+        $this->log->info('Declared Queue', [
+            'queue' => $result->queue,
+        ]);
+        $this->channel->queueBind($result->queue, $shutdownExchangeName);
+        $this->channel->consume(function (Message $message, Channel $channel, Client $bunny): void {
+            $this->log->info('Shutdown Message Received');
+            $channel->ack($message);
+            $bunny->disconnect();
+            sleep(random_int(1, 5));
+
+            exit(0);
+        }, $result->queue);
+
         $this->client->run();
     }
 

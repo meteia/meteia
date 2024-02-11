@@ -7,6 +7,7 @@ namespace Meteia\AdvancedMessageQueuing\Bunny;
 use Bunny\Channel;
 use Bunny\Client;
 use Bunny\Message;
+use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use Meteia\Events\Event;
 use Meteia\Events\EventBus;
 use Meteia\Events\EventId;
@@ -101,19 +102,40 @@ readonly class BunnyEventBus implements EventBus
             try {
                 $event = $this->serializer->deserialize($message->content, $eventClassName, 'json');
                 $eventHandler($event, $eventId, $correlationId, $causationId, $processId);
+                $channel->ack($message);
             } catch (\Throwable $t) {
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), [
                     'queueName' => $queueName,
                 ]);
             }
-            $channel->ack($message);
         }, $queueName);
     }
 
     #[\Override]
     public function run(): void
     {
+        $shutdownExchangeName = 'EventWorkers.Shutdown';
+        $this->channel->exchangeDeclare($shutdownExchangeName, exchangeType: 'fanout', durable: true);
+        $this->log->info('Declared Exchange', [
+            'exchange' => $shutdownExchangeName,
+        ]);
+
+        /** @var MethodQueueDeclareOkFrame $result */
+        $result = $this->channel->queueDeclare(exclusive: true);
+        $this->log->info('Declared Queue', [
+            'queue' => $result->queue,
+        ]);
+        $this->channel->queueBind($result->queue, $shutdownExchangeName);
+        $this->channel->consume(function (Message $message, Channel $channel, Client $bunny): void {
+            $this->log->info('Shutdown Message Received');
+            $channel->ack($message);
+            $bunny->disconnect();
+            sleep(random_int(1, 5));
+
+            exit(0);
+        }, $result->queue);
+
         $this->client->run();
     }
 

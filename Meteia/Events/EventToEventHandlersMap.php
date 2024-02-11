@@ -27,7 +27,7 @@ readonly class EventToEventHandlersMap implements \IteratorAggregate
     private function normalizedEvent(string $className): string
     {
         $parts = explode('\\', $className);
-        $parts = array_filter($parts, static fn ($part) => $part !== 'Events');
+        array_splice($parts, 2, 1);
 
         return implode('.', $parts);
     }
@@ -36,8 +36,7 @@ readonly class EventToEventHandlersMap implements \IteratorAggregate
     {
         $parts = explode('\\', $className);
         array_pop($parts);
-        array_splice($parts, 1, 1);
-        $parts = array_filter($parts, static fn ($part) => $part !== 'EventHandlers');
+        array_splice($parts, 1, 2);
 
         return implode('.', $parts);
     }

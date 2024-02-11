@@ -76,6 +76,9 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
         CausationId $causationId,
         ProcessId $processId,
     ): void {
+        $this->log->info('Incoming CorrelationId: ' . $correlationId);
+        $this->log->info('Incoming CausationId: ' . $causationId);
+        $this->log->info('Incoming ProcessId: ' . $processId);
         // TODO: Just how bad of an idea is this...
         $commandContainer = clone $this->container;
         $commandContainer->set(CorrelationId::class, $correlationId);
@@ -84,7 +87,6 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
         try {
             \assert(method_exists($command, 'invoke'));
             $commandContainer->call($command->invoke(...));
-            //            $this->log->info('Command succeeded', ['command' => $command::class]);
         } catch (\Throwable $e) {
             $this->log->error('Command failed', ['exception' => $e]);
         }
