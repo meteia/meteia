@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use PhpCsFixer\Fixer\FixerInterface;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
+use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Tokens;
 
 /**
@@ -11,26 +12,26 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class PrettierPHPFixer implements FixerInterface
 {
-    #[\Override]
+    #[Override]
     public function getPriority(): int
     {
         // Allow prettier to pre-process the code before php-cs-fixer
         return 999;
     }
 
-    #[\Override]
+    #[Override]
     public function isCandidate(Tokens $tokens): bool
     {
         return true;
     }
 
-    #[\Override]
+    #[Override]
     public function isRisky(): bool
     {
         return false;
     }
 
-    #[\Override]
+    #[Override]
     public function fix(SplFileInfo $file, Tokens $tokens): void
     {
         if ($tokens->count() > 0 && $this->isCandidate($tokens) && $this->supports($file)) {
@@ -38,20 +39,20 @@ final class PrettierPHPFixer implements FixerInterface
         }
     }
 
-    #[\Override]
+    #[Override]
     public function getName(): string
     {
         return 'Prettier/php';
     }
 
-    #[\Override]
+    #[Override]
     public function supports(SplFileInfo $file): bool
     {
         return true;
     }
 
-    #[\Override]
-    public function getDefinition(): PhpCsFixer\FixerDefinition\FixerDefinitionInterface
+    #[Override]
+    public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition('Format PHP files with prettier', [], null, null);
     }

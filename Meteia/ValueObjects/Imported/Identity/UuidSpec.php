@@ -6,13 +6,14 @@ namespace Meteia\Yeso\ValueObjects\Identity;
 
 use Meteia\Yeso\Exceptions\InvalidUuid;
 use PhpSpec\ObjectBehavior;
+use Ramsey\Uuid\Uuid;
 
 /** @mixin Uuid */
 class UuidSpec extends ObjectBehavior
 {
     public function it_generates_a_uuid_if_none_given(): void
     {
-        $this->__toString()->shouldMatch('/' . \Ramsey\Uuid\Uuid::VALID_PATTERN . '/');
+        $this->__toString()->shouldMatch('/' . Uuid::VALID_PATTERN . '/');
     }
 
     public function it_accepts_uuids(): void

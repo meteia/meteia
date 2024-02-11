@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 use Carbon\Carbon;
 use Meteia\MessageStreams\MessageSerializer;
+use PhpBench\Tests\TestCase;
 
 return;
 it('serialize/unserialize DateTime', function (): void {
-    /** @var \PhpBench\Tests\TestCase $this */
+    /** @var TestCase $this */
     $ms = new MessageSerializer();
 
     // Arrange
@@ -25,7 +26,7 @@ it('serialize/unserialize DateTime', function (): void {
 });
 
 it('serialize/unserialize DateTimeImmutable', function (): void {
-    /** @var \PhpBench\Tests\TestCase $this */
+    /** @var TestCase $this */
     $ms = new MessageSerializer();
 
     // Arrange
@@ -43,7 +44,7 @@ it('serialize/unserialize DateTimeImmutable', function (): void {
 });
 
 it('serialize/unserialize Carbon', function (): void {
-    /** @var \PhpBench\Tests\TestCase $this */
+    /** @var TestCase $this */
     $ms = new MessageSerializer();
 
     // Arrange
@@ -61,7 +62,7 @@ it('serialize/unserialize Carbon', function (): void {
 });
 
 it('serialize/unserialize UserId', function (): void {
-    /** @var \PhpBench\Tests\TestCase $this */
+    /** @var TestCase $this */
     $ms = new MessageSerializer();
 
     // Arrange

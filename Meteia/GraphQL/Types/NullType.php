@@ -23,7 +23,7 @@ class NullType extends Type implements OutputType, LeafType
     }
 
     /**
-     * @param \GraphQL\Language\AST\Node $valueNode
+     * @param Node $valueNode
      */
     public function isValidLiteral($valueNode)
     {

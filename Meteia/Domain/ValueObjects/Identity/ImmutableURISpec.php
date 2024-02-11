@@ -23,10 +23,7 @@ class ImmutableURISpec extends ObjectBehavior
 
     public function it_appends_a_path(): void
     {
-        $this->withPath('/potato')
-            ->__toString()
-            ->shouldEqual('/potato')
-        ;
+        $this->withPath('/potato')->__toString()->shouldEqual('/potato');
     }
 
     public function it_appends_a_query_string(): void

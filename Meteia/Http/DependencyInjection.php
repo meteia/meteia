@@ -50,7 +50,7 @@ return [
     CsrfSecretKey::class => static function (Configuration $configuration): CsrfSecretKey {
         $value = $configuration->string('METEIA_CSRF_SECRET_KEY', '');
         if ($value === '') {
-            throw new \Exception('METEIA_CSRF_SECRET_KEY not set');
+            throw new Exception('METEIA_CSRF_SECRET_KEY not set');
         }
 
         return CsrfSecretKey::fromToken($value);

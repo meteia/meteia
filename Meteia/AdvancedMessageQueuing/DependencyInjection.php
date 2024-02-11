@@ -7,6 +7,7 @@ use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Configuration\Configuration;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
 return [
@@ -31,7 +32,7 @@ return [
             'keepAlive' => $keepAlive,
         ]);
     },
-    \Bunny\Async\Client::class => static function (LoopInterface $loop, Configuration $config): Bunny\Async\Client {
+    Bunny\Async\Client::class => static function (LoopInterface $loop, Configuration $config): Bunny\Async\Client {
         $hostname = $config->string('RABBITMQ_HOST', '127.0.0.1');
         $port = $config->int('RABBITMQ_PORT', 5672);
         $username = $config->string('RABBITMQ_USERNAME', 'guest');
@@ -41,7 +42,7 @@ return [
         $heartbeat = $config->float('RABBITMQ_HEARTBEAT', 60.0);
         $keepAlive = $config->boolean('RABBITMQ_KEEPALIVE', false);
 
-        return new \Bunny\Async\Client($loop, [
+        return new Bunny\Async\Client($loop, [
             'host' => $hostname,
             'port' => $port,
             'vhost' => $virtualHost,
@@ -52,12 +53,12 @@ return [
             'keepAlive' => $keepAlive,
         ]);
     },
-    Channel::class => static function (Psr\Log\LoggerInterface $log, Client $client): Channel {
+    Channel::class => static function (LoggerInterface $log, Client $client): Channel {
         try {
             $client->connect();
 
             return $client->channel();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $log->warning('Failed to connect to RabbitMQ: ' . $e->getMessage(), ['exception' => $e]);
 
             exit(1);
