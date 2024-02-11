@@ -35,6 +35,11 @@ class ObjectStorage implements Storage
 
     public function canonicalUri(string $dest): Uri
     {
+        return $this->publicUri->withPath($dest);
+    }
+
+    public function internalUri(string $dest): Uri
+    {
         return new Uri($this->endpoint->withPath(implode('/', [$this->bucketName, $dest])));
     }
 
@@ -43,7 +48,7 @@ class ObjectStorage implements Storage
         $client = new Client();
 
         try {
-            $publicUri = $this->publicUri->withPath($dest);
+            $publicUri = $this->canonicalUri($dest);
 
             return $client->head($publicUri)->getStatusCode() === 200;
         } catch (ClientException) {
@@ -59,11 +64,12 @@ class ObjectStorage implements Storage
 
     public function store(Resource $src, string $dest): StoredFile
     {
-        $canonicalUri = $this->canonicalUri($dest);
+        $publicUri = $this->canonicalUri($dest);
         if ($this->exists($dest)) {
-            return new StoredFile($canonicalUri);
+            return new StoredFile($publicUri);
         }
 
+        $internalUri = $this->internalUri($dest);
         $hashedPayload = $src->hash('sha256')->hex();
 
         $now = new \DateTime('now', new \DateTimeZone('utc'));
@@ -88,7 +94,7 @@ class ObjectStorage implements Storage
 
         $canonicalRequest = implode("\n", [
             'PUT',
-            $canonicalUri->getPath(),
+            $internalUri->getPath(),
             '',
             $this->canonicalHeaders($canonicalHeaders),
             $signedHeaders,
@@ -108,7 +114,7 @@ class ObjectStorage implements Storage
         $client = new Client();
 
         try {
-            $client->request('PUT', (string) $canonicalUri, [
+            $client->request('PUT', (string) $internalUri, [
                 'headers' => [
                     'Authorization' => 'AWS4-HMAC-SHA256 ' .
                         implode(', ', [
@@ -121,16 +127,12 @@ class ObjectStorage implements Storage
                 'body' => $src->resource(),
             ]);
         } catch (ClientException $e) {
-            echo $e
-                ->getResponse()
-                ->getBody()
-                ->getContents() . PHP_EOL
-            ;
+            echo $e->getResponse()->getBody()->getContents() . PHP_EOL;
 
             throw $e;
         }
 
-        return new StoredFile($canonicalUri);
+        return new StoredFile($publicUri);
     }
 
     private function canonicalHeaders(array $headers): string

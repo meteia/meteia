@@ -16,5 +16,7 @@ interface Storage
 
     public function canonicalUri(string $dest): Uri;
 
+    public function internalUri(string $dest): Uri;
+
     public function delete(string $dest): void;
 }
