@@ -4,16 +4,27 @@ declare(strict_types=1);
 
 namespace Meteia\Http\Responses;
 
+use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Stream;
+use Psr\Http\Message\StreamInterface;
 
-class BinaryResponse extends \Laminas\Diactoros\Response\HtmlResponse
+class BinaryResponse extends Response
 {
-    public function __construct(string $data, $status = 200, array $headers = [])
+    public function __construct(StreamInterface|string $data, $status = 200, array $headers = [])
     {
-        $body = new Stream('php://temp', 'wb+');
-        $body->write($data);
-        $body->rewind();
+        $body = match (true) {
+            $data instanceof StreamInterface => $data,
+            default => $this->getStream($data),
+        };
+        parent::__construct($body, $status, $headers);
+    }
 
-        parent::__construct((string) $body, $status, $headers);
+    private function getStream($data): StreamInterface
+    {
+        $stream = new Stream('php://temp', 'wb+');
+        $stream->write($data);
+        $stream->rewind();
+
+        return $stream;
     }
 }

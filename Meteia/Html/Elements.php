@@ -30,7 +30,7 @@ function attributes(array $attributes): string
     return implode(' ', $attributes);
 }
 
-function el(string $name, array $attributes, string ...$children)
+function el(string $name, array $attributes, string|\Stringable ...$children)
 {
     $attributes = attributes($attributes);
     $children = implode(PHP_EOL, $children);
