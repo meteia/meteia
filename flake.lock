@@ -10,11 +10,11 @@
         "utils": "utils_2"
       },
       "locked": {
-        "lastModified": 1707638689,
-        "narHash": "sha256-G/3/V5VD90H/43KVSnI9Ka9sJWehZl+0X0KK6Jp2lHs=",
+        "lastModified": 1707639321,
+        "narHash": "sha256-7V5M0PTU0vYMyI8QtObgqeRRQgbWbchKIVOPtTJNL+M=",
         "owner": "jasonrm",
         "repo": "nix-chips",
-        "rev": "bedc07170936d8c17b58fe271f579d709c5dd450",
+        "rev": "fd25f4730f9b684e0caa03f42a004685ddcf6a1b",
         "type": "github"
       },
       "original": {
