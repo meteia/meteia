@@ -33,53 +33,6 @@ with lib; let
     version = "3";
   };
   taskConfigFile = pkgs.writeText "Taskfile.yml" (builtins.toJSON taskConfig);
-
-  lefthookConfig = {
-    pre-commit = {
-      commands = {
-        alejandra = {
-          glob = "*.nix";
-          run = "${pkgs.alejandra}/bin/alejandra --quiet {staged_files} && git add {staged_files}";
-        };
-        eslint = {
-          exclude = "GraphQL/index.tsx";
-          glob = "*.{js,ts,jsx,tsx}";
-          run = "./node_modules/.bin/eslint --fix --max-warnings 0 {staged_files} && git add {staged_files}";
-        };
-        php-cs-fixer = {
-          glob = "*.php";
-          run = "./vendor/bin/php-cs-fixer fix {staged_files} && git add {staged_files}";
-        };
-        sort-json = {
-          exclude = "package-lock.json";
-          glob = "*.json";
-          run = "./node_modules/.bin/prettier {staged_files} && git add {staged_files}";
-        };
-      };
-      parallel = true;
-    };
-    pre-push = {
-      commands = {
-        build = {run = "${pkgs.go-task}/bin/task build";};
-        eslint = {
-          glob = "*.{js,ts,jsx,tsx}";
-          run = "./node_modules/.bin/eslint --cache --max-warnings 0 .";
-        };
-        nix-build = {run = "nix build .#valhalla";};
-        php-cs-fixer = {
-          glob = "*.php";
-          run = "./vendor/bin/php-cs-fixer fix --dry-run";
-        };
-        tsc = {
-          glob = "*.{ts,tsx}";
-          run = "tsc --noEmit --project tsconfig.json";
-        };
-      };
-      parallel = true;
-    };
-  };
-
-  leftHook = pkgs.writeText "lefthook.yml" (builtins.toJSON lefthookConfig);
 in {
   imports = [
   ];
@@ -90,21 +43,16 @@ in {
   config = mkMerge [
     {
       devShell = {
-        contents = with pkgs; [
-          go-task
-          lefthook
-          alejandra
-        ];
+        contents = with pkgs; [];
         environment = [
         ];
         shellHooks = ''
-          ln -sf ${leftHook} lefthook.yml
-          ln -sf ${taskConfigFile} Taskfile.yml
           # ln -sf ${vscodeSettings} .vscode/settings.json
-          lefthook install
         '';
       };
 
+      programs.lefthook.enable = true;
+      programs.taskfile.enable = true;
       programs.nodejs.enable = true;
       programs.php.enable = true;
     }
