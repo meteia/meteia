@@ -32,6 +32,9 @@ function attributes(array $attributes): string
 
 function el(string $name, array $attributes, string|\Stringable ...$children)
 {
+    if (\count($attributes) === 1 && isset($attributes[0]) && \is_string($attributes[0])) {
+        $attributes = ['class' => $attributes[0]];
+    }
     $attributes = attributes($attributes);
     $children = implode(PHP_EOL, $children);
 
