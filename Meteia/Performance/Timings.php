@@ -30,16 +30,20 @@ class Timings
         $category = $this->filteredCategory($category);
         ++$this->timeDepth;
         $startTime = hrtime(true);
-        $result = $c();
-        $endTime = hrtime(true);
-        --$this->timeDepth;
-        $duration = ($endTime - $startTime) / 1000000 - $this->childDurations;
-        $this->childDurations += $duration;
-        if ($this->timeDepth === 0) {
-            $this->childDurations = 0;
-        }
 
-        $this->timings[$category] = ($this->timings[$category] ?? 0) + $duration;
+        try {
+            $result = $c();
+        } finally {
+            $endTime = hrtime(true);
+            --$this->timeDepth;
+            $duration = ($endTime - $startTime) / 1000000 - $this->childDurations;
+            $this->childDurations += $duration;
+            if ($this->timeDepth === 0) {
+                $this->childDurations = 0;
+            }
+
+            $this->timings[$category] = ($this->timings[$category] ?? 0) + $duration;
+        }
 
         return $result;
     }
