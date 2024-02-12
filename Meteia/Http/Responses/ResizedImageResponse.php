@@ -14,6 +14,9 @@ class ResizedImageResponse extends BinaryResponse
         int $height,
         int $pixelDensity,
     ) {
+        if ($sourceImageFormat === 'jpg') {
+            $sourceImageFormat = 'jpeg';
+        }
         if ($outputFileFormat === 'jpg') {
             $outputFileFormat = 'jpeg';
         }
