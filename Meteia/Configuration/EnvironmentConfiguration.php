@@ -66,11 +66,11 @@ readonly class EnvironmentConfiguration implements Configuration
         return (int) $value;
     }
 
-    public function string(string $name, string $default): string
+    public function string(string $name, string|\Stringable $default): string
     {
         $value = $this->env[$name] ?? null;
         if ($value === null) {
-            return $default;
+            return (string) $default;
         }
 
         return $value;

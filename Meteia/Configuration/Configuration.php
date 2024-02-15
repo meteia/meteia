@@ -6,7 +6,7 @@ namespace Meteia\Configuration;
 
 interface Configuration
 {
-    public function string(string $name, string $default): string;
+    public function string(string $name, string|\Stringable $default): string;
 
     public function int(string $name, int $default): int;
 
