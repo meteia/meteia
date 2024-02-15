@@ -17,7 +17,7 @@ readonly class EnvironmentConfiguration implements Configuration
     public function __construct()
     {
         $this->env = match (isset($_ENV['APP_ENV_FILE'])) {
-            true => Dotenv::parse(file_get_contents($_ENV['APP_ENV_FILE'])),
+            true => array_merge($_ENV, Dotenv::parse(file_get_contents($_ENV['APP_ENV_FILE']))),
             default => $_ENV,
         };
     }
