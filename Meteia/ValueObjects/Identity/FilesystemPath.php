@@ -61,6 +61,11 @@ class FilesystemPath extends StringLiteral
         return is_readable((string) $this);
     }
 
+    public function isDirectory(): bool
+    {
+        return is_dir((string) $this);
+    }
+
     public function join(...$paths): self
     {
         return new self($this->value, ...$paths);
@@ -119,5 +124,43 @@ class FilesystemPath extends StringLiteral
             mkdir($dirname, 0o777, true);
         }
         file_put_contents((string) $this, $content);
+    }
+
+    public function writeJson(array $array): void
+    {
+        $this->write(json_encode($array, JSON_THROW_ON_ERROR));
+    }
+
+    public function moveInto(self $destination): static
+    {
+        if (!$destination->exists()) {
+            throw new \Exception('Destination does not exist.');
+        }
+        if (!$destination->isDirectory()) {
+            throw new \Exception('Destination is not a directory.');
+        }
+        $destination = $destination->join($this->basename());
+        rename((string) $this, (string) $destination);
+
+        return $destination;
+    }
+
+    public function rename(self $newPath): static
+    {
+        $dirname = \dirname((string) $newPath);
+        if (!is_dir($dirname)) {
+            mkdir($dirname, 0o777, true);
+        }
+        $result = rename((string) $this, (string) $newPath);
+        if (!$result) {
+            throw new \Exception('Failed to rename file.');
+        }
+
+        return $newPath;
+    }
+
+    public function basename(): string
+    {
+        return pathinfo((string) $this, PATHINFO_BASENAME);
     }
 }
