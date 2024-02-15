@@ -5,8 +5,6 @@
       "name": "Jason R. McNeil"
     }
   ],
-  "license": "MIT",
-  "description": "An opinionated PHP framework for building web applications.",
   "autoload": {
     "files": [
       "Meteia/Dulce/Functions/dd.php",
@@ -22,16 +20,21 @@
   "bin": [
     "bin/meteia"
   ],
+  "description": "An opinionated PHP framework for building web applications.",
+  "license": "MIT",
   "name": "meteia/meteia",
   "require": {
     "aura/sql": "^5.0.2",
     "bunny/bunny": "^0.5.5",
+    "cakephp/chronos": "^3.0",
+    "ext-apcu": "*",
     "ext-gd": "*",
     "ext-gmp": "*",
     "ext-intl": "*",
     "ext-pdo": "*",
     "ext-sodium": "*",
     "guzzlehttp/guzzle": "^7.5.0",
+    "kornrunner/blurhash": "^1.2",
     "laminas/laminas-diactoros": "^3.3.0",
     "league/mime-type-detection": "^1.11",
     "nyholm/psr7": "^1.5.1",
