@@ -6,17 +6,18 @@ namespace Meteia\Cache;
 
 use Cake\Chronos\Chronos;
 use Meteia\Cache\Configuration\CacheDirectory;
+use Meteia\Cache\Configuration\CacheHmacSecretKey;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-class FileCache implements Cache
+class FileCache
 {
-    public function __construct(private CacheDirectory $path)
+    public function __construct(private CacheDirectory $path, private CacheHmacSecretKey $secretKey)
     {
     }
 
     public function remember(string $key, \DateTimeInterface $expires, callable $default): FilesystemPath
     {
-        $hashedKey = hash('sha256', $key);
+        $hashedKey = hash_hmac('sha256', $key, $this->secretKey->bytes);
         $dataPath = $this->path->join(substr($hashedKey, 0, 2), $hashedKey);
         $metadataPath = new FilesystemPath($dataPath . '.meta');
         $retryUntil = time() + 5;

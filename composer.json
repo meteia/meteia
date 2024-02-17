@@ -30,6 +30,7 @@
     "ext-apcu": "*",
     "ext-gd": "*",
     "ext-gmp": "*",
+    "ext-igbinary": "*",
     "ext-intl": "*",
     "ext-pdo": "*",
     "ext-sodium": "*",
