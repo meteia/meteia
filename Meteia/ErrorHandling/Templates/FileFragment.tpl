@@ -4,8 +4,8 @@
       <div class="<?= $line->activeLine ? 'bg-indigo-700' : 'odd:bg-gray-700' ?> py-0 px-4">
         <a href="<?= $line->href ?>"><?= $line->number ?></a>
       </div>
-      <div class="ml-2 p-0">
-        <pre><code class="php p-0"><?= rtrim($line->source) ?></code></pre>
+      <div class="p-0 bg-indigo-950 w-full">
+        <pre><code class="php p-0 <?= $line->activeLine ? 'bg-transparent' : '' ?>"><?= rtrim($line->source) ?></code></pre>
       </div>
     </div>
   <?php endforeach; ?>

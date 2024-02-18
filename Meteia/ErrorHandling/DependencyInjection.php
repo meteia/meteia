@@ -8,6 +8,7 @@ use Meteia\ErrorHandling\EditorUri;
 use Meteia\ErrorHandling\Endpoints\ConsoleErrorEndpoint;
 use Meteia\ErrorHandling\Endpoints\DeveloperErrorEndpoint;
 use Meteia\ErrorHandling\Endpoints\ErrorEndpoint;
+use Meteia\ErrorHandling\Endpoints\PublicErrorEndpoint;
 use Meteia\ErrorHandling\ErrorClassifications\ErrorClassification;
 use Meteia\ErrorHandling\ErrorClassifications\StrictErrorClassification;
 use Meteia\ErrorHandling\StackTraces\FrameFilterMeteia;
@@ -24,7 +25,8 @@ return [
 
         return match (strtolower($errorPage)) {
             'console' => $container->get(ConsoleErrorEndpoint::class),
-            default => $container->get(DeveloperErrorEndpoint::class),
+            'developer' => $container->get(DeveloperErrorEndpoint::class),
+            default => $container->get(PublicErrorEndpoint::class),
         };
     },
     EditorUri::class => static fn (Configuration $configuration): EditorUri => new EditorUri(

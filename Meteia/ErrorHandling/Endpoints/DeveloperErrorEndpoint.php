@@ -20,15 +20,18 @@ class DeveloperErrorEndpoint implements ErrorEndpoint
     public function response(\Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         if (str_contains($request->getHeaderLine('Accept'), 'application/json')) {
-            return new JsonResponse([
-                'message' => $throwable->getMessage(),
-                'stackTrace' => array_values(
-                    array_map(
-                        static fn ($frame) => implode(':', [$frame->file, $frame->line]),
-                        $this->stackTrace->for($throwable)->stackFrames(),
+            return new JsonResponse(
+                [
+                    'message' => $throwable->getMessage(),
+                    'stackTrace' => array_values(
+                        array_map(
+                            static fn ($frame) => implode(':', [$frame->file, $frame->line]),
+                            $this->stackTrace->for($throwable)->stackFrames(),
+                        ),
                     ),
-                ),
-            ]);
+                ],
+                500,
+            );
         }
 
         $this->layout->head()->title->set($throwable->getMessage());
