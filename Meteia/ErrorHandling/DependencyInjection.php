@@ -20,7 +20,7 @@ return [
             return $container->get(ConsoleErrorEndpoint::class);
         }
 
-        $errorPage = $configuration->string('ERRORS_ENDPOINT', 'public');
+        $errorPage = $configuration->string('ERROR_HANDLING_ENDPOINT', 'public');
 
         return match (strtolower($errorPage)) {
             'console' => $container->get(ConsoleErrorEndpoint::class),
@@ -28,7 +28,7 @@ return [
         };
     },
     EditorUri::class => static fn (Configuration $configuration): EditorUri => new EditorUri(
-        $configuration->string('ERRORS_EDITOR_URI', 'phpstorm://open'),
+        $configuration->string('EDITOR_URI', 'phpstorm://open'),
     ),
     FrameFilters::class => static function (): FrameFilters {
         // FIXME: This feels ugly, not sure how I want to handle this
