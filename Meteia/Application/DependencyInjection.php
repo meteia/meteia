@@ -16,7 +16,7 @@ return [
     ApplicationResourcesBaseUri::class => static fn (
         ApplicationResourcesManifestPath $applicationResourcesManifestPath,
         Configuration $configuration,
-    ) => new ApplicationResourcesBaseUri($configuration->string('RESOURCES_BASE_URI', '')),
+    ) => new ApplicationResourcesBaseUri($configuration->string('RESOURCES_BASE_URI', '/')),
     ApplicationPublicDir::class => static fn (ApplicationPath $applicationPath) => new ApplicationPublicDir(
         $applicationPath->join('public'),
     ),

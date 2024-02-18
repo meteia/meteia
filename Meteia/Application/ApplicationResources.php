@@ -49,6 +49,6 @@ readonly class ApplicationResources
 
             return;
         }
-        $head->scripts->module((string) $this->applicationResourcesBaseUri->withPath($path));
+        $head->scripts->module((string) $this->applicationResourcesBaseUri->withPath($this->prefix . $path));
     }
 }
