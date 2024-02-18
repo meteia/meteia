@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce\Templates;
+namespace Meteia\ErrorHandling\Templates;
 
 use Meteia\Application\RepositoryPath;
 use Meteia\Bluestone\PhpTemplate;

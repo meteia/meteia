@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce\Endpoints;
+namespace Meteia\ErrorHandling\Endpoints;
 
-use Meteia\Dulce\Templates\StackTrace;
+use Meteia\ErrorHandling\Templates\StackTrace;
 use Meteia\Html\Layout;
 use Meteia\Http\Responses\HtmlResponse;
 use Meteia\Http\Responses\JsonResponse;

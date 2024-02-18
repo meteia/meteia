@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce\ErrorClassifications;
+namespace Meteia\ErrorHandling\ErrorClassifications;
 
 class StrictErrorClassification implements ErrorClassification
 {

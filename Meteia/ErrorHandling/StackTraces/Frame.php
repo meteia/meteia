@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce\StackTraces;
+namespace Meteia\ErrorHandling\StackTraces;
 
 use Meteia\ValueObjects\Identity\FilesystemPath;
 

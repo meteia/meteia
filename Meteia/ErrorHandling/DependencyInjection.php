@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use Meteia\Configuration\Configuration;
 use Meteia\DependencyInjection\Container;
-use Meteia\Dulce\EditorUri;
-use Meteia\Dulce\Endpoints\ConsoleErrorEndpoint;
-use Meteia\Dulce\Endpoints\DeveloperErrorEndpoint;
-use Meteia\Dulce\Endpoints\ErrorEndpoint;
-use Meteia\Dulce\ErrorClassifications\ErrorClassification;
-use Meteia\Dulce\ErrorClassifications\StrictErrorClassification;
-use Meteia\Dulce\StackTraces\FrameFilterMeteia;
-use Meteia\Dulce\StackTraces\FrameFilters;
+use Meteia\ErrorHandling\EditorUri;
+use Meteia\ErrorHandling\Endpoints\ConsoleErrorEndpoint;
+use Meteia\ErrorHandling\Endpoints\DeveloperErrorEndpoint;
+use Meteia\ErrorHandling\Endpoints\ErrorEndpoint;
+use Meteia\ErrorHandling\ErrorClassifications\ErrorClassification;
+use Meteia\ErrorHandling\ErrorClassifications\StrictErrorClassification;
+use Meteia\ErrorHandling\StackTraces\FrameFilterMeteia;
+use Meteia\ErrorHandling\StackTraces\FrameFilters;
 
 return [
     ErrorClassification::class => StrictErrorClassification::class,

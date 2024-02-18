@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce\Endpoints;
+namespace Meteia\ErrorHandling\Endpoints;
 
-use Meteia\Dulce\StackTraces\Frames;
-use Meteia\Dulce\StackTraces\Line;
+use Meteia\ErrorHandling\StackTraces\Frames;
+use Meteia\ErrorHandling\StackTraces\Line;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

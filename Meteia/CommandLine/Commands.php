@@ -9,7 +9,7 @@ use Meteia\Application\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\Classy\PsrClasses;
 use Meteia\DependencyInjection\Container;
-use Meteia\Dulce\Endpoints\ConsoleErrorEndpoint;
+use Meteia\ErrorHandling\Endpoints\ConsoleErrorEndpoint;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;

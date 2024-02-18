@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce;
+namespace Meteia\ErrorHandling;
 
-use Meteia\Dulce\ErrorClassifications\ErrorClassification;
+use Meteia\ErrorHandling\ErrorClassifications\ErrorClassification;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -23,7 +23,7 @@ class Dulce
         });
         // set_error_handler(function (...$args) use ($container, $callback): void {
         //    /** @var self $errorHandler */
-        //    $errorHandler = $container->get(Dulce::class);
+        //    $errorHandler = $container->get(ErrorHandling::class);
         //    $args[] = $callback;
         //    $errorHandler->onError(...$args);
         // });

@@ -1,4 +1,4 @@
-# Meteia Dulce
+# Meteia ErrorHandling
 
 ## Requirements
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce;
+namespace Meteia\ErrorHandling;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 

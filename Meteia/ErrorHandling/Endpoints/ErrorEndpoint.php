@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce\Endpoints;
+namespace Meteia\ErrorHandling\Endpoints;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

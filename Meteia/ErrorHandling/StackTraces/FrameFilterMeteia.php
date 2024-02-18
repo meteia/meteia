@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce\StackTraces;
+namespace Meteia\ErrorHandling\StackTraces;
 
 class FrameFilterMeteia implements FrameFilter
 {
@@ -15,7 +15,7 @@ class FrameFilterMeteia implements FrameFilter
         $paths = [
             implode(\DIRECTORY_SEPARATOR, ['vendor']),
             implode(\DIRECTORY_SEPARATOR, ['dulce', 'functions']),
-            implode(\DIRECTORY_SEPARATOR, ['Meteia', 'Dulce']),
+            implode(\DIRECTORY_SEPARATOR, ['Meteia', 'ErrorHandling']),
         ];
 
         foreach ($paths as $path) {

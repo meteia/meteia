@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Dulce;
+namespace Meteia\ErrorHandling;
 
 use Laminas\Diactoros\Response;
 use Meteia\Http\Endpoint;
