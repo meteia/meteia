@@ -5,34 +5,26 @@ declare(strict_types=1);
 namespace Meteia\Application;
 
 use Meteia\Html\Elements\Head;
-use Meteia\ValueObjects\Identity\FilesystemPath;
 
-use function Meteia\Polyfills\common_prefix_length;
-
-class ApplicationResources
+readonly class ApplicationResources
 {
-    private array $knownFiles = [];
-    private bool $useManifest = false;
+    public array $knownFiles;
+    public bool $useManifest;
 
-    private readonly string $prefix;
+    private string $prefix;
 
     public function __construct(
-        private readonly ApplicationResourcesBaseUri $applicationResourcesBaseUri,
-        ApplicationPublicDir $publicDir,
-        FilesystemPath $manifest,
+        private ApplicationResourcesBaseUri $applicationResourcesBaseUri,
+        ApplicationResourcesManifestPath $manifest,
     ) {
-        $commonLen = common_prefix_length([(string) $publicDir, (string) $manifest]);
-        $relativeManifest = substr((string) $manifest, $commonLen);
-        $this->prefix = '/' . trim(\dirname($relativeManifest), '/');
+        $this->prefix = '/dist/';
+
         if ($manifest->isReadable()) {
             $this->useManifest = true;
             $this->knownFiles = json_decode($manifest->read(), true, 512, JSON_THROW_ON_ERROR);
+        } else {
+            $this->knownFiles = [];
         }
-    }
-
-    public function useManifest(): bool
-    {
-        return $this->useManifest;
     }
 
     public function requireEntryModule(mixed $target, Head $head, bool $isReact = false): void
@@ -49,10 +41,10 @@ class ApplicationResources
             foreach ($this->knownFiles[$path]['imports'] ?? [] as $import) {
                 $this->requireModule($import, $head);
             }
-            $head->scripts->module($this->prefix . '/' . $this->knownFiles[$path]['file']);
+            $head->scripts->module($this->prefix . $this->knownFiles[$path]['file']);
 
             foreach ($this->knownFiles[$path]['css'] ?? [] as $import) {
-                $head->stylesheets->load($this->prefix . '/' . $import, null, null);
+                $head->stylesheets->load($this->prefix . $import, null, null);
             }
 
             return;
