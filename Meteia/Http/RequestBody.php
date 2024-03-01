@@ -9,7 +9,7 @@ use Symfony\Component\Serializer\Serializer;
 
 class RequestBody
 {
-    private null|string $content = null;
+    private ?string $content = null;
 
     public function __construct(
         private readonly ServerRequestInterface $request,
