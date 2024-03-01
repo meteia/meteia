@@ -28,6 +28,7 @@
                   apcu
                   event
                   imagick
+                  igbinary
                 ];
             extraConfig = ''
               output_buffering = 4096
