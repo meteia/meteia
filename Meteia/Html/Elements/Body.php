@@ -14,20 +14,22 @@ class Body implements \Stringable
         public Footer $footer,
         public string|\Stringable $content = '',
         public string $className = '',
+        public array $attributes = [],
     ) {
     }
 
     public function __toString(): string
     {
-        return <<<EOF
-            <body class="{$this->className}">
-            {$this->header}
-            <main>
-                {$this->content}
-            </main>
-            {$this->footer}
-            </body>
-            EOF;
+        return el(
+            'body',
+            [
+                'class' => $this->className,
+                ...$this->attributes,
+            ],
+            $this->header,
+            el('main', [], $this->content),
+            $this->footer,
+        );
     }
 
     public function content(string|\Stringable $content): void
