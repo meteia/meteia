@@ -123,7 +123,12 @@ class FilesystemPath extends StringLiteral
         if (!is_dir($dirname)) {
             mkdir($dirname, 0o777, true);
         }
-        file_put_contents((string) $this, $content);
+        $tmpName = tempnam($dirname, 'fsp-write');
+        $success = file_put_contents($tmpName, $content);
+        if ($success === false) {
+            throw new \Exception('Failed to write file.');
+        }
+        rename($tmpName, (string) $this);
     }
 
     public function writeJson(array $array): void
