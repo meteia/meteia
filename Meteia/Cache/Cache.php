@@ -20,24 +20,18 @@ readonly class Cache
         $hashedKey = hash_hmac('sha256', $key, $this->secretKey->bytes);
         $dataPath = $this->path->join(substr($hashedKey, 0, 2), $hashedKey);
         $metadataPath = new FilesystemPath($dataPath . '.meta');
-        $retryUntil = time() + 5;
-        while (time() <= $retryUntil) {
+        while (true) {
             if ($metadataPath->exists() && $dataPath->exists()) {
                 $metadata = $metadataPath->readJson();
                 $expiresAt = Chronos::createFromFormat(\DateTimeInterface::RFC3339, $metadata->expires);
-                if ($expiresAt->isPast()) {
-                    $dataPath->delete();
-                    $metadataPath->delete();
+                if ($expiresAt->isFuture()) {
+                    $data = $dataPath->read();
 
-                    continue;
+                    return igbinary_unserialize($data);
                 }
-
-                $data = $dataPath->read();
-
-                return igbinary_unserialize($data);
             }
 
-            if (!$this->acquireLock($hashedKey, 1)) {
+            if (!$this->acquireLock($hashedKey)) {
                 continue;
             }
 
@@ -51,16 +45,15 @@ readonly class Cache
 
             return $data;
         }
-
-        throw new \Exception('Could not acquire lock, retry later.');
     }
 
-    private function acquireLock(string $lockname, int $timeout = 10)
+    private function acquireLock(string $key)
     {
-        $until = time() + $timeout;
+        $timeoutSeconds = 6;
+        $until = time() + $timeoutSeconds;
 
         while (time() <= $until) {
-            if (apcu_add($lockname, 1, $timeout * 10)) {
+            if (apcu_add($key, 1, $timeoutSeconds * 10)) {
                 return true;
             }
         }
@@ -68,8 +61,8 @@ readonly class Cache
         return false;
     }
 
-    private function releaseLock(string $lockname)
+    private function releaseLock(string $key)
     {
-        return apcu_delete($lockname);
+        return apcu_delete($key);
     }
 }
