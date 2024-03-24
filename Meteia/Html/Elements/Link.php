@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Html\Element;
+use Meteia\Html\VoidElement;
 
 class Link implements \Stringable
 {
-    use Element;
+    use VoidElement;
 
     public function __construct(
         public string $rel,
-        public string $href,
+        public string|\Stringable $href,
         public ?string $integrity = null,
         public ?string $crossorigin = null,
         public ?string $sizes = null,

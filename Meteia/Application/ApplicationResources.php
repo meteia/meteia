@@ -14,7 +14,6 @@ readonly class ApplicationResources
     private string $prefix;
 
     public function __construct(
-        private ApplicationResourcesBaseUri $applicationResourcesBaseUri,
         ApplicationResourcesManifestPath $manifest,
     ) {
         $this->prefix = '/dist/';
@@ -49,6 +48,6 @@ readonly class ApplicationResources
 
             return;
         }
-        $head->scripts->module((string) $this->applicationResourcesBaseUri->withPath($this->prefix . $path));
+        $head->scripts->module($this->prefix . $path);
     }
 }

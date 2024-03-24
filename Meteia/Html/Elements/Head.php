@@ -20,13 +20,13 @@ class Head implements \Stringable
 
     public function __toString(): string
     {
-        return <<<EOF
-            <head>
-              {$this->title}
-              {$this->stylesheets}
-              {$this->metadata}
-              {$this->scripts}
-            </head>
-            EOF;
+        return el(
+            'head',
+            [],
+            $this->title,
+            $this->stylesheets,
+            $this->scripts,
+            $this->metadata,
+        );
     }
 }
