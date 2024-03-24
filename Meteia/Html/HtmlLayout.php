@@ -17,7 +17,7 @@ class HtmlLayout implements Layout
     {
         return <<<EOF
             <!DOCTYPE html>
-            <html>
+            <html lang="en">
             {$this->head}
             {$this->body}
             </html>
