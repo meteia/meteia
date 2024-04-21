@@ -43,7 +43,7 @@ return [
         return new Scheme('http');
     },
     Host::class => static function (Configuration $configuration, Scheme $scheme): Host {
-        $host = $configuration->string('HTTP_HOST', $_SERVER['HTTP_HOST'] ?? 'example.com');
+        $host = $configuration->string('HTTP_HOST', $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'example.com');
 
         return new Host($scheme . '://' . $host);
     },
