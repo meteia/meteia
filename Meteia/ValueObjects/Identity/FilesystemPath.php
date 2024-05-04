@@ -168,4 +168,31 @@ class FilesystemPath extends StringLiteral
     {
         return pathinfo((string) $this, PATHINFO_BASENAME);
     }
+
+    public function mimeType(): string
+    {
+        return mime_content_type((string) $this);
+    }
+
+    public function extensionFromMimeType(): string
+    {
+        $mimeType = $this->mimeType();
+
+        return match ($mimeType) {
+            'image/avif' => 'avif',
+            'image/webp' => 'webp',
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            'image/svg+xml' => 'svg',
+            'audio/mpeg' => 'mp3',
+            'audio/ogg' => 'ogg',
+            'audio/wav' => 'wav',
+            'video/mp4' => 'mp4',
+            'video/ogg' => 'ogg',
+            'video/webm' => 'webm',
+            default => explode('+', explode('/', $mimeType, 2)[1], 2)[0],
+        };
+    }
 }
