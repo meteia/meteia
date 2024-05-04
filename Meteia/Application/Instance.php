@@ -28,7 +28,17 @@ readonly class Instance
 
     public function run(array $middleware = []): void
     {
-        // ob_start();
+        $container = $this->container();
+
+        $requestHandler = $this->requestHandler($container, $middleware);
+        $serverRequest = $container->get(ServerRequestInterface::class);
+        $response = $requestHandler->handle($serverRequest);
+
+        send($response);
+    }
+
+    public function container(array $definitions = []): Container
+    {
         $timings = new Timings();
 
         $applicationDefinitions = [
@@ -36,6 +46,7 @@ readonly class Instance
             ApplicationPath::class => $this->path,
             ApplicationPublicDir::class => $this->publicDir,
             Timings::class => $timings,
+            ...$definitions,
         ];
 
         /** @var Container $container */
@@ -43,13 +54,16 @@ readonly class Instance
             'di.init',
             fn () => ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions),
         );
-        $container = new TimedContainer($timings, $container);
 
-        Dulce::onFatalError($container, function (\Throwable $throwable) use ($applicationDefinitions): void {
+        return new TimedContainer($timings, $container);
+    }
+
+    public function requestHandler(Container $container, array $middleware = []): RequestHandlerInterface
+    {
+        Dulce::onFatalError($container, function (\Throwable $throwable): void {
             // A fresh container is needed to clear out any previous state, layout rendering in particular
-            $freshContainer = ContainerBuilder::build($this->path, $this->namespace, [
+            $freshContainer = $this->container([
                 \Throwable::class => $throwable,
-                ...$applicationDefinitions,
             ]);
             $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
             $response = $freshContainer->call([$errorEndpoint, 'response'], [$throwable]);
@@ -62,10 +76,6 @@ readonly class Instance
         $requestHandler->append(...$middleware);
         $requestHandler->append(PsrEndpoints::class);
 
-        $serverRequest = $container->get(ServerRequestInterface::class);
-
-        $response = $requestHandler->handle($serverRequest);
-
-        send($response);
+        return $requestHandler;
     }
 }
