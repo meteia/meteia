@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class UniqueIdNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     #[\Override]
-    public function normalize(mixed $object, string $format = null, array $context = []): string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         \assert($object instanceof UniqueId);
 
@@ -19,7 +19,7 @@ class UniqueIdNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof UniqueId;
     }
@@ -33,15 +33,19 @@ class UniqueIdNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     #[\Override]
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): UniqueId
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): UniqueId
     {
         // @var UniqueId $type
         return $type::fromToken($data);
     }
 
     #[\Override]
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
-    {
+    public function supportsDenormalization(
+        mixed $data,
+        string $type,
+        ?string $format = null,
+        array $context = [],
+    ): bool {
         return is_subclass_of($type, UniqueId::class);
     }
 }

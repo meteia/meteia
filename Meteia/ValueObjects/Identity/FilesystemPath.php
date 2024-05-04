@@ -48,7 +48,7 @@ class FilesystemPath extends StringLiteral
         return new \RegexIterator($iterator, $regex, \RegexIterator::MATCH);
     }
 
-    public function hash(string $algo, SecretKey $hmacKey = null): Hash
+    public function hash(string $algo, ?SecretKey $hmacKey = null): Hash
     {
         $hashCtx = $hmacKey ? hash_init($algo, HASH_HMAC, (string) $hmacKey) : hash_init($algo);
         hash_update_file($hashCtx, (string) $this);
@@ -74,7 +74,7 @@ class FilesystemPath extends StringLiteral
     /**
      * @return \Iterator<int, string>
      */
-    public function lines(int $start = 0, int $end = null): \Iterator
+    public function lines(int $start = 0, ?int $end = null): \Iterator
     {
         $file = new \SplFileObject((string) $this);
         $file->seek($start);

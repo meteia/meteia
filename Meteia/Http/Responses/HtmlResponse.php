@@ -6,7 +6,7 @@ namespace Meteia\Http\Responses;
 
 class HtmlResponse extends \Laminas\Diactoros\Response\HtmlResponse
 {
-    public function __construct(string|\Stringable $renderable = null, $status = 200, array $headers = [])
+    public function __construct(null|string|\Stringable $renderable = null, $status = 200, array $headers = [])
     {
         parent::__construct((string) $renderable, $status, $headers);
     }

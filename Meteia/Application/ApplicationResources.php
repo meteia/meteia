@@ -13,9 +13,8 @@ readonly class ApplicationResources
 
     private string $prefix;
 
-    public function __construct(
-        ApplicationResourcesManifestPath $manifest,
-    ) {
+    public function __construct(ApplicationResourcesManifestPath $manifest)
+    {
         $this->prefix = '/dist/';
 
         if ($manifest->isReadable()) {

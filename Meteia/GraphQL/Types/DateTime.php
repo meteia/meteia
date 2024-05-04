@@ -29,7 +29,7 @@ class DateTime extends ScalarType implements Resolver
         return $date->format($args['format']);
     }
 
-    public function parseLiteral($valueNode, array $variables = null)
+    public function parseLiteral($valueNode, ?array $variables = null)
     {
         if ($valueNode instanceof StringValueNode) {
             return $valueNode->value;

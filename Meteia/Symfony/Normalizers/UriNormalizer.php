@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class UriNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     #[\Override]
-    public function normalize(mixed $object, string $format = null, array $context = []): string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         \assert($object instanceof UriInterface);
 
@@ -21,7 +21,7 @@ class UriNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof UriInterface;
     }
@@ -35,15 +35,19 @@ class UriNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     #[\Override]
-    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): UriInterface
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): UriInterface
     {
         // @var UniqueId $type
         return new Uri($data);
     }
 
     #[\Override]
-    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
-    {
+    public function supportsDenormalization(
+        mixed $data,
+        string $type,
+        ?string $format = null,
+        array $context = [],
+    ): bool {
         return $type === UriInterface::class || is_subclass_of($type, UriInterface::class);
     }
 }

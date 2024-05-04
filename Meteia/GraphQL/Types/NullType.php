@@ -43,7 +43,7 @@ class NullType extends Type implements OutputType, LeafType
     /**
      * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input.
      */
-    public function parseLiteral(Node $valueNode, array $variables = null)
+    public function parseLiteral(Node $valueNode, ?array $variables = null)
     {
         return null;
     }

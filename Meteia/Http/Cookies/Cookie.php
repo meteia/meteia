@@ -23,7 +23,7 @@ class Cookie
      */
     protected $cookieAttributes;
 
-    public function __construct(string $name, string $value, CookieAttributes $cookieAttributes = null)
+    public function __construct(string $name, string $value, ?CookieAttributes $cookieAttributes = null)
     {
         $this->name = $name;
         $this->value = $value;

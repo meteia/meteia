@@ -11,9 +11,8 @@ class Scripts implements \Stringable
 {
     private array $scripts = [];
 
-    public function __construct(
-        private ApplicationResourcesBaseUri $applicationResourcesBaseUri,
-    ) {
+    public function __construct(private ApplicationResourcesBaseUri $applicationResourcesBaseUri)
+    {
     }
 
     public function __toString()

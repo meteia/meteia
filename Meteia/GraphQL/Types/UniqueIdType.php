@@ -27,7 +27,7 @@ class UniqueIdType extends ScalarType implements Resolver
         ]);
     }
 
-    public function parseLiteral($valueNode, array $variables = null)
+    public function parseLiteral($valueNode, ?array $variables = null)
     {
         if ($valueNode instanceof StringValueNode) {
             try {

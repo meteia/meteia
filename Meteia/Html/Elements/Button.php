@@ -8,7 +8,7 @@ use Meteia\Html\CustomElement;
 
 class Button extends CustomElement
 {
-    public function __construct(array $attributes = [], string|\Stringable $children = null)
+    public function __construct(array $attributes = [], null|string|\Stringable $children = null)
     {
         parent::__construct('button', $attributes, $children);
     }

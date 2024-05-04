@@ -42,7 +42,7 @@ class XChaCha20Poly1305
     public function encrypt(
         string $plaintext,
         string $associatedData,
-        SecretKey $secret = null,
+        ?SecretKey $secret = null,
     ): XChaCha20Poly1305EncryptionResult {
         if (!$secret) {
             $secret = SecretKey::random();

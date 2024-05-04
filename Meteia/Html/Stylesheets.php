@@ -11,9 +11,8 @@ class Stylesheets implements \Stringable
 {
     private array $stylesheets = [];
 
-    public function __construct(
-        private ApplicationResourcesBaseUri $applicationResourcesBaseUri,
-    ) {
+    public function __construct(private ApplicationResourcesBaseUri $applicationResourcesBaseUri)
+    {
     }
 
     public function __toString()
@@ -21,7 +20,7 @@ class Stylesheets implements \Stringable
         return implode('', $this->stylesheets);
     }
 
-    public function load($href, string $integrity = null, string $crossorigin = null): void
+    public function load($href, ?string $integrity = null, ?string $crossorigin = null): void
     {
         if (str_starts_with($href, '/')) {
             $href = (string) $this->applicationResourcesBaseUri->withPath($href);

@@ -14,14 +14,14 @@ class OpenedCookie extends Cookie
     public function __construct(
         string $name,
         string $value,
-        CookieAttributes $cookieAttributes = null,
+        ?CookieAttributes $cookieAttributes = null,
         string $associatedData = '',
     ) {
         parent::__construct($name, $value, $cookieAttributes);
         $this->associatedData = $associatedData;
     }
 
-    public function seal(XChaCha20Poly1305 $XChaCha20Poly1305, SecretKey $secret = null): SealCookieResult
+    public function seal(XChaCha20Poly1305 $XChaCha20Poly1305, ?SecretKey $secret = null): SealCookieResult
     {
         $ad = implode('_', array_filter([$this->name, $this->associatedData]));
         $result = $XChaCha20Poly1305->encrypt($this->value, $ad, $secret);

@@ -18,7 +18,7 @@ class ServerTimingProfiler implements ProfilerInterface
     {
     }
 
-    public function finish(string $statement = null, array $values = []): void
+    public function finish(?string $statement = null, array $values = []): void
     {
         $duration = microtime(true) - $this->startTime;
         $this->timings->add('app.sql.pdo.' . $this->function, $duration * 1000);
