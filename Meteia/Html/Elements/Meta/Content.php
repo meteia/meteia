@@ -6,7 +6,7 @@ namespace Meteia\Html\Elements\Meta;
 
 class Content implements \Stringable
 {
-    public function __construct(private readonly string $name, private readonly string $content)
+    public function __construct(private readonly string|\Stringable $name, private readonly string|\Stringable $content)
     {
     }
 

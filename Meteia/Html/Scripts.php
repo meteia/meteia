@@ -15,21 +15,28 @@ class Scripts implements \Stringable
     {
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return implode('', $this->scripts);
     }
 
-    public function load($src, $async = false, $defer = false, string $integrity = '', string $crossorigin = ''): void
-    {
+    public function load(
+        string|\Stringable $src,
+        $async = false,
+        $defer = false,
+        string $integrity = '',
+        string $crossorigin = '',
+    ): void {
+        $src = (string) $src;
         if (str_starts_with($src, '/')) {
             $src = (string) $this->applicationResourcesBaseUri->withPath($src);
         }
         $this->scripts[$src] = new Script($src, $async, $defer, '', $integrity, $crossorigin);
     }
 
-    public function module($src): void
+    public function module(string|\Stringable $src): void
     {
+        $src = (string) $src;
         if (str_starts_with($src, '/')) {
             $src = (string) $this->applicationResourcesBaseUri->withPath($src);
         }
