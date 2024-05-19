@@ -81,4 +81,9 @@ readonly class EnvironmentConfiguration implements Configuration
 
         return $value;
     }
+
+    public function all(): array
+    {
+        return $this->env;
+    }
 }
