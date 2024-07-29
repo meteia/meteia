@@ -39,6 +39,11 @@ class Hash extends StringLiteral
         return static::$base62->encode($this->binary());
     }
 
+    public function base64(): string
+    {
+        return base64_encode($this->binary());
+    }
+
     public function binary(): string
     {
         return hex2bin($this->value);
