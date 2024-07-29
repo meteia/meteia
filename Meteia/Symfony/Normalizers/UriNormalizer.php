@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Symfony\Normalizers;
 
-use Meteia\ValueObjects\Identity\UniqueId;
 use Meteia\ValueObjects\Identity\Uri;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -37,7 +36,6 @@ class UriNormalizer implements NormalizerInterface, DenormalizerInterface
     #[\Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): UriInterface
     {
-        // @var UniqueId $type
         return new Uri($data);
     }
 
