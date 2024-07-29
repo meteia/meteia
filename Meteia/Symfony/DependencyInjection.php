@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Meteia\Symfony\Normalizers\HashNormalizer;
 use Meteia\Symfony\Normalizers\UniqueIdNormalizer;
 use Meteia\Symfony\Normalizers\UriNormalizer;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor;
@@ -21,6 +22,7 @@ return [
             typeExtractors: [new ConstructorExtractor([$phpDocExtractor]), $phpDocExtractor],
         );
         $normalizers = [
+            new HashNormalizer(),
             new UriNormalizer(),
             new UniqueIdNormalizer(),
             new BackedEnumNormalizer(),
