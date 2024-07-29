@@ -6,7 +6,7 @@ namespace Meteia\Database\CommandLine;
 
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
-use Meteia\Database\Database;
+use Meteia\Database\MigrationDatabase;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,7 +21,7 @@ class Migrate implements Command
         private readonly InputInterface $input,
         private readonly OutputInterface $output,
         private readonly ApplicationPath $applicationPath,
-        private readonly Database $db,
+        private readonly MigrationDatabase $db,
     ) {
     }
 
@@ -76,7 +76,7 @@ class Migrate implements Command
             $filename = $file->getBasename('.sql');
             [$id, $type, $name] = explode('.', $filename, 3);
             if (\in_array($id, $migrationIds, true)) {
-                $this->output->writeln(sprintf('existing : %s', $filename));
+                $this->output->writeln(\sprintf('existing : %s', $filename));
 
                 continue;
             }
@@ -87,13 +87,13 @@ class Migrate implements Command
             $sql = file_get_contents($realPath);
 
             try {
-                $this->output->writeln(sprintf('applying : %s', $filename));
+                $this->output->writeln(\sprintf('applying : %s', $filename));
                 $this->db->exec($sql);
-                $this->output->writeln(sprintf('applied  : %s', $filename));
+                $this->output->writeln(\sprintf('applied  : %s', $filename));
             } catch (\PDOException $t) {
                 if ($type === 'ni') {
-                    $this->output->writeln(sprintf('ignoring error during non-idempotent migration %s', $filename));
-                    $this->output->writeln(sprintf("\t%s", $t->getMessage()));
+                    $this->output->writeln(\sprintf('ignoring error during non-idempotent migration %s', $filename));
+                    $this->output->writeln(\sprintf("\t%s", $t->getMessage()));
                 } else {
                     throw $t;
                 }
@@ -104,7 +104,7 @@ class Migrate implements Command
                     'id' => $id,
                     'name' => $name,
                 ]);
-                $this->output->writeln(sprintf('recorded : %s', $filename));
+                $this->output->writeln(\sprintf('recorded : %s', $filename));
             }
         }
     }

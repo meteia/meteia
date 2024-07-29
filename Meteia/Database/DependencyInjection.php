@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Meteia\Configuration\Configuration;
 use Meteia\Database\Database;
+use Meteia\Database\MigrationDatabase;
 
 return [
     Database::class => static function (Configuration $configuration): Database {
@@ -20,4 +21,5 @@ return [
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
     },
+    MigrationDatabase::class => static fn (Database $database): MigrationDatabase => $database,
 ];

@@ -8,7 +8,7 @@ use Aura\Sql\ExtendedPdo;
 use Meteia\Cryptography\Hash;
 use Meteia\ValueObjects\Identity\UniqueId;
 
-class Database extends ExtendedPdo
+class Database extends ExtendedPdo implements MigrationDatabase
 {
     public function delete(string $table, array $whereBindings): void
     {
