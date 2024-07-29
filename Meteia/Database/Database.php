@@ -19,7 +19,7 @@ class Database extends ExtendedPdo
             ' AND ',
             array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)),
         );
-        $query = sprintf('DELETE FROM `%s` WHERE %s', $table, $whereColumn);
+        $query = \sprintf('DELETE FROM %s WHERE %s', $this->quoteTableName($table), $whereColumn);
         $bindings = $this->prepareBindings($whereBindings);
         $this->perform($query, $bindings);
     }
@@ -33,7 +33,7 @@ class Database extends ExtendedPdo
         $columns = implode(', ', array_map(static fn ($column) => "`{$column}`", array_keys($bindings)));
         $columnBindings = implode(', ', array_map(static fn ($column) => ":{$column}", array_keys($bindings)));
 
-        $query = sprintf('INSERT INTO `%s` (%s) VALUES (%s)', $table, $columns, $columnBindings);
+        $query = \sprintf('INSERT INTO %s (%s) VALUES (%s)', $this->quoteTableName($table), $columns, $columnBindings);
         $bindings = $this->prepareBindings($bindings);
         $this->perform($query, $bindings);
     }
@@ -53,7 +53,7 @@ class Database extends ExtendedPdo
             ' AND ',
             array_map(static fn ($column) => "`{$column}` = :{$column}", array_keys($whereBindings)),
         );
-        $query = sprintf('SELECT * FROM `%s` WHERE %s', $table, $whereColumn);
+        $query = \sprintf('SELECT * FROM %s WHERE %s', $this->quoteTableName($table), $whereColumn);
         $bindings = $this->prepareBindings($whereBindings);
 
         return $this->fetchObjects($query, $bindings);
@@ -73,7 +73,7 @@ class Database extends ExtendedPdo
             ' AND ',
             array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)),
         );
-        $query = sprintf('UPDATE `%s` SET %s WHERE %s', $table, $setColumns, $whereColumn);
+        $query = \sprintf('UPDATE %s SET %s WHERE %s', $this->quoteTableName($table), $setColumns, $whereColumn);
         $bindings = $this->prepareBindings([...$setBindings, ...$whereBindings]);
         $this->fetchAffected($query, $bindings);
     }
@@ -129,5 +129,13 @@ class Database extends ExtendedPdo
         }
 
         return $value;
+    }
+
+    private function quoteTableName(string $table): string
+    {
+        $parts = explode('.', $table, 2);
+        array_map(static fn ($part) => "`{$part}`", $parts);
+
+        return implode('.', $parts);
     }
 }
