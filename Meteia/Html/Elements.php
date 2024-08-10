@@ -21,7 +21,7 @@ function attributes(array $attributes): string
                 return $k;
             }
 
-            return sprintf('%s="%s"', $k, html((string) $v));
+            return \sprintf('%s="%s"', $k, html((string) $v));
         },
         array_keys($attributes),
         $attributes,
@@ -30,7 +30,7 @@ function attributes(array $attributes): string
     return implode(' ', $attributes);
 }
 
-function el(string $name, array $attributes, string|\Stringable ...$children)
+function el(string $name, ?array $attributes = [], string|\Stringable ...$children): string
 {
     if (\count($attributes) === 1 && isset($attributes[0]) && \is_string($attributes[0])) {
         $attributes = ['class' => $attributes[0]];
