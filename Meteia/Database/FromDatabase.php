@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Database;
 
+use Meteia\Cryptography\Hash;
 use Meteia\Library\StringCase;
 
 trait FromDatabase
@@ -34,6 +35,9 @@ trait FromDatabase
                     return static function (object $row) use ($columnName, $expectedTypeClass) {
                         if (!isset($row->{$columnName})) {
                             return null;
+                        }
+                        if ($expectedTypeClass === Hash::class || is_subclass_of($expectedTypeClass, Hash::class)) {
+                            return $expectedTypeClass::fromBinary($row->{$columnName});
                         }
                         if (is_subclass_of($expectedTypeClass, \BackedEnum::class)) {
                             return $expectedTypeClass::from($row->{$columnName});
