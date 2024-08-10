@@ -14,6 +14,12 @@ if (!function_exists('dump_value')) {
             if ($value instanceof DateTimeInterface) {
                 return $value->format(DateTimeInterface::RFC3339);
             }
+            if ($value instanceof JsonSerializable) {
+                return dump_value($value->jsonSerialize());
+            }
+            if ($value instanceof Stringable) {
+                return $value->__toString();
+            }
             $objectHash = spl_object_hash($value);
             if (isset($seen[$objectHash])) {
                 return '[object ' . $value::class . ' ' . $objectHash . ']';
