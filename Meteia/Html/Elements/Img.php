@@ -10,20 +10,18 @@ readonly class Img
 {
     use Element;
 
-    protected string $decoding;
-
     public function __construct(
-        protected string $src,
-        protected ?string $alt = null,
-        protected ?int $width = null,
-        protected ?int $height = null,
-        protected ?string $srcset = null,
-        protected ?string $sizes = null,
-        protected ?string $class = null,
-        protected ?string $crossorigin = null,
-        protected ?string $fetchpriority = null,
-        protected ?string $loading = null,
+        public string $src,
+        public ?string $alt = null,
+        public ?int $width = null,
+        public ?int $height = null,
+        public ?string $srcSet = null,
+        public ?string $sizes = null,
+        public ?string $className = null,
+        public ?string $crossOrigin = null,
+        public ?string $fetchpriority = null,
+        public ?string $loading = null,
+        public ?string $decoding = 'async',
     ) {
-        $this->decoding = 'async';
     }
 }
