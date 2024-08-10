@@ -6,18 +6,18 @@ namespace Meteia\Html\Elements;
 
 use Meteia\Html\VoidElement;
 
-class Source
+readonly class Source
 {
     use VoidElement;
 
     public function __construct(
-        protected string $type,
-        protected ?string $src = null,
-        protected ?string $srcset = null,
-        protected ?string $sizes = null,
-        protected ?string $media = null,
-        protected ?string $width = null,
-        protected ?string $height = null,
+        public string $type,
+        public ?string $src = null,
+        public ?string $srcSet = null,
+        public ?string $sizes = null,
+        public ?string $media = null,
+        public ?string $width = null,
+        public ?string $height = null,
     ) {
     }
 }
