@@ -19,14 +19,17 @@ trait Element
                 if (\is_bool($v) && $v) {
                     return $k;
                 }
+                if ($k === 'className') {
+                    $k = 'class';
+                }
 
-                return sprintf('%s="%s"', $k, $v);
+                return \sprintf('%s="%s"', $k, $v);
             },
             array_keys($attrs),
             $attrs,
         );
         $attrs = implode(' ', $attrs);
 
-        return sprintf('<%s %s>%s</%s>' . PHP_EOL, $tagName, $attrs, $originalAttrs['children'] ?? '', $tagName);
+        return \sprintf('<%s %s>%s</%s>' . PHP_EOL, $tagName, $attrs, $originalAttrs['children'] ?? '', $tagName);
     }
 }
