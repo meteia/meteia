@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Meteia\Configuration\Configuration;
 use Meteia\Database\Database;
 use Meteia\Database\MigrationDatabase;
+use Meteia\Database\MigrationsTableName;
 
 return [
     Database::class => static function (Configuration $configuration): Database {
@@ -22,4 +23,9 @@ return [
         ]);
     },
     MigrationDatabase::class => static fn (Database $database): MigrationDatabase => $database,
+    MigrationsTableName::class => static fn (
+        Configuration $configuration,
+    ): MigrationsTableName => new MigrationsTableName(
+        $configuration->string('METEIA_DATABASE_MIGRATIONS_TABLE', 'migrations'),
+    ),
 ];

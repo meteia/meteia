@@ -7,21 +7,23 @@ namespace Meteia\Database\CommandLine;
 use Meteia\Application\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Meteia\Database\MigrationDatabase;
+use Meteia\Database\MigrationsTableName;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Migrate implements Command
+readonly class Migrate implements Command
 {
     public const ARG_DEV = 'dev';
     public const ARG_RESET = 'reset';
 
     public function __construct(
-        private readonly InputInterface $input,
-        private readonly OutputInterface $output,
-        private readonly ApplicationPath $applicationPath,
-        private readonly MigrationDatabase $db,
+        private InputInterface $input,
+        private OutputInterface $output,
+        private ApplicationPath $applicationPath,
+        private MigrationDatabase $db,
+        private MigrationsTableName $migrationsTableName,
     ) {
     }
 
@@ -50,21 +52,24 @@ class Migrate implements Command
             }
             sleep($retryCount);
         }
+        $migrationsTableName = '`' . $this->migrationsTableName . '`';
 
-        $this->db->exec('
-            CREATE TABLE IF NOT EXISTS migrations (
+        $this->db->exec("
+            CREATE TABLE IF NOT EXISTS {$migrationsTableName} (
                 id        DATETIME NOT NULL,
                 name      VARCHAR(63) NOT NULL,
                 performed DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
                 UNIQUE INDEX id(id)
             )
-        ');
+        ");
         if ($this->input->getOption(self::ARG_RESET)) {
             $this->output->writeln('truncated migrations');
-            $this->db->exec('TRUNCATE migrations;');
+            $this->db->exec("TRUNCATE {$migrationsTableName};");
         }
 
-        $migrationIds = $this->db->fetchCol("SELECT DATE_FORMAT(id, '%Y%m%d%H%i%s') FROM migrations ORDER BY id;");
+        $migrationIds = $this->db->fetchCol(
+            "SELECT DATE_FORMAT(id, '%Y%m%d%H%i%s') FROM {$migrationsTableName} ORDER BY id;",
+        );
 
         $allMigrationFiles = new \AppendIterator();
         $meteiaMigrationsDirectory = implode(\DIRECTORY_SEPARATOR, [__DIR__, '..', '..', '..', 'migrations', '*.sql']);
@@ -100,7 +105,7 @@ class Migrate implements Command
             }
 
             if (!$this->input->getOption(self::ARG_DEV)) {
-                $this->db->perform('INSERT INTO migrations (id, name) VALUES (:id, :name)', [
+                $this->db->perform("INSERT INTO {$migrationsTableName} (id, name) VALUES (:id, :name)", [
                     'id' => $id,
                     'name' => $name,
                 ]);
