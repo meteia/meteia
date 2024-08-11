@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Library\ArrayUtils;
+namespace Meteia\Library;
 
 function array_first(array $array, ?callable $callback = null, $default = null)
 {
