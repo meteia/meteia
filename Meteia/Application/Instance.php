@@ -58,17 +58,22 @@ readonly class Instance
         return new TimedContainer($timings, $container);
     }
 
-    public function requestHandler(Container $container, array $middleware = []): RequestHandlerInterface
-    {
-        Dulce::onFatalError($container, function (\Throwable $throwable): void {
-            // A fresh container is needed to clear out any previous state, layout rendering in particular
-            $freshContainer = $this->container([
-                \Throwable::class => $throwable,
-            ]);
-            $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
-            $response = $freshContainer->call([$errorEndpoint, 'response'], [$throwable]);
-            send($response);
-        });
+    public function requestHandler(
+        Container $container,
+        array $middleware = [],
+        bool $isErrorHandlingDisabled = false,
+    ): RequestHandlerInterface {
+        if (!$isErrorHandlingDisabled) {
+            Dulce::onFatalError($container, function (\Throwable $throwable): void {
+                // A fresh container is needed to clear out any previous state, layout rendering in particular
+                $freshContainer = $this->container([
+                    \Throwable::class => $throwable,
+                ]);
+                $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
+                $response = $freshContainer->call([$errorEndpoint, 'response'], [$throwable]);
+                send($response);
+            });
+        }
 
         /** @var RequestHandlerInterface $requestHandler */
         $requestHandler = $container->get(RequestHandlerInterface::class);
