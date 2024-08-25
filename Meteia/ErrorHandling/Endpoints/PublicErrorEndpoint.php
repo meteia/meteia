@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\ErrorHandling\Endpoints;
 
-use Meteia\ErrorHandling\Templates\StackTrace;
 use Meteia\Html\Layout;
 use Meteia\Http\Responses\HtmlResponse;
 use Meteia\Http\Responses\JsonResponse;
@@ -13,9 +12,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 use function Meteia\Html\Elements\el;
 
-class PublicErrorEndpoint implements ErrorEndpoint
+readonly class PublicErrorEndpoint implements ErrorEndpoint
 {
-    public function __construct(private StackTrace $stackTrace, private Layout $layout)
+    public function __construct(private Layout $layout)
     {
     }
 
