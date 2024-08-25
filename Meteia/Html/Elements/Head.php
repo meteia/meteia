@@ -20,6 +20,6 @@ class Head implements \Stringable
 
     public function __toString(): string
     {
-        return el('head', [], $this->title, $this->metadata, $this->stylesheets, $this->scripts);
+        return el('head', [], $this->title, $this->metadata, $this->scripts, $this->stylesheets);
     }
 }
