@@ -7,11 +7,9 @@
   ...
 }:
 with lib; {
-  imports = [
-  ];
+  imports = [];
   options = with types; {
-    project = {
-    };
+    project = {};
   };
   config = mkMerge [
     {
@@ -23,7 +21,21 @@ with lib; {
       programs.lefthook.enable = true;
       programs.taskfile.enable = true;
       programs.nodejs.enable = true;
-      programs.php.enable = true;
+      programs.php = {
+        pkg = pkgs.php84;
+        extensions = {
+          enabled,
+          all,
+          ...
+        }:
+          with all;
+            enabled
+            ++ [
+              apcu
+              igbinary
+            ];
+        enable = true;
+      };
     }
   ];
 }

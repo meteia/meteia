@@ -24,7 +24,7 @@
   "license": "MIT",
   "name": "meteia/meteia",
   "require": {
-    "aura/sql": "^5.0.2",
+    "aura/sql": "^6.0.0",
     "bunny/bunny": "^0.5.5",
     "cakephp/chronos": "^3.0",
     "ext-apcu": "*",
@@ -40,7 +40,7 @@
     "league/mime-type-detection": "^1.11",
     "nyholm/psr7": "^1.5.1",
     "nyholm/psr7-server": "^1.0.2",
-    "php": "^8.3",
+    "php": "^8.4",
     "phpdocumentor/reflection-docblock": "^5.3",
     "psr/container": "^2.0.2",
     "psr/http-factory": "^1.0.1",
