@@ -15,7 +15,7 @@ class IntegerLiteral extends ImmutablePrimitiveValueObject
     {
         $value = filter_var($value, FILTER_VALIDATE_INT);
 
-        if ($value === false) {
+        if (!$value) {
             throw new InvalidValueObjectException($value, ['int']);
         }
 

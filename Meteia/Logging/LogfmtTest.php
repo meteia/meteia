@@ -64,14 +64,14 @@ test('floats are rounded', function (): void {
 
 // test('strings with quotes are escaped', function () {
 //    $out = $this->>uut->format("info", "world", ['special' => 'four"score']);
-//
+
 //    /** @var \PHPUnit\Framework\TestCase $this */
 //    $this->assertEquals('level=info msg=world special=four\"score', $out);
 // });
-//
+
 // test('strings with spaces & quotes are quoted & escaped', function () {
 //    $out = $this->>uut->format("info", "world", ['special' => 'four "score']);
-//
+
 //    /** @var \PHPUnit\Framework\TestCase $this */
 //    $this->assertEquals('level=info msg=world special="four \"score"', $out);
 // });

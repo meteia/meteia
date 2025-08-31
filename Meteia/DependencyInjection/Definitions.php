@@ -13,7 +13,7 @@ class Definitions
         $definitions = [];
         foreach (glob((string) $filesystemPath) as $filename) {
             $loaded = include $filename;
-            if ($loaded === true) {
+            if ($loaded) {
                 continue;
             }
             if (!\is_array($loaded)) {

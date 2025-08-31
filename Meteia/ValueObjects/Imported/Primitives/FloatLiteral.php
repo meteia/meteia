@@ -15,7 +15,7 @@ class FloatLiteral extends PrimitiveValueObject
     {
         $filteredValue = filter_var($value, FILTER_VALIDATE_FLOAT);
 
-        if ($filteredValue === false) {
+        if (!$filteredValue) {
             throw new ImproperType(\gettype($value), ['float']);
         }
 

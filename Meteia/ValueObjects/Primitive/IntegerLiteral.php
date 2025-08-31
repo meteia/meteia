@@ -15,7 +15,7 @@ abstract class IntegerLiteral extends PrimitiveValueObject
     {
         $value = filter_var($value, FILTER_VALIDATE_INT);
 
-        if ($value === false) {
+        if (!$value) {
             throw new ValueObjectInvalid($value, ['int']);
         }
 

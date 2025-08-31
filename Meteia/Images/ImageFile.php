@@ -35,7 +35,7 @@ readonly class ImageFile implements Image
             ImageFormat::AVIF => imagecreatefromavif((string) $this->path),
             default => throw new \Exception("Unexpected match value {$imageFormat->value}."),
         };
-        if ($src === false) {
+        if (!$src) {
             throw new \Exception('Failed to read source.');
         }
 

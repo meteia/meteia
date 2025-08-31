@@ -21,7 +21,6 @@ class Api
             ],
         ]);
         $result = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
-        dd($result);
 
         return new AuthorizedAccount($result['apiUrl'], $result['authorizationToken']);
     }

@@ -15,12 +15,12 @@ class BooleanLiteral extends PrimitiveValueObject
 
     public function isTrue(): bool
     {
-        return $this->value === true;
+        return $this->value;
     }
 
     public function isFalse(): bool
     {
-        return $this->value === false;
+        return !$this->value;
     }
 
     public function not(): self

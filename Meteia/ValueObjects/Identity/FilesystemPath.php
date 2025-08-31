@@ -32,7 +32,7 @@ class FilesystemPath extends StringLiteral
     {
         $filename = pathinfo((string) $this, PATHINFO_BASENAME);
         $extensionIdx = stripos($filename, '.');
-        if ($extensionIdx === false) {
+        if (!$extensionIdx) {
             return '';
         }
 
@@ -90,7 +90,7 @@ class FilesystemPath extends StringLiteral
     public function open(): Resource
     {
         $resource = fopen((string) $this, 'r');
-        if ($resource === false) {
+        if (!$resource) {
             throw new \Exception('Unable to open file: ' . $this);
         }
 
@@ -125,7 +125,7 @@ class FilesystemPath extends StringLiteral
         }
         $tmpName = tempnam($dirname, 'fsp-write');
         $success = file_put_contents($tmpName, $content);
-        if ($success === false) {
+        if (!$success) {
             throw new \Exception('Failed to write file.');
         }
         rename($tmpName, (string) $this);

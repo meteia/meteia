@@ -29,7 +29,6 @@ class SchemaFields
                 // 'resolve' => function ($value, $args, RequestContext $context) use ($queryFieldClassName) {
                 //    /** @var ObjectResolver $resolver */
                 //    $resolver = $this->container->get($queryFieldClassName . 'Resolver');
-                //
                 //    return $resolver->data($value, $args, $context);
                 // },
             ];

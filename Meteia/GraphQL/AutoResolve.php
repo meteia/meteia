@@ -25,7 +25,7 @@ class AutoResolve
     {
         $returnType = $resolveInfo->returnType;
         $expectsList = $returnType instanceof ListOfType;
-        while ($returnType instanceof WrappingType && $expectsList === false) {
+        while ($returnType instanceof WrappingType && !$expectsList) {
             $returnType = $returnType->getWrappedType(false);
             $expectsList = $returnType instanceof ListOfType;
         }

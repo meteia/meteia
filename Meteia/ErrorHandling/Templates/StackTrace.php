@@ -38,7 +38,7 @@ class StackTrace
 
         $frames = array_filter(
             $frames,
-            static fn($frame) => !isset($frame['file']) || stripos($frame['file'], 'vendor') === false,
+            static fn($frame) => !isset($frame['file']) || !stripos($frame['file'], 'vendor'),
         );
 
         return array_map(function ($trace) {

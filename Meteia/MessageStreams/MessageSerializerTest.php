@@ -70,7 +70,7 @@ it('serialize/unserialize UserId', function (): void {
 
     // Act
     $mid = $ms->serialize($before);
-    dump($mid);
+
     $after = $ms->unserialize($mid);
 
     // Assert

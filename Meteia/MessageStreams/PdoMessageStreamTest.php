@@ -37,16 +37,14 @@ function init(ExtendedPdoInterface $pdo): PdoEventStream
 // class FakeUnitOfWorkContext implements UnitOfWorkContext
 // {
 //    public CommandMessages $commandMessages;
-//
+
 //    public EventMessages $eventMessages;
-//
-//
+
 //    public function commitCommandMessages(CommandMessages $commandMessages)
 //    {
 //        $this->commandMessages = $commandMessages;
 //    }
-//
-//
+
 //    public function commitEventMessages(EventMessages $eventMessages)
 //    {
 //        $this->eventMessages = $eventMessages;

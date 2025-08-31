@@ -22,7 +22,7 @@ class FileFragments
         );
 
         // $relativePath = str_replace($this->baseDirectory . '/', '', $absolutePath);
-        //
+
         // $editorUri = $this->editorUri->withQuery([
         //    'file' => $editorUriFile,
         //    'line' => $focusedLine,

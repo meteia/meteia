@@ -12,7 +12,7 @@ class ApplicationPath extends FilesystemPath
     {
         parent::__construct(...$paths);
         $value = realpath($this->value);
-        if ($value === false) {
+        if (!$value) {
             throw new \Exception("Invalid ApplicationPath: {$this->value}");
         }
         $this->value = $value;

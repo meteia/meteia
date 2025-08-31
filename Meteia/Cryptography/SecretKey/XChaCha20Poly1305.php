@@ -30,7 +30,7 @@ class XChaCha20Poly1305
             $nonce,
             $secret->randomBytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES),
         );
-        if ($plaintext === false) {
+        if (!$plaintext) {
             throw new DecryptionFailed(
                 'Either 1) ciphertext or associated data has been modified or 2) the secret is incorrect',
             );

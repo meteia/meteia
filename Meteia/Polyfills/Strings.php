@@ -32,7 +32,10 @@ function common_prefix_length(array $strings): int
     // While we still have string to compare,
     // if the indexed character is the same in both strings,
     // increment the index.
-    for ($i = 0; $i < $len && $s1[$i] === $s2[$i]; ++$i);
+    $i = 0;
+    while ($i < $len && $s1[$i] === $s2[$i]) {
+        ++$i;
+    }
 
     return $i;
 }

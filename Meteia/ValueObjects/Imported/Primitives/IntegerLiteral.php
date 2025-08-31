@@ -15,7 +15,7 @@ class IntegerLiteral extends PrimitiveValueObject
     {
         $filteredValue = filter_var($value, FILTER_VALIDATE_INT);
 
-        if ($filteredValue === false) {
+        if (!$filteredValue) {
             throw new ImproperType(\gettype($value), ['int']);
         }
 

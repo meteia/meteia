@@ -58,7 +58,7 @@ class PdoMessageStream implements MessageStream
             $this->snapshotVersions[$target::class] = $hash;
         }
 
-        dump($this->snapshotVersions[$target::class]);
+        // dump($this->snapshotVersions[$target::class]);
         $query = '
             SELECT snapshot, message_stream_sequence
             FROM message_stream_snapshots

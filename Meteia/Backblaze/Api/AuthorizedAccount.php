@@ -28,7 +28,6 @@ class AuthorizedAccount
 
     public function upload(StreamInterface $stream, string $bucket, string $path): void
     {
-        dd('TODO');
         $request = new Request('POST', '', [
             'headers' => [],
         ]);
@@ -38,7 +37,6 @@ class AuthorizedAccount
 
     private function getUploadUrl(): void
     {
-        dd('TODO');
         $request = new Request('GET', '', [
             'headers' => [],
         ]);
@@ -47,7 +45,6 @@ class AuthorizedAccount
     }
 }
 
-//
 // {
 // "absoluteMinimumPartSize": 5000000,
 // "accountId": "YOUR_ACCOUNT_ID",
