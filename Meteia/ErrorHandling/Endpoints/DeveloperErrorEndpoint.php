@@ -37,23 +37,6 @@ class DeveloperErrorEndpoint implements ErrorEndpoint
         $this
             ->layout->body()
             ->header->title($throwable->getMessage());
-        $this->layout->head()->scripts->load(
-            'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js',
-            false,
-            false,
-            'sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=',
-            'anonymous',
-        );
-        $this->layout->head()->stylesheets->load(
-            'https://fonts.googleapis.com/css?family=Inconsolata|Geo',
-            '',
-            'anonymous',
-        );
-        $this->layout->head()->stylesheets->load(
-            'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night.min.css',
-            'sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=',
-            'anonymous',
-        );
 
         $this->layout->body()->content($this->stackTrace->for($throwable));
 

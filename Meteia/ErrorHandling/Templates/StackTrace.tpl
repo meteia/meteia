@@ -7,4 +7,3 @@
   </ul>
 </div>
 </div>
-<script>hljs.initHighlightingOnLoad();</script>

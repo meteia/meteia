@@ -13,13 +13,9 @@ class Definitions
         $definitions = [];
         foreach (glob((string) $filesystemPath) as $filename) {
             $loaded = include $filename;
-            if ($loaded) {
-                continue;
-            }
-            if (!\is_array($loaded)) {
+            if (!is_array($loaded)) {
                 throw new \Exception("{$filename} should return an array");
             }
-
             $definitions[] = $loaded;
         }
 

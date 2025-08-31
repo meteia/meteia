@@ -17,9 +17,7 @@
       "Meteia\\": "Meteia/"
     }
   },
-  "bin": [
-    "bin/meteia"
-  ],
+  "bin": ["bin/meteia"],
   "description": "An opinionated PHP framework for building web applications.",
   "license": "MIT",
   "name": "meteia/meteia",
