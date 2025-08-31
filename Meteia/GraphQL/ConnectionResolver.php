@@ -17,9 +17,9 @@ trait ConnectionResolver
     protected function processedRows(array $rows, array $args, array $cursorColumns): object
     {
         if (!$args || !\count($args)) {
-            throw new \Exception(
-                'A type that has ' . static::class . ' as a field is likely not passing through default arguments.',
-            );
+            throw new \Exception('A type that has '
+            . static::class
+            . ' as a field is likely not passing through default arguments.');
         }
         $hasNextPage = $this->hasNextPage(\count($rows), $args);
         if (isset($args[ConnectionField::ARG_FIRST])) {
@@ -37,7 +37,7 @@ trait ConnectionResolver
         }
 
         /** @var array $edges */
-        $edges = array_map(fn ($row) => $this->asEdge($row, $cursorColumns), $rows);
+        $edges = array_map(fn($row) => $this->asEdge($row, $cursorColumns), $rows);
         $firstEdge = $edges[0] ?? null;
         $lastEdge = end($edges);
 

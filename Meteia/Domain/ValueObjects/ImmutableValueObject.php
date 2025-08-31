@@ -33,6 +33,7 @@ abstract class ImmutableValueObject implements ValueObject
         }
     }
 
+    #[\Override]
     public function getIterator()
     {
         $vars = get_object_vars($this);
@@ -43,6 +44,7 @@ abstract class ImmutableValueObject implements ValueObject
         }
     }
 
+    #[\Override]
     public function jsonSerialize()
     {
         $data = [];

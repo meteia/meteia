@@ -11,7 +11,8 @@ class FileFragment
     /**
      * @param array<int, Line> $lines
      */
-    public function __construct(public readonly FilesystemPath $path, public readonly array $lines)
-    {
-    }
+    public function __construct(
+        public readonly FilesystemPath $path,
+        public readonly array $lines,
+    ) {}
 }

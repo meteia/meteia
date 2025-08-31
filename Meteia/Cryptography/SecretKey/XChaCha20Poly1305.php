@@ -10,9 +10,9 @@ use Tuupola\Base62;
 
 class XChaCha20Poly1305
 {
-    public function __construct(private readonly Base62 $codec)
-    {
-    }
+    public function __construct(
+        private readonly Base62 $codec,
+    ) {}
 
     public function decrypt(
         string $ciphertext,

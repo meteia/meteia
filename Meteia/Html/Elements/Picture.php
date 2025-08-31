@@ -9,9 +9,10 @@ readonly class Picture
     /**
      * @param array<int, Source> $sources
      */
-    public function __construct(public Img $img, public array $sources)
-    {
-    }
+    public function __construct(
+        public Img $img,
+        public array $sources,
+    ) {}
 
     public function __toString(): string
     {

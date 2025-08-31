@@ -19,12 +19,12 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
         private readonly Database $db,
         private readonly string $table,
         private readonly array $cursorOver = ['id'],
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function data(mixed $root, array $args, RequestContext $requestContext): object
     {
-        $cursor = $args[ConnectionField::ARG_AFTER] ?? ($args[ConnectionField::ARG_BEFORE] ?? false);
+        $cursor = $args[ConnectionField::ARG_AFTER] ?? $args[ConnectionField::ARG_BEFORE] ?? false;
         $cursorColumns = implode(',', $this->cursorOver);
         $cursorDirection = !$cursor || isset($args[ConnectionField::ARG_AFTER]) ? 'forward' : 'reverse';
 
@@ -71,17 +71,13 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
             // FIXME: This seems pretty expensive just to fix column names... would it better in the query?
             // Maybe we could ask for mappings (maybe even static?) similar to how we do resolveWhereBindings
             // TODO: This probably should be a trait, or some place more reusable
-            $columnNameMap = array_map_assoc(
-                static fn ($i, $column) => [
-                    $column => lcfirst(implode('', array_map(ucfirst(...), explode('_', $column)))),
-                ],
-                array_keys($rows[0]),
-            );
+            $columnNameMap = array_map_assoc(static fn($i, $column) => [
+                $column => lcfirst(implode('', array_map(ucfirst(...), explode('_', $column)))),
+            ], array_keys($rows[0]));
             $rows = array_map(
-                static fn ($row) => (object) array_map_assoc(
-                    static fn ($column, $row) => [$columnNameMap[$column] => $row],
-                    $row,
-                ),
+                static fn($row) => (object) array_map_assoc(static fn($column, $row) => [
+                    $columnNameMap[$column] => $row,
+                ], $row),
                 $rows,
             );
         }

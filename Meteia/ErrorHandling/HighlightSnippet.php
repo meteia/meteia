@@ -33,7 +33,12 @@ class HighlightSnippet
             $line = htmlentities($line, ENT_QUOTES | ENT_HTML5);
 
             $output[] = [
-                'href' => 'idea://open?' . http_build_query(['file' => $filename, 'line' => $offset]),
+                'href' =>
+                    'idea://open?'
+                    . http_build_query([
+                        'file' => $filename,
+                        'line' => $offset,
+                    ]),
                 'number' => $offset,
                 'activeLine' => $offset === $lineNumber,
                 'source' => $line,

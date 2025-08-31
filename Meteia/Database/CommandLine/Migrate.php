@@ -24,14 +24,15 @@ readonly class Migrate implements Command
         private ApplicationPath $applicationPath,
         private MigrationDatabase $db,
         private MigrationsTableName $migrationsTableName,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function description(): string
     {
         return 'Apply any pending migrations';
     }
 
+    #[\Override]
     public function execute(): void
     {
         $retryCount = 0;
@@ -72,7 +73,14 @@ readonly class Migrate implements Command
         );
 
         $allMigrationFiles = new \AppendIterator();
-        $meteiaMigrationsDirectory = implode(\DIRECTORY_SEPARATOR, [__DIR__, '..', '..', '..', 'migrations', '*.sql']);
+        $meteiaMigrationsDirectory = implode(\DIRECTORY_SEPARATOR, [
+            __DIR__,
+            '..',
+            '..',
+            '..',
+            'migrations',
+            '*.sql',
+        ]);
         $allMigrationFiles->append(new \GlobIterator($meteiaMigrationsDirectory));
         $allMigrationFiles->append(new \GlobIterator((string) $this->applicationPath->join('migrations', '*.sql')));
 
@@ -114,6 +122,7 @@ readonly class Migrate implements Command
         }
     }
 
+    #[\Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition([

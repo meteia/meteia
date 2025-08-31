@@ -18,14 +18,15 @@ class Upload implements Command
     public function __construct(
         private readonly ContentAddressableStorage $contentAddressableStorage,
         private readonly InputInterface $input,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function description(): string
     {
         return 'Upload one or more files to the configured storage';
     }
 
+    #[\Override]
     public function execute(): void
     {
         $files = $this->input->getArgument(self::ARG_FILES);
@@ -36,6 +37,7 @@ class Upload implements Command
         }
     }
 
+    #[\Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition([

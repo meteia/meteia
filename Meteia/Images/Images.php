@@ -11,9 +11,9 @@ use Meteia\ValueObjects\Identity\FilesystemPath;
 
 readonly class Images
 {
-    public function __construct(private ApplicationPublicDir $publicDir)
-    {
-    }
+    public function __construct(
+        private ApplicationPublicDir $publicDir,
+    ) {}
 
     public function blurhash(ImageFile $image, int $componentsX = 4, int $componentsY = 3): string
     {
@@ -105,7 +105,7 @@ readonly class Images
         }
 
         $aspectRatio = $width / $height;
-        if ($targetWidth / $targetHeight > $aspectRatio) {
+        if (($targetWidth / $targetHeight) > $aspectRatio) {
             $newWidth = $targetHeight * $aspectRatio;
             $newHeight = $targetHeight;
         } else {

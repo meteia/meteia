@@ -10,9 +10,10 @@ use Psr\Log\LoggerInterface;
 
 class Dulce
 {
-    public function __construct(private LoggerInterface $logger, private ErrorClassification $errorClassification)
-    {
-    }
+    public function __construct(
+        private LoggerInterface $logger,
+        private ErrorClassification $errorClassification,
+    ) {}
 
     public static function onFatalError(ContainerInterface|InvokerInterface $container, callable $callback): void
     {

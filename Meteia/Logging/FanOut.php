@@ -9,10 +9,11 @@ use Psr\Log\LoggerInterface;
 
 class FanOut extends AbstractLogger
 {
-    public function __construct(private array $logs)
-    {
-    }
+    public function __construct(
+        private array $logs,
+    ) {}
 
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         /** @var LoggerInterface $log */

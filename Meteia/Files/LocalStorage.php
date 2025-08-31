@@ -16,19 +16,21 @@ class LocalStorage implements Storage
     public function __construct(
         private readonly ApplicationPublicDir $applicationPublicDir,
         private readonly Host $host,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function canonicalUri(string $dest): Uri
     {
         return $this->host->withPath(implode('/', ['files', $dest]));
     }
 
+    #[\Override]
     public function exists(string $dest): bool
     {
         return $this->onDiskDest($dest)->exists();
     }
 
+    #[\Override]
     public function store(Resource $src, string $dest): StoredFile
     {
         $onDiskDest = $this->onDiskDest($dest);

@@ -26,9 +26,9 @@ class RGB
     public function asHex(): string
     {
         return strtoupper(
-            str_pad(dechex($this->red), 2, '0') .
-                str_pad(dechex($this->green), 2, '0') .
-                str_pad(dechex($this->blue), 2, '0'),
+            str_pad(dechex($this->red), 2, '0')
+            . str_pad(dechex($this->green), 2, '0')
+            . str_pad(dechex($this->blue), 2, '0'),
         );
     }
 

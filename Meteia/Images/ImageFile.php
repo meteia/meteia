@@ -15,6 +15,7 @@ readonly class ImageFile implements Image
         $this->path = $path;
     }
 
+    #[\Override]
     public function dimensions(): array
     {
         [$sourceWidth, $sourceHeight] = getimagesize((string) $this->path);
@@ -22,6 +23,7 @@ readonly class ImageFile implements Image
         return [$sourceWidth, $sourceHeight];
     }
 
+    #[\Override]
     public function gdImage(): \GdImage
     {
         $imageFormat = ImageFormat::of($this->path);

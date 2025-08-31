@@ -16,13 +16,14 @@ abstract readonly class UniqueId implements HasPrefix, \JsonSerializable
 
     public string $token;
 
-    public function __construct(public string $bytes)
-    {
+    public function __construct(
+        public string $bytes,
+    ) {
         \assert(
-            \strlen($bytes) === static::LEN_TIMESTAMP + static::LEN_RANDOM,
-            'expected ' . static::LEN_TIMESTAMP + static::LEN_RANDOM . ' got ' . \strlen($bytes),
+            \strlen($bytes) === (static::LEN_TIMESTAMP + static::LEN_RANDOM),
+            'expected ' . (static::LEN_TIMESTAMP + static::LEN_RANDOM) . ' got ' . \strlen($bytes),
         );
-        $token = (new Base62())->encode($this->bytes);
+        $token = new Base62()->encode($this->bytes);
         $token = str_pad($token, static::LEN_ENCODED, '0', STR_PAD_LEFT);
         \assert(\strlen($token) === static::LEN_ENCODED, 'expected ' . static::LEN_ENCODED . ' got ' . \strlen($token));
         $this->token = implode('_', [static::prefix(), $token]);
@@ -48,7 +49,7 @@ abstract readonly class UniqueId implements HasPrefix, \JsonSerializable
         [$prefix, $token] = explode('_', $token, 3);
         \assert($prefix === static::prefix(), 'Expected token with prefix ' . static::prefix());
         $token = ltrim($token, '0');
-        $data = (new Base62())->decode($token);
+        $data = new Base62()->decode($token);
 
         return new static($data);
     }
@@ -81,7 +82,11 @@ abstract readonly class UniqueId implements HasPrefix, \JsonSerializable
     {
         $hash = $this->binaryHash();
 
-        return implode('_', [static::prefix(), 'hash', (new Base62())->encode($hash)]);
+        return implode('_', [
+            static::prefix(),
+            'hash',
+            new Base62()->encode($hash),
+        ]);
     }
 
     public function binaryHash(): string
@@ -89,6 +94,7 @@ abstract readonly class UniqueId implements HasPrefix, \JsonSerializable
         return hash('sha256', $this->bytes, true);
     }
 
+    #[\Override]
     public function jsonSerialize(): string
     {
         return $this->token;

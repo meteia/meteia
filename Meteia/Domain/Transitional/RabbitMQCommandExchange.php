@@ -23,6 +23,7 @@ class RabbitMQCommandExchange implements PublishesCommands
         $this->messageSerializer = $messageSerializer;
     }
 
+    #[\Override]
     public function publish(Command $command): void
     {
         $routingKey = str_replace('\\', '.', $command::class);

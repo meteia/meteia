@@ -16,8 +16,9 @@ class UniqueIdType extends ScalarType implements Resolver
 {
     use ClassBasedName;
 
-    public function __construct(private readonly string $uniqueIdClass)
-    {
+    public function __construct(
+        private readonly string $uniqueIdClass,
+    ) {
         \assert(
             is_subclass_of($uniqueIdClass, UniqueId::class),
             $uniqueIdClass . ' does not implement ' . UniqueId::class,
@@ -27,6 +28,7 @@ class UniqueIdType extends ScalarType implements Resolver
         ]);
     }
 
+    #[\Override]
     public function parseLiteral($valueNode, ?array $variables = null)
     {
         if ($valueNode instanceof StringValueNode) {
@@ -40,6 +42,7 @@ class UniqueIdType extends ScalarType implements Resolver
         return null;
     }
 
+    #[\Override]
     public function parseValue($value)
     {
         if ($value instanceof $this->uniqueIdClass) {
@@ -53,17 +56,19 @@ class UniqueIdType extends ScalarType implements Resolver
         }
     }
 
+    #[\Override]
     public function serialize($value)
     {
         return (string) $value;
     }
 
+    #[\Override]
     public function data($root, array $args, RequestContext $requestContext): mixed
     {
         if (isset($root->id) && $root->id instanceof $this->uniqueIdClass) {
             return $root->id;
         }
 
-        return new $this->uniqueIdClass($root->id ?? ($args['id'] ?? $root));
+        return new $this->uniqueIdClass($root->id ?? $args['id'] ?? $root);
     }
 }

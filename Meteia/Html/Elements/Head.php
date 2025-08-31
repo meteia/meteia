@@ -15,9 +15,9 @@ class Head implements \Stringable
         public Metadata $metadata,
         public Stylesheets $stylesheets,
         public Scripts $scripts,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function __toString(): string
     {
         return el('head', [], $this->title, $this->metadata, $this->scripts, $this->stylesheets);

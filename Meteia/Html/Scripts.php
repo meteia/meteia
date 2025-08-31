@@ -11,10 +11,11 @@ class Scripts implements \Stringable
 {
     private array $scripts = [];
 
-    public function __construct(private ApplicationResourcesBaseUri $applicationResourcesBaseUri)
-    {
-    }
+    public function __construct(
+        private ApplicationResourcesBaseUri $applicationResourcesBaseUri,
+    ) {}
 
+    #[\Override]
     public function __toString(): string
     {
         return implode('', $this->scripts);

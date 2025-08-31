@@ -16,8 +16,11 @@ class UdpSystemLog extends AbstractLogger
      */
     private $socket;
 
-    public function __construct(private string $hostname = '127.0.0.1', private int $port = 10514, $facility = 23)
-    {
+    public function __construct(
+        private string $hostname = '127.0.0.1',
+        private int $port = 10514,
+        $facility = 23,
+    ) {
         // Assertion::between($facility, self::FACILITY_MIN, self::FACILITY_MAX);
         $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
     }
@@ -27,6 +30,7 @@ class UdpSystemLog extends AbstractLogger
         socket_close($this->socket);
     }
 
+    #[\Override]
     public function log($level, string|\Stringable $message, array $context = []): void
     {
         $message .= PHP_EOL;

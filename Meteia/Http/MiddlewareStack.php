@@ -11,6 +11,7 @@ class MiddlewareStack implements \IteratorAggregate
     /**
      * @return \Traversable<MiddlewareInterface>
      */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         foreach ($this->middleware as $middleware) {

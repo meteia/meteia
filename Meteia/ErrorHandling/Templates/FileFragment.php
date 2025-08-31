@@ -10,9 +10,10 @@ class FileFragment
 {
     use PhpTemplate;
 
-    public function __construct(private readonly string $file, private readonly int $line)
-    {
-    }
+    public function __construct(
+        private readonly string $file,
+        private readonly int $line,
+    ) {}
 
     public function lines(): array
     {
@@ -29,7 +30,12 @@ class FileFragment
             $line = htmlentities($line, ENT_QUOTES | ENT_HTML5);
 
             $output[] = (object) [
-                'href' => 'idea://open?' . http_build_query(['file' => $this->file, 'line' => $offset]),
+                'href' =>
+                    'idea://open?'
+                    . http_build_query([
+                        'file' => $this->file,
+                        'line' => $offset,
+                    ]),
                 'number' => $offset,
                 'activeLine' => $offset === $this->line,
                 'source' => $line,

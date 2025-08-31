@@ -8,7 +8,8 @@ use Meteia\Cryptography\SecretKey;
 
 class XChaCha20Poly1305EncryptionResult
 {
-    public function __construct(public readonly string $ciphertext, public readonly SecretKey $secret)
-    {
-    }
+    public function __construct(
+        public readonly string $ciphertext,
+        public readonly SecretKey $secret,
+    ) {}
 }

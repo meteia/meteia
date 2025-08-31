@@ -19,6 +19,7 @@ class SqlProfilerLogger extends AbstractLogger
         $this->logger = $logger;
     }
 
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         if ($context['statement']) {

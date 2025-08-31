@@ -6,7 +6,7 @@ namespace Meteia\DependencyInjection\Fixtures;
 
 class FactoryProduct implements FactoryOutput
 {
-    public function __construct(private string $requiredString)
-    {
-    }
+    public function __construct(
+        private string $requiredString,
+    ) {}
 }

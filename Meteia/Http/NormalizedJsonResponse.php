@@ -10,9 +10,9 @@ use Symfony\Component\Serializer\Serializer;
 
 readonly class NormalizedJsonResponse
 {
-    public function __construct(private Serializer $serializer)
-    {
-    }
+    public function __construct(
+        private Serializer $serializer,
+    ) {}
 
     public function from(object $object): ResponseInterface
     {

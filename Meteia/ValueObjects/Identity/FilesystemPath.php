@@ -12,7 +12,7 @@ class FilesystemPath extends StringLiteral
 {
     public function __construct(...$paths)
     {
-        $paths = array_map(static fn ($path) => rtrim((string) $path, \DIRECTORY_SEPARATOR), $paths);
+        $paths = array_map(static fn($path) => rtrim((string) $path, \DIRECTORY_SEPARATOR), $paths);
         $value = implode(\DIRECTORY_SEPARATOR, $paths);
 
         parent::__construct($value);

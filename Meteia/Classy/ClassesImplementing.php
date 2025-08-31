@@ -6,10 +6,12 @@ namespace Meteia\Classy;
 
 class ClassesImplementing implements \IteratorAggregate
 {
-    public function __construct(private readonly iterable $classes, private readonly string $implementing)
-    {
-    }
+    public function __construct(
+        private readonly iterable $classes,
+        private readonly string $implementing,
+    ) {}
 
+    #[\Override]
     public function getIterator(): \Traversable
     {
         foreach ($this->classes as $class) {

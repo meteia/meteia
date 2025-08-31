@@ -21,14 +21,15 @@ class NewMigration implements Command
         private readonly InputInterface $input,
         private readonly OutputInterface $output,
         private readonly ApplicationPath $applicationPath,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function description(): string
     {
         return 'Create a new migration';
     }
 
+    #[\Override]
     public function execute(): void
     {
         $id = date('YmdHis');
@@ -47,13 +48,14 @@ class NewMigration implements Command
         $filename = implode('.', [$id, $migrationType, $filename]);
         $target = $this->applicationPath->join('migrations', $filename);
         $template = <<<'SQL'
-            -- writing your migration in an idempotent fashion is advised (where possible, ALTER for example can't be for MYSQL)
+        -- writing your migration in an idempotent fashion is advised (where possible, ALTER for example can't be for MYSQL)
 
-            SQL;
+        SQL;
         file_put_contents((string) $target, $template);
         $this->output->writeln('Created Migration: ' . $filename);
     }
 
+    #[\Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition([

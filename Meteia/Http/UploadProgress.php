@@ -14,9 +14,9 @@ class UploadProgress
 
     private int $totalWork = 0;
 
-    public function __construct(private readonly int $intervalNanos = 250_000_000)
-    {
-    }
+    public function __construct(
+        private readonly int $intervalNanos = 250_000_000,
+    ) {}
 
     public function addWork(int $amount): void
     {
@@ -44,11 +44,13 @@ class UploadProgress
             while (ob_get_level()) {
                 ob_end_flush();
             }
-            echo json_encode([
-                'status' => 'working',
-                'completedWork' => $this->completedWork,
-                'totalWork' => $this->totalWork,
-            ]) . PHP_EOL;
+            echo
+                json_encode([
+                        'status' => 'working',
+                        'completedWork' => $this->completedWork,
+                        'totalWork' => $this->totalWork,
+                    ]) . PHP_EOL
+            ;
             flush();
         }
     }
@@ -56,7 +58,7 @@ class UploadProgress
     private function shouldSendUpdate(): bool
     {
         $now = hrtime(true);
-        if ($now - $this->lastUpdateSent > $this->intervalNanos) {
+        if (($now - $this->lastUpdateSent) > $this->intervalNanos) {
             $this->lastUpdateSent = $now;
 
             return true;

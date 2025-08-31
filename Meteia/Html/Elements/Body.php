@@ -15,9 +15,9 @@ class Body implements \Stringable
         public string|\Stringable $content = '',
         public string $className = '',
         public array $attributes = [],
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function __toString(): string
     {
         return el(

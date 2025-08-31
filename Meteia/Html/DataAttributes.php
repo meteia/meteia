@@ -9,7 +9,7 @@ trait DataAttributes
     public function attrs(...$names): string
     {
         $attrs = get_object_vars($this);
-        $attrs = array_filter($attrs, static fn ($key) => \in_array($key, $names, true), ARRAY_FILTER_USE_KEY);
+        $attrs = array_filter($attrs, static fn($key) => \in_array($key, $names, true), ARRAY_FILTER_USE_KEY);
         $attrs = array_map(
             static function ($k, $v) {
                 $k = preg_replace('~(?<=\\w)([A-Z])~u', '-$1', $k);

@@ -32,6 +32,7 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         }
     }
 
+    #[\Override]
     public function getIterator(): \Traversable
     {
         $vars = get_object_vars($this);
@@ -42,6 +43,7 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         }
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         $data = [];

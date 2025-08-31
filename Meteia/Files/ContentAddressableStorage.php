@@ -15,8 +15,7 @@ class ContentAddressableStorage
     public function __construct(
         private readonly Storage $storage,
         private readonly ContentAddressableStorageSecretKey $contentAddressableStorageSecretKey,
-    ) {
-    }
+    ) {}
 
     public function canonicalUri(Hash $hash, string $fileExtension): Uri
     {

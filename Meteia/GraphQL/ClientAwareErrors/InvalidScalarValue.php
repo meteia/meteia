@@ -13,6 +13,7 @@ class InvalidScalarValue extends \Exception implements ClientAware
         return 'values';
     }
 
+    #[\Override]
     public function isClientSafe(): bool
     {
         return true;

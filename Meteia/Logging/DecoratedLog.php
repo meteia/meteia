@@ -27,6 +27,7 @@ class DecoratedLog extends AbstractLogger
         $this->pathPrefix = trim((string) $repositoryPath, \DIRECTORY_SEPARATOR);
     }
 
+    #[\Override]
     public function log($level, string|\Stringable $message, array $context = []): void
     {
         if (!isset($context['file'], $context['line'])) {
@@ -43,7 +44,12 @@ class DecoratedLog extends AbstractLogger
         unset($context['file'], $context['line']);
         $this->log->log(
             $level,
-            implode(' -> ', [$this->correlationId, $this->causationId, $this->processId, $message]),
+            implode(' -> ', [
+                $this->correlationId,
+                $this->causationId,
+                $this->processId,
+                $message,
+            ]),
             $context,
         );
     }

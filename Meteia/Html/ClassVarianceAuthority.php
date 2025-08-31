@@ -6,14 +6,16 @@ namespace Meteia\Html;
 
 class ClassVarianceAuthority implements ClassName
 {
-    public function __construct(private readonly string $class = '', private readonly array $variants = [])
-    {
-    }
+    public function __construct(
+        private readonly string $class = '',
+        private readonly array $variants = [],
+    ) {}
 
+    #[\Override]
     public function use(array $props): string
     {
         $activeVariants = array_map(
-            fn ($variantName, $variant) => $this->variants[$variantName][$variant] ?? '',
+            fn($variantName, $variant) => $this->variants[$variantName][$variant] ?? '',
             array_keys($props),
             $props,
         );
@@ -22,12 +24,13 @@ class ClassVarianceAuthority implements ClassName
         $activeVariantClassNames = explode(' ', implode(' ', $activeVariants));
         $allClassNames = [...$coreClassNames, ...$activeVariantClassNames];
         $allClassNames = array_map('trim', $allClassNames);
-        $allClassNames = array_filter($allClassNames, static fn ($className) => $className !== '');
+        $allClassNames = array_filter($allClassNames, static fn($className) => $className !== '');
         $uniqueClassNames = array_unique($allClassNames);
 
         return implode(' ', $uniqueClassNames);
     }
 
+    #[\Override]
     public function attribute(array $props): ClassAttribute
     {
         return new ClassAttribute($this->use($props));

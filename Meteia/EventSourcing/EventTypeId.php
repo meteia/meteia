@@ -8,6 +8,7 @@ use Meteia\ValueObjects\Identity\UniqueId;
 
 readonly class EventTypeId extends UniqueId
 {
+    #[\Override]
     public static function prefix(): string
     {
         return 'eti';

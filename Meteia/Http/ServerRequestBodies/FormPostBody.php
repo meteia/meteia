@@ -21,11 +21,13 @@ readonly class FormPostBody implements ServerRequestBody
         return $this->data;
     }
 
+    #[\Override]
     public function int($key, int $default): int
     {
         return (int) ($this->data[$key] ?? $default);
     }
 
+    #[\Override]
     public function string($key, string $default): string
     {
         return trim($this->data[$key] ?? $default);
@@ -51,7 +53,7 @@ readonly class FormPostBody implements ServerRequestBody
     {
         $reflection = new \ReflectionClass($class);
         $instanceArgs = array_map(
-            fn (\ReflectionParameter $parameter) => $this->data[StringCase::snake($parameter->getName())],
+            fn(\ReflectionParameter $parameter) => $this->data[StringCase::snake($parameter->getName())],
             $reflection->getConstructor()?->getParameters() ?? [],
         );
 

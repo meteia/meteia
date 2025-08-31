@@ -8,6 +8,7 @@ use Meteia\Commands\CommandId;
 
 readonly class CausationId extends UniqueId
 {
+    #[\Override]
     public static function prefix(): string
     {
         return 'cus';

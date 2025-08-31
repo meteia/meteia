@@ -26,8 +26,7 @@ class EventBus implements MessageHandler
         private Queue $queue,
         private MessageSerializer $messageSerializer,
         private Container $container,
-    ) {
-    }
+    ) {}
 
     public function publish(DomainEvent $event): void
     {

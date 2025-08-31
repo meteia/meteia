@@ -12,8 +12,8 @@ trait Element
         $tagName = array_pop($tagName);
         $tagName = strtolower($tagName);
 
-        $originalAttrs = array_filter(get_object_vars($this), static fn ($val) => !empty($val));
-        $attrs = array_filter($originalAttrs, static fn ($value, $key) => $key !== 'children', ARRAY_FILTER_USE_BOTH);
+        $originalAttrs = array_filter(get_object_vars($this), static fn($val) => !empty($val));
+        $attrs = array_filter($originalAttrs, static fn($value, $key) => $key !== 'children', ARRAY_FILTER_USE_BOTH);
         $attrs = array_map(
             static function ($k, $v) {
                 if (\is_bool($v) && $v) {

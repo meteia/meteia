@@ -12,7 +12,7 @@ trait ResolveWith
     {
         return [
             'type' => self::nonNull($this),
-            'resolve' => fn (mixed $root, array $args, RequestContext $requestContext) => $this->data(
+            'resolve' => fn(mixed $root, array $args, RequestContext $requestContext) => $this->data(
                 $args[$propertyName] ?? $default,
                 $args,
                 $requestContext,
@@ -24,7 +24,7 @@ trait ResolveWith
     {
         return [
             'type' => self::nonNull($this),
-            'resolve' => fn (mixed $root, array $args, RequestContext $requestContext) => $this->data(
+            'resolve' => fn(mixed $root, array $args, RequestContext $requestContext) => $this->data(
                 $root->{$propertyName} ?? $default,
                 $args,
                 $requestContext,

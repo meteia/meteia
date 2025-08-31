@@ -30,19 +30,24 @@ class ObjectStorage implements Storage
         private readonly SecretKey $secretKey,
         private readonly Region $region,
         private readonly ExtensionMimeTypeDetector $extensionMimeTypeDetector,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function canonicalUri(string $dest): Uri
     {
         return $this->publicUri->withPath($dest);
     }
 
+    #[\Override]
     public function internalUri(string $dest): Uri
     {
-        return new Uri($this->endpoint->withPath(implode('/', [$this->bucketName, $dest])));
+        return new Uri($this->endpoint->withPath(implode('/', [
+            $this->bucketName,
+            $dest,
+        ])));
     }
 
+    #[\Override]
     public function exists(string $dest): bool
     {
         $client = new Client();
@@ -62,6 +67,7 @@ class ObjectStorage implements Storage
         // noop
     }
 
+    #[\Override]
     public function store(Resource $src, string $dest): StoredFile
     {
         $publicUri = $this->canonicalUri($dest);
@@ -73,7 +79,12 @@ class ObjectStorage implements Storage
         $hashedPayload = $src->hash('sha256')->hex();
 
         $now = new \DateTime('now', new \DateTimeZone('utc'));
-        $scope = implode('/', [$now->format(self::DATE), $this->region, 's3', 'aws4_request']);
+        $scope = implode('/', [
+            $now->format(self::DATE),
+            $this->region,
+            's3',
+            'aws4_request',
+        ]);
 
         $contentType = $this->extensionMimeTypeDetector->detectMimeTypeFromFile($dest) ?? 'application/octet-stream';
         $contentLength = $src->size();
@@ -116,8 +127,9 @@ class ObjectStorage implements Storage
         try {
             $client->request('PUT', (string) $internalUri, [
                 'headers' => [
-                    'Authorization' => 'AWS4-HMAC-SHA256 ' .
-                        implode(', ', [
+                    'Authorization' =>
+                        'AWS4-HMAC-SHA256 '
+                        . implode(', ', [
                             sprintf('Credential=%s/%s', $this->accessKey, $scope),
                             "SignedHeaders={$signedHeaders}",
                             "Signature={$signature}",
@@ -140,14 +152,13 @@ class ObjectStorage implements Storage
         ksort($headers);
         array_map(trim(...), $headers);
 
-        return implode(
-            "\n",
-            array_map(
-                static fn ($key, $value) => sprintf('%s:%s', strtolower($key), trim((string) $value)),
+        return (
+            implode("\n", array_map(
+                static fn($key, $value) => sprintf('%s:%s', strtolower($key), trim((string) $value)),
                 array_keys($headers),
                 $headers,
-            ),
-        ) . "\n";
+            )) . "\n"
+        );
     }
 
     private function sign(\DateTime $now, string $content): string

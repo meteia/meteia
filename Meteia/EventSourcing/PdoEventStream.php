@@ -23,9 +23,9 @@ class PdoEventStream implements EventStream
         private ExtendedPdoInterface $db,
         private MessageSerializer $messageSerializer,
         private Timings $timings,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function append(
         AggregateRootId $aggregateRootId,
         int $aggregateSequence,
@@ -52,6 +52,7 @@ class PdoEventStream implements EventStream
         }
     }
 
+    #[\Override]
     public function replay(AggregateRootId $aggregateRootId, EventSourced $target): EventSourced
     {
         return $this->loadLatestSnapshot($aggregateRootId, $target);

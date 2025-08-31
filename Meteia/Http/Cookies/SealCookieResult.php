@@ -8,9 +8,10 @@ use Meteia\Cryptography\SecretKey;
 
 class SealCookieResult
 {
-    public function __construct(private SealedCookie $sealedCookie, private SecretKey $secret)
-    {
-    }
+    public function __construct(
+        private SealedCookie $sealedCookie,
+        private SecretKey $secret,
+    ) {}
 
     public function sealedCookie(): SealedCookie
     {

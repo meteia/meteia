@@ -17,8 +17,7 @@ class EventMessage
         public AggregateRootId $aggregateRootId,
         public DomainEvent $event,
         public int $sequence,
-    ) {
-    }
+    ) {}
 
     public function publishTo(EventBus $rabbitMQExchange): void
     {

@@ -14,23 +14,25 @@ use function Meteia\Html\Elements\el;
 
 readonly class PublicErrorEndpoint implements ErrorEndpoint
 {
-    public function __construct(private Layout $layout)
-    {
-    }
+    public function __construct(
+        private Layout $layout,
+    ) {}
 
+    #[\Override]
     public function response(\Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         if (str_contains($request->getHeaderLine('Accept'), 'application/json')) {
-            return new JsonResponse(
-                [
-                    'message' => 'An error has occurred. Please try again later.',
-                ],
-                500,
-            );
+            return new JsonResponse([
+                'message' => 'An error has occurred. Please try again later.',
+            ], 500);
         }
 
-        $this->layout->head()->title->set('Server Error');
-        $this->layout->body()->header->title('Server Error');
+        $this
+            ->layout->head()
+            ->title->set('Server Error');
+        $this
+            ->layout->body()
+            ->header->title('Server Error');
 
         $body = el('p', [], 'An error has occurred. Please try again later.');
 

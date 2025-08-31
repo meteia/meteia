@@ -13,7 +13,7 @@ trait FromDatabase
 
     public static function fromDatabase(object $row): static
     {
-        $parameters = array_map(static fn (callable $make) => $make($row), static::constructorDatabaseColumnNames());
+        $parameters = array_map(static fn(callable $make) => $make($row), static::constructorDatabaseColumnNames());
 
         return new static(...$parameters);
     }
@@ -47,13 +47,13 @@ trait FromDatabase
                     };
                 }
                 if ($expectedTypeClass === 'bool') {
-                    return static fn (object $row) => (bool) $row->{$columnName};
+                    return static fn(object $row) => (bool) $row->{$columnName};
                 }
                 if ($expectedTypeClass === 'array') {
-                    return static fn (object $row) => json_decode($row->{$columnName}, true);
+                    return static fn(object $row) => json_decode($row->{$columnName}, true);
                 }
 
-                return static fn (object $row) => $row->{$columnName};
+                return static fn(object $row) => $row->{$columnName};
             }, $constructor->getParameters());
         }
 

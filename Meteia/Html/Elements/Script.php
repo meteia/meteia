@@ -17,6 +17,5 @@ class Script
         public string $type = '',
         public string $integrity = '',
         public string $crossorigin = '',
-    ) {
-    }
+    ) {}
 }

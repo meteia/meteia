@@ -29,11 +29,13 @@ class ImmediateUnitOfWork implements UnitOfWork
         $this->pendingCommandMessages = new CommandMessages();
     }
 
+    #[\Override]
     public function caused(EventMessages $eventMessages): void
     {
         $this->pendingEventMessages = $this->pendingEventMessages->merge($eventMessages);
     }
 
+    #[\Override]
     public function complete(CausationId $causationId, CorrelationId $correlationId): void
     {
         /** @var EventMessage $eventMessage */
@@ -51,6 +53,7 @@ class ImmediateUnitOfWork implements UnitOfWork
         $this->pendingCommandMessages = new CommandMessages();
     }
 
+    #[\Override]
     public function wantsTo(CommandMessages $commandMessages): void
     {
         $this->pendingCommandMessages = $this->pendingCommandMessages->merge($commandMessages);

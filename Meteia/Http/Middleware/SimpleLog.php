@@ -13,10 +13,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class SimpleLog implements MiddlewareInterface
 {
-    public function __construct(private readonly RequestBody $requestBody, private readonly LogPath $logPath)
-    {
-    }
+    public function __construct(
+        private readonly RequestBody $requestBody,
+        private readonly LogPath $logPath,
+    ) {}
 
+    #[\Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $logFile = $this->logPath->join('http.log');

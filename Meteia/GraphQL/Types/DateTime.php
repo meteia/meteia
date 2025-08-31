@@ -22,6 +22,7 @@ class DateTime extends ScalarType implements Resolver
         ];
     }
 
+    #[\Override]
     public function data($root, array $args, RequestContext $requestContext): string
     {
         $date = new \DateTime($root, new \DateTimeZone('UTC'));
@@ -29,6 +30,7 @@ class DateTime extends ScalarType implements Resolver
         return $date->format($args['format']);
     }
 
+    #[\Override]
     public function parseLiteral($valueNode, ?array $variables = null)
     {
         if ($valueNode instanceof StringValueNode) {
@@ -38,6 +40,7 @@ class DateTime extends ScalarType implements Resolver
         return null;
     }
 
+    #[\Override]
     public function parseValue($value)
     {
         $date = new \DateTime($value, new \DateTimeZone('UTC'));
@@ -45,6 +48,7 @@ class DateTime extends ScalarType implements Resolver
         return $date->format(\DateTime::ATOM);
     }
 
+    #[\Override]
     public function serialize($value)
     {
         return $value;

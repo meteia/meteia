@@ -14,11 +14,13 @@ class StringLiteral extends ImmutablePrimitiveValueObject implements Comparable
         $this->value = (string) $value;
     }
 
+    #[\Override]
     public function __toString()
     {
         return $this->value;
     }
 
+    #[\Override]
     public function compareTo(Comparable $other)
     {
         return strcasecmp($this->toNative(), $other->toNative());

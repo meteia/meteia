@@ -13,7 +13,13 @@ trait ClassBasedName
         // Always remove the first namespace
         array_shift($names);
 
-        $names = array_diff($names, ['ApiServer', 'GraphQL', 'Types', 'Queries', 'Mutations']);
+        $names = array_diff($names, [
+            'ApiServer',
+            'GraphQL',
+            'Types',
+            'Queries',
+            'Mutations',
+        ]);
 
         return implode('_', $names);
     }

@@ -12,8 +12,9 @@ class Resource
     /**
      * @param resource $resource
      */
-    public function __construct(private readonly mixed $resource)
-    {
+    public function __construct(
+        private readonly mixed $resource,
+    ) {
         \assert(\is_resource($resource));
     }
 

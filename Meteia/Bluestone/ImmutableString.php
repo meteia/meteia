@@ -6,10 +6,11 @@ namespace Meteia\Bluestone;
 
 class ImmutableString implements \Stringable
 {
-    public function __construct(private readonly string $string = '')
-    {
-    }
+    public function __construct(
+        private readonly string $string = '',
+    ) {}
 
+    #[\Override]
     public function __toString()
     {
         return $this->string;

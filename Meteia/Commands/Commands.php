@@ -15,8 +15,7 @@ readonly class Commands implements \IteratorAggregate
     public function __construct(
         private ApplicationPath $applicationPath,
         private ApplicationNamespace $applicationNamespace,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function getIterator(): \Traversable

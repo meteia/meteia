@@ -12,9 +12,9 @@ readonly class PsrClasses implements \IteratorAggregate
         private FilesystemPath $baseDirectory,
         private string|\Stringable $namespacePrefix,
         private array $regex,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function getIterator(): \Generator
     {
         $searchRoot = $this->baseDirectory->join($this->namespacePrefix)->realpath();

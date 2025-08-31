@@ -8,6 +8,7 @@ use Meteia\ValueObjects\Identity\UniqueId;
 
 readonly class LogSourceId extends UniqueId
 {
+    #[\Override]
     public static function prefix(): string
     {
         return 'log';

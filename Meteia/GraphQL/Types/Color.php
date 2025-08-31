@@ -26,6 +26,7 @@ class Color extends ObjectType implements Resolver
         ]);
     }
 
+    #[\Override]
     public function data(mixed $root, array $args, RequestContext $requestContext): object
     {
         $color = \is_string($root) ? $root : '10203040';

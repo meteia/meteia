@@ -17,15 +17,14 @@ class SetCookieMiddleware implements MiddlewareInterface
      */
     private $cookies = [];
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
+    #[\Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $response = $handler->handle($request);
 
-        $response = array_reduce($this->cookies, static fn ($response, Cookie $cookie) => $response, $response);
+        $response = array_reduce($this->cookies, static fn($response, Cookie $cookie) => $response, $response);
 
         return $response;
     }

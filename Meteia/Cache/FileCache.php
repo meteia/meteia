@@ -11,9 +11,10 @@ use Meteia\ValueObjects\Identity\FilesystemPath;
 
 class FileCache
 {
-    public function __construct(private CacheDirectory $path, private CacheHmacSecretKey $secretKey)
-    {
-    }
+    public function __construct(
+        private CacheDirectory $path,
+        private CacheHmacSecretKey $secretKey,
+    ) {}
 
     public function remember(string $key, \DateTimeInterface $expires, callable $default): FilesystemPath
     {

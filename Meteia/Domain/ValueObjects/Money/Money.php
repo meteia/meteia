@@ -64,6 +64,7 @@ class Money extends ImmutableValueObject
         return new PreciseUSD($this->value);
     }
 
+    #[\Override]
     public function jsonSerialize()
     {
         return [

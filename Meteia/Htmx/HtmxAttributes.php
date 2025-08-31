@@ -42,9 +42,9 @@ readonly class HtmxAttributes implements \Stringable
         private ?string $trigger = null,
         private ?string $validate = null,
         private ?string $vals = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function __toString(): string
     {
         $attrs = $this->toArray();
@@ -65,8 +65,8 @@ readonly class HtmxAttributes implements \Stringable
 
     public function toArray(): array
     {
-        $attrs = array_filter(get_object_vars($this), static fn ($val) => !empty($val));
+        $attrs = array_filter(get_object_vars($this), static fn($val) => !empty($val));
 
-        return array_map_assoc(static fn ($k, $v) => ['hx-' . StringCase::kebab($k) => $v], $attrs);
+        return array_map_assoc(static fn($k, $v) => ['hx-' . StringCase::kebab($k) => $v], $attrs);
     }
 }

@@ -14,23 +14,21 @@ use function Meteia\Polyfills\array_map_assoc;
 
 class ServerTimingHeader implements MiddlewareInterface
 {
-    public function __construct(private readonly Timings $timings)
-    {
-    }
+    public function __construct(
+        private readonly Timings $timings,
+    ) {}
 
     public function addHeader(ResponseInterface $response): ResponseInterface
     {
-        $value = implode(
-            ',',
-            array_map_assoc(
-                static fn ($key, $value) => [$key => $key . ';dur=' . round($value, 4)],
-                $this->timings->all(),
-            ),
-        );
+        $value = implode(',', array_map_assoc(
+            static fn($key, $value) => [$key => $key . ';dur=' . round($value, 4)],
+            $this->timings->all(),
+        ));
 
         return $response->withHeader('Server-Timing', $value);
     }
 
+    #[\Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $response = $handler->handle($request);

@@ -20,6 +20,7 @@ abstract class ImmutableArray implements \IteratorAggregate, \Countable, \ArrayA
         $this->values = $values;
     }
 
+    #[\Override]
     public function getIterator()
     {
         foreach ($this->values as $key => $values) {
@@ -45,26 +46,31 @@ abstract class ImmutableArray implements \IteratorAggregate, \Countable, \ArrayA
         return $this->appendArray(iterator_to_array($traversable));
     }
 
+    #[\Override]
     public function count()
     {
         return \count($this->values);
     }
 
+    #[\Override]
     public function offsetExists($offset)
     {
         return isset($this->values[$offset]);
     }
 
+    #[\Override]
     public function offsetGet($offset)
     {
         return $this->values[$offset];
     }
 
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         throw new ObjectMutationProhibited();
     }
 
+    #[\Override]
     public function offsetUnset($offset): void
     {
         throw new ObjectMutationProhibited();

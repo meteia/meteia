@@ -6,9 +6,10 @@ namespace Meteia\DependencyInjection\Fixtures;
 
 class InnerDependency
 {
-    public function __construct(public \DateTime $dateTime, public string $option = '')
-    {
-    }
+    public function __construct(
+        public \DateTime $dateTime,
+        public string $option = '',
+    ) {}
 
     public function reverse(string $text): string
     {

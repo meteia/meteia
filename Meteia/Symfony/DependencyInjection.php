@@ -18,9 +18,10 @@ use Symfony\Component\Serializer\Serializer;
 return [
     Serializer::class => static function (): Serializer {
         $phpDocExtractor = new PhpDocExtractor();
-        $typeExtractor = new PropertyInfoExtractor(
-            typeExtractors: [new ConstructorExtractor([$phpDocExtractor]), $phpDocExtractor],
-        );
+        $typeExtractor = new PropertyInfoExtractor(typeExtractors: [
+            new ConstructorExtractor([$phpDocExtractor]),
+            $phpDocExtractor,
+        ]);
         $normalizers = [
             new HashNormalizer(),
             new UriNormalizer(),

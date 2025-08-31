@@ -10,9 +10,9 @@ use Symfony\Component\Console\Input\InputDefinition;
 
 readonly class StopWorker implements Command
 {
-    public function __construct(private Channel $channel)
-    {
-    }
+    public function __construct(
+        private Channel $channel,
+    ) {}
 
     #[\Override]
     public function execute(): void

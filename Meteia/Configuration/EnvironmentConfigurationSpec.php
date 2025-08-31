@@ -40,30 +40,63 @@ class EnvironmentConfigurationSpec extends ObjectBehavior
 
     public function it_accepts_all_for_string(): void
     {
-        $this->shouldNotThrow(UnexpectedType::class)->during('string', ['INT', '1']);
-        $this->shouldNotThrow(UnexpectedType::class)->during('string', ['BOOL_TRUE', '2']);
-        $this->shouldNotThrow(UnexpectedType::class)->during('string', ['FLOAT', '3']);
+        $this->shouldNotThrow(UnexpectedType::class)->during('string', [
+            'INT',
+            '1',
+        ]);
+        $this->shouldNotThrow(UnexpectedType::class)->during('string', [
+            'BOOL_TRUE',
+            '2',
+        ]);
+        $this->shouldNotThrow(UnexpectedType::class)->during('string', [
+            'FLOAT',
+            '3',
+        ]);
     }
 
     public function it_throws_on_invalid_int(): void
     {
         $this->shouldThrow(UnexpectedType::class)->during('int', ['STRING', 1]);
-        $this->shouldThrow(UnexpectedType::class)->during('int', ['BOOL_TRUE', 2]);
+        $this->shouldThrow(UnexpectedType::class)->during('int', [
+            'BOOL_TRUE',
+            2,
+        ]);
         $this->shouldThrow(UnexpectedType::class)->during('int', ['FLOAT', 3]);
     }
 
     public function it_throws_on_invalid_float(): void
     {
-        $this->shouldThrow(UnexpectedType::class)->during('float', ['STRING', 2.1]);
-        $this->shouldThrow(UnexpectedType::class)->during('float', ['BOOL_TRUE', 2.2]);
-        $this->shouldNotThrow(UnexpectedType::class)->during('float', ['INT', 2.3]);
+        $this->shouldThrow(UnexpectedType::class)->during('float', [
+            'STRING',
+            2.1,
+        ]);
+        $this->shouldThrow(UnexpectedType::class)->during('float', [
+            'BOOL_TRUE',
+            2.2,
+        ]);
+        $this->shouldNotThrow(UnexpectedType::class)->during('float', [
+            'INT',
+            2.3,
+        ]);
     }
 
     public function it_throws_on_invalid_bool(): void
     {
-        $this->shouldThrow(UnexpectedType::class)->during('boolean', ['STRING', true]);
-        $this->shouldThrow(UnexpectedType::class)->during('boolean', ['INT', true]);
-        $this->shouldThrow(UnexpectedType::class)->during('boolean', ['FLOAT', true]);
-        $this->shouldThrow(UnexpectedType::class)->during('boolean', ['BOOL_INVALID', true]);
+        $this->shouldThrow(UnexpectedType::class)->during('boolean', [
+            'STRING',
+            true,
+        ]);
+        $this->shouldThrow(UnexpectedType::class)->during('boolean', [
+            'INT',
+            true,
+        ]);
+        $this->shouldThrow(UnexpectedType::class)->during('boolean', [
+            'FLOAT',
+            true,
+        ]);
+        $this->shouldThrow(UnexpectedType::class)->during('boolean', [
+            'BOOL_INVALID',
+            true,
+        ]);
     }
 }

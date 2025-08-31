@@ -101,7 +101,14 @@ class Connection
 
         $fileExtension = $this->normalizeExtension($fileExtension);
         $fileHash = hash_hmac_file('sha256', $filePath, $this->hmacKey);
-        $fileName = implode('/', [substr($fileHash, 0, 2), substr($fileHash, 2, 2), $fileHash]) . '.' . $fileExtension;
+        $fileName =
+            implode('/', [
+                substr($fileHash, 0, 2),
+                substr($fileHash, 2, 2),
+                $fileHash,
+            ])
+            . '.'
+            . $fileExtension;
     }
 
     private function uploadUrl(string $bucketId): UploadUrl

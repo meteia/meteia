@@ -11,9 +11,9 @@ class Fake
 {
     use EventSourcing;
 
-    public function __construct(private AggregateRootId $id)
-    {
-    }
+    public function __construct(
+        private AggregateRootId $id,
+    ) {}
 
     public function create(): void
     {

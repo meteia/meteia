@@ -10,6 +10,5 @@ class Line
         public readonly string $text,
         public readonly int $number,
         public readonly bool $shouldHighlight,
-    ) {
-    }
+    ) {}
 }

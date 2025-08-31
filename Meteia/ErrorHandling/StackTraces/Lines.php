@@ -6,10 +6,9 @@ namespace Meteia\ErrorHandling\StackTraces;
 
 class Lines implements \IteratorAggregate
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
+    #[\Override]
     public function getIterator()
     {
         yield '';

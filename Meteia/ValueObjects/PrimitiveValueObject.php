@@ -13,6 +13,7 @@ abstract class PrimitiveValueObject implements \JsonSerializable
         return $this->value;
     }
 
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return $this->toNative();

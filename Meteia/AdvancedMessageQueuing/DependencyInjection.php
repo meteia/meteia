@@ -64,10 +64,11 @@ return [
             exit(1);
         }
     },
-    CommandsExchangeName::class => static fn (
+    CommandsExchangeName::class => static fn(
         Configuration $configuration,
         ApplicationNamespace $applicationNamespace,
-    ): CommandsExchangeName => new CommandsExchangeName(
-        $configuration->string('METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME', $applicationNamespace . '.Commands'),
-    ),
+    ): CommandsExchangeName => new CommandsExchangeName($configuration->string(
+        'METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME',
+        $applicationNamespace . '.Commands',
+    )),
 ];

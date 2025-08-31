@@ -11,8 +11,10 @@ class TypedRequestQuery
 {
     private array $values = [];
 
-    public function __construct(private readonly BooleanValues $booleanValues, ServerRequestInterface $sri)
-    {
+    public function __construct(
+        private readonly BooleanValues $booleanValues,
+        ServerRequestInterface $sri,
+    ) {
         parse_str($sri->getUri()->getQuery(), $this->values);
     }
 

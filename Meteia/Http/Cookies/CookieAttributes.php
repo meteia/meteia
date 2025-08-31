@@ -54,7 +54,7 @@ class CookieAttributes
             'SameSite' => $this->sameSite,
         ]);
 
-        $kvParts = array_map(static fn ($key, $value) => $key . '=' . $value, array_keys($kvParts), $kvParts);
+        $kvParts = array_map(static fn($key, $value) => $key . '=' . $value, array_keys($kvParts), $kvParts);
 
         $flagParts = array_filter([$this->secure, $this->httpOnly]);
 

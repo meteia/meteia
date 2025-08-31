@@ -14,6 +14,7 @@ class Uri extends \Laminas\Diactoros\Uri implements UriInterface, \JsonSerializa
         parent::__construct($value);
     }
 
+    #[\Override]
     public function jsonSerialize(): string
     {
         return (string) $this;

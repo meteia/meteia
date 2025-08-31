@@ -61,46 +61,61 @@ readonly class BunnyCommandBus implements CommandBus
     public function registerCommandHandler(string $commandClassName, CommandMessageHandler $handler): void
     {
         $queueName = $this->queueNameForCommand($commandClassName);
-        $this->log->info('Registering Command Handler', ['queue' => $queueName]);
+        $this->log->info('Registering Command Handler', [
+            'queue' => $queueName,
+        ]);
 
-        $ok = $this->channel->queueDeclare(queue: $queueName, durable: true);
-        $this->log->info('Command Queue Declared', ['queue' => $queueName, 'status' => $ok ? 'ok' : 'failed']);
+        $ok = $this->channel->queueDeclare(
+            queue: $queueName,
+            durable: true,
+        );
+        $this->log->info('Command Queue Declared', [
+            'queue' => $queueName,
+            'status' => $ok ? 'ok' : 'failed',
+        ]);
 
-        $ok = $this->channel->queueBind(queue: $queueName, exchange: $this->exchangeName, routingKey: $queueName);
+        $ok = $this->channel->queueBind(
+            queue: $queueName,
+            exchange: $this->exchangeName,
+            routingKey: $queueName,
+        );
         $this->log->info('Command Queue Bound', [
             'queue' => $queueName,
             'exchange' => $this->exchangeName,
             'status' => $ok ? 'ok' : 'failed',
         ]);
 
-        $this->channel->consume(function (Message $message, Channel $channel, Client $bunny) use (
-            $commandClassName,
-            $queueName,
-            $handler,
-        ): void {
-            $commandId = CommandId::fromToken($message->headers['message-id']);
-            $correlationId = CorrelationId::fromToken($message->headers['correlation-id']);
-            $causationId = CausationId::fromToken($message->headers['causation-id']);
-            $processId = ProcessId::fromToken($message->headers['process-id']);
-            $this->log->info('Received Command', [
-                'queueName' => $queueName,
-                'commandId' => $commandId,
-                'correlationId' => $correlationId,
-                'causationId' => $causationId,
-                'processId' => $processId,
-            ]);
-
-            try {
-                $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
-                $handler->handle($command, $commandId, $correlationId, $causationId, $processId);
-                $channel->ack($message);
-            } catch (\Throwable $t) {
-                $channel->nack($message, false, false);
-                $this->log->error($t->getMessage(), [
+        $this->channel->consume(
+            function (Message $message, Channel $channel, Client $bunny) use (
+                $commandClassName,
+                $queueName,
+                $handler,
+            ): void {
+                $commandId = CommandId::fromToken($message->headers['message-id']);
+                $correlationId = CorrelationId::fromToken($message->headers['correlation-id']);
+                $causationId = CausationId::fromToken($message->headers['causation-id']);
+                $processId = ProcessId::fromToken($message->headers['process-id']);
+                $this->log->info('Received Command', [
                     'queueName' => $queueName,
+                    'commandId' => $commandId,
+                    'correlationId' => $correlationId,
+                    'causationId' => $causationId,
+                    'processId' => $processId,
                 ]);
-            }
-        }, $queueName);
+
+                try {
+                    $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
+                    $handler->handle($command, $commandId, $correlationId, $causationId, $processId);
+                    $channel->ack($message);
+                } catch (\Throwable $t) {
+                    $channel->nack($message, false, false);
+                    $this->log->error($t->getMessage(), [
+                        'queueName' => $queueName,
+                    ]);
+                }
+            },
+            $queueName,
+        );
     }
 
     #[\Override]

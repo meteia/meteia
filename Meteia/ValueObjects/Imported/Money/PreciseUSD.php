@@ -25,6 +25,7 @@ class PreciseUSD implements PreciseMoney
         return (string) $this->amount;
     }
 
+    #[\Override]
     public function round(int $precision = 2): RoundedMoney
     {
         return new RoundedUSD(BC::round($this->amount, $precision));

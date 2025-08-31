@@ -15,10 +15,10 @@ class Database extends ExtendedPdo implements MigrationDatabase
         if (\count($whereBindings) === 0) {
             throw new \Exception('Missing where bindings for delete');
         }
-        $whereColumn = implode(
-            ' AND ',
-            array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)),
-        );
+        $whereColumn = implode(' AND ', array_map(
+            static fn($column) => "`{$column}`=:{$column}",
+            array_keys($whereBindings),
+        ));
         $query = \sprintf('DELETE FROM %s WHERE %s', $this->quoteTableName($table), $whereColumn);
         $bindings = $this->prepareBindings($whereBindings);
         $this->perform($query, $bindings);
@@ -30,8 +30,8 @@ class Database extends ExtendedPdo implements MigrationDatabase
             throw new \Exception('Missing where bindings for insert');
         }
 
-        $columns = implode(', ', array_map(static fn ($column) => "`{$column}`", array_keys($bindings)));
-        $columnBindings = implode(', ', array_map(static fn ($column) => ":{$column}", array_keys($bindings)));
+        $columns = implode(', ', array_map(static fn($column) => "`{$column}`", array_keys($bindings)));
+        $columnBindings = implode(', ', array_map(static fn($column) => ":{$column}", array_keys($bindings)));
 
         $query = \sprintf('INSERT INTO %s (%s) VALUES (%s)', $this->quoteTableName($table), $columns, $columnBindings);
         $bindings = $this->prepareBindings($bindings);
@@ -49,10 +49,10 @@ class Database extends ExtendedPdo implements MigrationDatabase
             throw new \Exception('Missing where bindings for select');
         }
 
-        $whereColumn = implode(
-            ' AND ',
-            array_map(static fn ($column) => "`{$column}` = :{$column}", array_keys($whereBindings)),
-        );
+        $whereColumn = implode(' AND ', array_map(
+            static fn($column) => "`{$column}` = :{$column}",
+            array_keys($whereBindings),
+        ));
         $query = \sprintf('SELECT * FROM %s WHERE %s', $this->quoteTableName($table), $whereColumn);
         $bindings = $this->prepareBindings($whereBindings);
 
@@ -65,16 +65,19 @@ class Database extends ExtendedPdo implements MigrationDatabase
             throw new \Exception('Missing set and/or where bindings for update');
         }
 
-        $setColumns = implode(
-            ', ',
-            array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($setBindings)),
-        );
-        $whereColumn = implode(
-            ' AND ',
-            array_map(static fn ($column) => "`{$column}`=:{$column}", array_keys($whereBindings)),
-        );
+        $setColumns = implode(', ', array_map(
+            static fn($column) => "`{$column}`=:{$column}",
+            array_keys($setBindings),
+        ));
+        $whereColumn = implode(' AND ', array_map(
+            static fn($column) => "`{$column}`=:{$column}",
+            array_keys($whereBindings),
+        ));
         $query = \sprintf('UPDATE %s SET %s WHERE %s', $this->quoteTableName($table), $setColumns, $whereColumn);
-        $bindings = $this->prepareBindings([...$setBindings, ...$whereBindings]);
+        $bindings = $this->prepareBindings([
+            ...$setBindings,
+            ...$whereBindings,
+        ]);
         $this->fetchAffected($query, $bindings);
     }
 
@@ -85,7 +88,7 @@ class Database extends ExtendedPdo implements MigrationDatabase
         } catch (\PDOException $exception) {
             $setBindings = array_filter(
                 $setBindings,
-                static fn ($key) => !\array_key_exists($key, $whereBindings),
+                static fn($key) => !\array_key_exists($key, $whereBindings),
                 ARRAY_FILTER_USE_KEY,
             );
             if (\count($setBindings) === 0) {
@@ -134,7 +137,7 @@ class Database extends ExtendedPdo implements MigrationDatabase
     private function quoteTableName(string $table): string
     {
         $parts = explode('.', $table, 2);
-        array_map(static fn ($part) => "`{$part}`", $parts);
+        array_map(static fn($part) => "`{$part}`", $parts);
 
         return implode('.', $parts);
     }

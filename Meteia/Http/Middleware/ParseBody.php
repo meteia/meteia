@@ -11,6 +11,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ParseBody implements MiddlewareInterface
 {
+    #[\Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $ct = implode('', $request->getHeader('Content-Type'));

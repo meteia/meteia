@@ -23,9 +23,9 @@ class Commands implements \IteratorAggregate
         private readonly Container $container,
         private readonly ApplicationNamespace $applicationNamespace,
         private readonly ApplicationPath $applicationPath,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public function getIterator(): \Generator
     {
         $classes = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, [
@@ -53,7 +53,10 @@ class Commands implements \IteratorAggregate
                     $errorEndpoint = $this->container->get(ConsoleErrorEndpoint::class);
 
                     /** @var ResponseInterface $response */
-                    $response = $this->container->call([$errorEndpoint, 'response'], [$throwable]);
+                    $response = $this->container->call([
+                        $errorEndpoint,
+                        'response',
+                    ], [$throwable]);
                     send($response);
                 }
             });
@@ -67,7 +70,7 @@ class Commands implements \IteratorAggregate
         $commandNameParts = explode('\\', trim($className, '\\'));
         $commandNameParts = array_filter(
             $commandNameParts,
-            fn ($part) => !\in_array($part, ['CommandLine', 'Meteia', (string) $this->applicationNamespace], true),
+            fn($part) => !\in_array($part, ['CommandLine', 'Meteia', (string) $this->applicationNamespace], true),
         );
 
         return implode(':', $commandNameParts);

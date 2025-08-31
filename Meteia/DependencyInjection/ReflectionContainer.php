@@ -8,11 +8,13 @@ class ReflectionContainer implements Container
 {
     private array $cache = [];
 
-    public function __construct(private array $definitions = [])
-    {
+    public function __construct(
+        private array $definitions = [],
+    ) {
         $this->definitions[Container::class] = $this;
     }
 
+    #[\Override]
     public function call($callable, array $parameters = []): mixed
     {
         if (\is_array($callable) && \is_object($callable[0])) {
@@ -22,6 +24,7 @@ class ReflectionContainer implements Container
         return $callable(...$this->resolveFunctionParameters($callable, $parameters));
     }
 
+    #[\Override]
     public function get(string $id): mixed
     {
         if (isset($this->cache[$id])) {
@@ -44,11 +47,13 @@ class ReflectionContainer implements Container
         throw new \Exception("{$id} was not resolvable, and {$target} was not a class?");
     }
 
+    #[\Override]
     public function has(string $id): bool
     {
         return $this->get($id) !== null;
     }
 
+    #[\Override]
     public function set(string $id, mixed $value): void
     {
         if (\is_callable($value)) {
@@ -111,12 +116,12 @@ class ReflectionContainer implements Container
     {
         $rm = new \ReflectionFunction($callable);
 
-        return array_map(fn ($param) => $this->resolveParameter($param, $parameters), $rm->getParameters());
+        return array_map(fn($param) => $this->resolveParameter($param, $parameters), $rm->getParameters());
     }
 
     private function resolveMethodParameters(\ReflectionMethod $method, array $parameters = []): array
     {
-        return array_map(fn ($param) => $this->resolveParameter($param, $parameters), $method->getParameters());
+        return array_map(fn($param) => $this->resolveParameter($param, $parameters), $method->getParameters());
     }
 
     private function resolveParameter(\ReflectionParameter $rp, array $parameters = []): mixed

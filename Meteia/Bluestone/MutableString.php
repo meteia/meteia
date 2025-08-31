@@ -6,9 +6,9 @@ namespace Meteia\Bluestone;
 
 class MutableString
 {
-    public function __construct(private string $string = '')
-    {
-    }
+    public function __construct(
+        private string $string = '',
+    ) {}
 
     public function __toString()
     {

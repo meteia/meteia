@@ -22,10 +22,10 @@ return [
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
     },
-    MigrationDatabase::class => static fn (Database $database): MigrationDatabase => $database,
-    MigrationsTableName::class => static fn (
-        Configuration $configuration,
-    ): MigrationsTableName => new MigrationsTableName(
-        $configuration->string('METEIA_DATABASE_MIGRATIONS_TABLE', 'migrations'),
-    ),
+    MigrationDatabase::class => static fn(Database $database): MigrationDatabase => $database,
+    MigrationsTableName::class =>
+        static fn(Configuration $configuration): MigrationsTableName => new MigrationsTableName($configuration->string(
+            'METEIA_DATABASE_MIGRATIONS_TABLE',
+            'migrations',
+        )),
 ];

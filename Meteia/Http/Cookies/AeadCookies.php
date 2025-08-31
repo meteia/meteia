@@ -12,17 +12,26 @@ class AeadCookies
 {
     private const VERSION_1 = 'C1';
 
-    public function __construct(private readonly XChaCha20Poly1305 $XChaCha20Poly1305, private readonly Base62 $base62)
-    {
-    }
+    public function __construct(
+        private readonly XChaCha20Poly1305 $XChaCha20Poly1305,
+        private readonly Base62 $base62,
+    ) {}
 
     public function encode(string $name, string $value, SecretKey $secret): Cookie
     {
         $nonce = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
-        $ad = implode('_', [self::VERSION_1, $name, $this->base62->encode($nonce)]);
+        $ad = implode('_', [
+            self::VERSION_1,
+            $name,
+            $this->base62->encode($nonce),
+        ]);
         $ciphertext = $this->XChaCha20Poly1305->encrypt($value, $ad, $secret);
 
-        $cookieValue = implode('_', [self::VERSION_1, $this->base62->encode($nonce), $ciphertext->ciphertext]);
+        $cookieValue = implode('_', [
+            self::VERSION_1,
+            $this->base62->encode($nonce),
+            $ciphertext->ciphertext,
+        ]);
 
         return new Cookie($name, $cookieValue);
     }

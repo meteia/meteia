@@ -21,6 +21,7 @@ class ErrorEndpoint implements Endpoint
         $this->throwable = $throwable;
     }
 
+    #[\Override]
     public function response(ServerRequestInterface $request): ResponseInterface
     {
         $message = $this->throwable->getMessage();

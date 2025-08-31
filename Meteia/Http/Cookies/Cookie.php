@@ -37,7 +37,10 @@ class Cookie
 
     public function includeIn(ResponseInterface $response): ResponseInterface
     {
-        $parts = array_filter([sprintf('%s=%s', $this->name, $this->value), (string) $this->cookieAttributes]);
+        $parts = array_filter([
+            sprintf('%s=%s', $this->name, $this->value),
+            (string) $this->cookieAttributes,
+        ]);
 
         return $response->withAddedHeader('Set-Cookie', implode('; ', $parts));
     }

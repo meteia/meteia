@@ -9,6 +9,7 @@ use Meteia\Events\EventId;
 
 readonly class ProcessId extends UniqueId
 {
+    #[\Override]
     public static function prefix(): string
     {
         return 'pid';

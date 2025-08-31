@@ -6,10 +6,11 @@ namespace Meteia\Html;
 
 class ClassAttribute implements \Stringable
 {
-    public function __construct(private readonly string|\Stringable $className)
-    {
-    }
+    public function __construct(
+        private readonly string|\Stringable $className,
+    ) {}
 
+    #[\Override]
     public function __toString(): string
     {
         return sprintf('class="%s"', $this->className);

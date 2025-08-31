@@ -44,6 +44,7 @@ class UUID extends ImmutablePrimitiveValueObject
         $this->value = $value;
     }
 
+    #[\Override]
     public function __toString()
     {
         return $this->value;

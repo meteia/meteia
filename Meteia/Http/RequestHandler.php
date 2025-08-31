@@ -14,9 +14,9 @@ class RequestHandler implements RequestHandlerInterface, MiddlewareInterface
 {
     private $middleware = [];
 
-    public function __construct(private Container $container)
-    {
-    }
+    public function __construct(
+        private Container $container,
+    ) {}
 
     public function append(MiddlewareInterface|string ...$middleware): self
     {
@@ -25,6 +25,7 @@ class RequestHandler implements RequestHandlerInterface, MiddlewareInterface
         return $this;
     }
 
+    #[\Override]
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->process($request, $this);
@@ -37,6 +38,7 @@ class RequestHandler implements RequestHandlerInterface, MiddlewareInterface
         return $this;
     }
 
+    #[\Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         /** @var MiddlewareInterface $middleware */

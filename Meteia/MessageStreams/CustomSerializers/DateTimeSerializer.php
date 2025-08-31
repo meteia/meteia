@@ -6,9 +6,9 @@ namespace Meteia\MessageStreams\CustomSerializers;
 
 class DateTimeSerializer
 {
-    public function __construct(private bool $immutable = false)
-    {
-    }
+    public function __construct(
+        private bool $immutable = false,
+    ) {}
 
     public function serialize(\DateTimeInterface $value): array
     {

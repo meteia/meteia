@@ -10,10 +10,11 @@ class Title implements \Stringable
 
     protected string $suffix;
 
-    public function __construct(private string $title)
-    {
-    }
+    public function __construct(
+        private string $title,
+    ) {}
 
+    #[\Override]
     public function __toString(): string
     {
         return '<title>' . html($this->title) . '</title>';

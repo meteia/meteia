@@ -13,11 +13,14 @@ use Meteia\Http\NamedEndpoints;
 
 class Endpoints extends ListOfType implements QueryField, Resolver
 {
-    public function __construct(private readonly Link $link, private readonly NamedEndpoints $namedEndpoints)
-    {
+    public function __construct(
+        private readonly Link $link,
+        private readonly NamedEndpoints $namedEndpoints,
+    ) {
         parent::__construct(self::nonNull($link));
     }
 
+    #[\Override]
     public function data(mixed $root, array $args, RequestContext $requestContext): array
     {
         $set = $requestContext->requestingUser()->isAnonymous() ? $args['anon'] : $args['user'];

@@ -12,10 +12,11 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ConsoleErrorEndpoint implements ErrorEndpoint
 {
-    public function __construct(private readonly Frames $frames)
-    {
-    }
+    public function __construct(
+        private readonly Frames $frames,
+    ) {}
 
+    #[\Override]
     public function response(\Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         $output = sprintf('fatal error: %s %s', $throwable::class, $throwable->getMessage()) . PHP_EOL . PHP_EOL;

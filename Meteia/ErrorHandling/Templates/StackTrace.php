@@ -15,9 +15,9 @@ class StackTrace
 
     private \Throwable $throwable;
 
-    public function __construct(private readonly RepositoryPath $repositoryPath)
-    {
-    }
+    public function __construct(
+        private readonly RepositoryPath $repositoryPath,
+    ) {}
 
     public function for(\Throwable $throwable): self
     {
@@ -38,7 +38,7 @@ class StackTrace
 
         $frames = array_filter(
             $frames,
-            static fn ($frame) => !isset($frame['file']) || stripos($frame['file'], 'vendor') === false,
+            static fn($frame) => !isset($frame['file']) || stripos($frame['file'], 'vendor') === false,
         );
 
         return array_map(function ($trace) {

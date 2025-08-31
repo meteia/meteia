@@ -22,6 +22,5 @@ readonly class Img
         public ?string $fetchpriority = null,
         public ?string $loading = null,
         public ?string $decoding = 'async',
-    ) {
-    }
+    ) {}
 }

@@ -19,16 +19,16 @@ function db(): ExtendedPdoInterface
 function init(ExtendedPdoInterface $pdo): PdoEventStream
 {
     $query = <<<'SQL'
-        CREATE TABLE message_streams (
-            message_stream_id       BINARY(20)                         NOT NULL,
-            message_stream_sequence BIGINT UNSIGNED                    NOT NULL,
-            message_type_id         BINARY(20)                         NOT NULL,
-            message                 MEDIUMTEXT                         NOT NULL,
-            created                 DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
-            CONSTRAINT message_stream_id UNIQUE (message_stream_id, message_stream_sequence)
-        );
-        CREATE INDEX message_type_id ON message_streams(message_type_id);
-        SQL;
+    CREATE TABLE message_streams (
+        message_stream_id       BINARY(20)                         NOT NULL,
+        message_stream_sequence BIGINT UNSIGNED                    NOT NULL,
+        message_type_id         BINARY(20)                         NOT NULL,
+        message                 MEDIUMTEXT                         NOT NULL,
+        created                 DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
+        CONSTRAINT message_stream_id UNIQUE (message_stream_id, message_stream_sequence)
+    );
+    CREATE INDEX message_type_id ON message_streams(message_type_id);
+    SQL;
     $pdo->exec($query);
 
     return new PdoEventStream($pdo, new MessageSerializer());
@@ -90,9 +90,10 @@ class TestEntity
  */
 class TestMessage implements Message
 {
-    public function __construct(private AggregateRootId $someId, private int $sequence)
-    {
-    }
+    public function __construct(
+        private AggregateRootId $someId,
+        private int $sequence,
+    ) {}
 
     public function appendTo(MessageStream $messageStream): void
     {

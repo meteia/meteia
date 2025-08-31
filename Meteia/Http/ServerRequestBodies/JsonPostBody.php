@@ -20,11 +20,13 @@ class JsonPostBody implements ServerRequestBody
         return $this->data[$name] ?? $default;
     }
 
+    #[\Override]
     public function int($key, int $default): int
     {
         return (int) ($this->data[$key] ?? $default);
     }
 
+    #[\Override]
     public function string($key, string $default): string
     {
         return trim($this->data[$key] ?? $default);

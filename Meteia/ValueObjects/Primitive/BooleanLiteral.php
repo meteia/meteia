@@ -23,6 +23,7 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
         return 'FALSE';
     }
 
+    #[\Override]
     public function compareTo(Comparable $other)
     {
         if ($this->toNative() === $other->toNative()) {
@@ -36,6 +37,7 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
         return 1;
     }
 
+    #[\Override]
     public function jsonSerialize()
     {
         return $this->isTrue();

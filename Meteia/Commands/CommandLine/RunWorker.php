@@ -61,7 +61,9 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
     public function execute(): void
     {
         foreach ($this->commands as $command) {
-            $this->log->info('Registering command handler', ['command' => $command]);
+            $this->log->info('Registering command handler', [
+                'command' => $command,
+            ]);
             $this->commandBus->registerCommandHandler($command, $this);
         }
         $this->log->info('Running command worker');

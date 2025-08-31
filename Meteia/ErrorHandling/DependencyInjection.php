@@ -29,9 +29,10 @@ return [
             default => $container->get(PublicErrorEndpoint::class),
         };
     },
-    EditorUri::class => static fn (Configuration $configuration): EditorUri => new EditorUri(
-        $configuration->string('EDITOR_URI', 'phpstorm://open'),
-    ),
+    EditorUri::class => static fn(Configuration $configuration): EditorUri => new EditorUri($configuration->string(
+        'EDITOR_URI',
+        'phpstorm://open',
+    )),
     FrameFilters::class => static function (): FrameFilters {
         // FIXME: This feels ugly, not sure how I want to handle this
         return new FrameFilters([new FrameFilterMeteia()]);

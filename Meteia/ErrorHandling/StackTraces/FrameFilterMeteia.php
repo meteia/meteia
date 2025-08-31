@@ -6,6 +6,7 @@ namespace Meteia\ErrorHandling\StackTraces;
 
 class FrameFilterMeteia implements FrameFilter
 {
+    #[\Override]
     public function filter(array $frame): bool
     {
         if (!isset($frame['file'])) {

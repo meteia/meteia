@@ -23,8 +23,7 @@ readonly class Instance
         private ApplicationNamespace $namespace,
         private ApplicationPath $path,
         private ApplicationPublicDir $publicDir,
-    ) {
-    }
+    ) {}
 
     public function run(array $middleware = []): void
     {
@@ -50,10 +49,11 @@ readonly class Instance
         ];
 
         /** @var Container $container */
-        $container = $timings->measure(
-            'di.init',
-            fn () => ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions),
-        );
+        $container = $timings->measure('di.init', fn() => ContainerBuilder::build(
+            $this->path,
+            $this->namespace,
+            $applicationDefinitions,
+        ));
 
         return new TimedContainer($timings, $container);
     }
@@ -70,7 +70,10 @@ readonly class Instance
                     \Throwable::class => $throwable,
                 ]);
                 $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
-                $response = $freshContainer->call([$errorEndpoint, 'response'], [$throwable]);
+                $response = $freshContainer->call([
+                    $errorEndpoint,
+                    'response',
+                ], [$throwable]);
                 send($response);
             });
         }

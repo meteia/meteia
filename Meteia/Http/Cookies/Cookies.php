@@ -8,9 +8,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class Cookies
 {
-    public function __construct(private readonly ServerRequestInterface $serverRequest)
-    {
-    }
+    public function __construct(
+        private readonly ServerRequestInterface $serverRequest,
+    ) {}
 
     public function string(string $name, string $default): string
     {

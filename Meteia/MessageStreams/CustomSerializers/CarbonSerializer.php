@@ -10,9 +10,9 @@ use Carbon\CarbonInterface;
 
 class CarbonSerializer
 {
-    public function __construct(private bool $immutable = false)
-    {
-    }
+    public function __construct(
+        private bool $immutable = false,
+    ) {}
 
     public function serialize(CarbonInterface $value): array
     {

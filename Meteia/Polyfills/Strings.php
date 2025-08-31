@@ -41,7 +41,7 @@ function remove_common_prefix(array $strings): array
 {
     $prefixLength = common_prefix_length($strings);
 
-    return array_map(static fn (string $string) => substr($string, $prefixLength), $strings);
+    return array_map(static fn(string $string) => substr($string, $prefixLength), $strings);
 }
 
 function without_prefix(string $string, string $prefix): string

@@ -20,8 +20,7 @@ class PdoMessageStream implements MessageStream
         private ExtendedPdoInterface $db,
         private MessageSerializer $messageSerializer,
         private Timings $timings,
-    ) {
-    }
+    ) {}
 
     public function append(
         UniqueId $messageStreamId,

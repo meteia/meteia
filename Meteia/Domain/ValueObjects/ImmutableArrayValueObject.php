@@ -14,14 +14,16 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
 {
     public const TYPE = 'ArrayTypeNotDefined';
 
-    public function __construct(protected array $values = [])
-    {
+    public function __construct(
+        protected array $values = [],
+    ) {
         if (!\is_array($values)) {
             throw new InvalidValueObjectException($values, ['array']);
         }
         $this->guardType($values);
     }
 
+    #[\Override]
     public function __toString()
     {
         return implode(', ', $this->values);
@@ -37,6 +39,7 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         return $this->values;
     }
 
+    #[\Override]
     public function getIterator()
     {
         foreach ($this->values as $key => $values) {
@@ -62,31 +65,37 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         return $this->values;
     }
 
+    #[\Override]
     public function count()
     {
         return \count($this->values);
     }
 
+    #[\Override]
     public function offsetExists($offset)
     {
         return isset($this->values[$offset]);
     }
 
+    #[\Override]
     public function offsetGet($offset)
     {
         return $this->values[$offset];
     }
 
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         throw new ImmutableValueObjectException();
     }
 
+    #[\Override]
     public function offsetUnset($offset): void
     {
         throw new ImmutableValueObjectException();
     }
 
+    #[\Override]
     public function jsonSerialize()
     {
         return $this->toNative();

@@ -18,6 +18,10 @@ abstract class ContainerBuilder
         $defaults = Definitions::glob(new FilesystemPath(__DIR__, '..', '*', 'DependencyInjection.php'));
         $application = Definitions::glob($applicationPath->join($applicationNamespace, '*', 'DependencyInjection.php'));
 
-        return new ReflectionContainer([...$defaults, ...$application, ...$additionalDefinitions]);
+        return new ReflectionContainer([
+            ...$defaults,
+            ...$application,
+            ...$additionalDefinitions,
+        ]);
     }
 }

@@ -12,6 +12,5 @@ class Frame
         public readonly FilesystemPath $path,
         public readonly int $lineNumber,
         public readonly FileFragment $fileFragment,
-    ) {
-    }
+    ) {}
 }

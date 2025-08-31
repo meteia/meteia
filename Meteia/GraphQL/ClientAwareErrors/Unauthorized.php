@@ -18,6 +18,7 @@ class Unauthorized extends \Exception implements ClientAware
         return 'authorization';
     }
 
+    #[\Override]
     public function isClientSafe(): bool
     {
         return true;

@@ -18,16 +18,17 @@ readonly class EnvironmentConfiguration implements Configuration
     {
         $this->env = match (isset($_ENV['APP_ENV_FILES'])) {
             true => array_merge($_ENV, ...array_map(
-                static fn (string $file) => Dotenv::parse(file_get_contents($file)),
+                static fn(string $file) => Dotenv::parse(file_get_contents($file)),
                 array_filter(
                     explode(',', $_ENV['APP_ENV_FILES']),
-                    static fn (string $file) => file_exists($file) && is_readable($file),
+                    static fn(string $file) => file_exists($file) && is_readable($file),
                 ),
             )),
             default => $_ENV,
         };
     }
 
+    #[\Override]
     public function boolean(string $name, bool $default): bool
     {
         $value = $this->env[$name] ?? null;
@@ -45,6 +46,7 @@ readonly class EnvironmentConfiguration implements Configuration
         throw new UnexpectedType('Expected boolean, got ' . $value);
     }
 
+    #[\Override]
     public function float(string $name, float $default): float
     {
         $value = $this->env[$name] ?? null;
@@ -58,6 +60,7 @@ readonly class EnvironmentConfiguration implements Configuration
         return (float) $value;
     }
 
+    #[\Override]
     public function int(string $name, int $default): int
     {
         $value = $this->env[$name] ?? null;
@@ -72,6 +75,7 @@ readonly class EnvironmentConfiguration implements Configuration
         return (int) $value;
     }
 
+    #[\Override]
     public function string(string $name, string|\Stringable $default): string
     {
         $value = $this->env[$name] ?? null;

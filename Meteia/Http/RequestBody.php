@@ -14,8 +14,7 @@ class RequestBody
     public function __construct(
         private readonly ServerRequestInterface $request,
         private readonly Serializer $serializer,
-    ) {
-    }
+    ) {}
 
     public function content(): string
     {

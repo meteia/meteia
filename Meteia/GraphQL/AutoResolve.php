@@ -17,9 +17,9 @@ use Meteia\GraphQL\Contracts\ResolvesAttr;
 
 class AutoResolve
 {
-    public function __construct(private readonly Container $container)
-    {
-    }
+    public function __construct(
+        private readonly Container $container,
+    ) {}
 
     public function resolve($source, array $args, RequestContext $requestContext, ResolveInfo $resolveInfo)
     {
@@ -53,7 +53,7 @@ class AutoResolve
                 && $expectsList
             ) {
                 return array_map(
-                    static fn ($source) => $resolver->data($source, $args, $requestContext),
+                    static fn($source) => $resolver->data($source, $args, $requestContext),
                     $source->{$resolveInfo->fieldName},
                 );
             }

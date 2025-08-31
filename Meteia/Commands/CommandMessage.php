@@ -13,6 +13,5 @@ readonly class CommandMessage
         public Command $command,
         public CausationId $causationId,
         public CorrelationId $correlationId,
-    ) {
-    }
+    ) {}
 }

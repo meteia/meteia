@@ -27,11 +27,13 @@ class RFC5424Formatted extends AbstractLogger
 
     private $procId;
 
-    public function __construct(private LoggerInterface $log)
-    {
+    public function __construct(
+        private LoggerInterface $log,
+    ) {
         $this->procId = CorrelationId::random();
     }
 
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         $formatted = $this->formated($level, $message, $context);
@@ -40,27 +42,21 @@ class RFC5424Formatted extends AbstractLogger
 
     private function prefixed(string $level, string $message): string
     {
-        $priority = 23 * 8 + self::SEVERITY[strtoupper($level)];
+        $priority = (23 * 8) + self::SEVERITY[strtoupper($level)];
 
         return implode(' ', [
             // <PRI>VERSION
             "<{$priority}>1",
-
             // TIMESTAMP
             date(\DateTime::ATOM),
-
             // HOSTNAME
             gethostname() ?? '-',
-
             // APP-NAME
             'appName',
-
             // PROCID
             substr((string) $this->procId, 0, 32),
-
             // MSGID
             'subsystem',
-
             // MESSAGE
             $message,
         ]);

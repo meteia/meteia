@@ -29,7 +29,7 @@ if (!function_exists('dump_value')) {
             return dump_value(get_object_vars($value), $seen);
         }
         if (is_array($value)) {
-            return array_map(static fn ($innerValue) => dump_value($innerValue, $seen), $value);
+            return array_map(static fn($innerValue) => dump_value($innerValue, $seen), $value);
         }
         if (is_string($value) && $value !== '' && !ctype_print($value)) {
             return '0x' . bin2hex($value);
@@ -46,13 +46,13 @@ if (!function_exists('jdd')) {
         $stackTrace = array_slice(
             array_filter(
                 $stackTrace,
-                static fn ($frame) => isset($frame['file'], $frame['line']) && !str_contains($frame['file'], '/vendor/'),
+                static fn($frame) => isset($frame['file'], $frame['line']) && !str_contains($frame['file'], '/vendor/'),
             ),
             0,
         );
         $commonPrefix = common_prefix_length(array_column($stackTrace, 'file'));
         $stackTrace = array_map(
-            static fn ($frame) => substr($frame['file'], $commonPrefix) . ':' . $frame['line'],
+            static fn($frame) => substr($frame['file'], $commonPrefix) . ':' . $frame['line'],
             $stackTrace,
         );
 
@@ -68,7 +68,7 @@ if (!function_exists('jdd')) {
 
         send($response);
 
-        exit;
+        exit();
     }
 }
 
@@ -80,15 +80,17 @@ if (!function_exists('hdd')) {
         $stackTrace = array_slice(
             array_filter(
                 $stackTrace,
-                static fn ($frame) => isset($frame['file'], $frame['line'])
-                    && preg_match('#/(vendor|DependencyInjection)/#', $frame['file']) === 0,
+                static fn($frame) => (
+                    isset($frame['file'], $frame['line'])
+                    && preg_match('#/(vendor|DependencyInjection)/#', $frame['file']) === 0
+                ),
             ),
             0,
         );
         $fileNames = array_column($stackTrace, 'file');
         $prefixLength = common_prefix_length($fileNames);
         $stackTrace = array_map(
-            static fn ($frame) => substr($frame['file'], $prefixLength) . ':' . $frame['line'],
+            static fn($frame) => substr($frame['file'], $prefixLength) . ':' . $frame['line'],
             $stackTrace,
         );
         $stackTrace = array_reverse($stackTrace);

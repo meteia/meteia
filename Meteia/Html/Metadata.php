@@ -8,6 +8,7 @@ class Metadata implements \Stringable
 {
     private array $tags = [];
 
+    #[\Override]
     public function __toString()
     {
         return implode('', $this->tags);

@@ -65,7 +65,9 @@ class ImmutableArraySpec extends ObjectBehavior
 
     public function it_throws_when_pushing_an_invalid_type(): void
     {
-        $this->shouldThrow(ImproperType::class)->during('push', [new \Exception()]);
+        $this->shouldThrow(ImproperType::class)->during('push', [
+            new \Exception(),
+        ]);
     }
 
     public function it_allows_read_only_array_access(): void
@@ -78,20 +80,23 @@ class ImmutableArraySpec extends ObjectBehavior
 
     public function it_prohibits_mutations(): void
     {
-        $this->shouldThrow(ObjectMutationProhibited::class)->during('offsetSet', [0, new \stdClass()]);
-        $this->shouldThrow(ObjectMutationProhibited::class)->during('offsetUnset', [0]);
+        $this->shouldThrow(ObjectMutationProhibited::class)->during('offsetSet', [
+            0,
+            new \stdClass(),
+        ]);
+        $this->shouldThrow(ObjectMutationProhibited::class)->during('offsetUnset', [
+            0,
+        ]);
     }
 
     public function it_can_be_merged_with_another_array(): void
     {
         $this->appendArray([new \stdClass()])->shouldHaveCount(1);
-        $this->appendArray([new \stdClass()])
-            ->appendArray([new \stdClass()])
-            ->shouldHaveCount(2)
-        ;
+        $this->appendArray([new \stdClass()])->appendArray([
+            new \stdClass(),
+        ])->shouldHaveCount(2);
         $this->appendArray([new \stdClass()])
             ->appendTraversable(new ImmutableArrayStub([new \stdClass()]))
-            ->shouldHaveCount(2)
-        ;
+            ->shouldHaveCount(2);
     }
 }

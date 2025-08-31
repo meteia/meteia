@@ -21,7 +21,7 @@ final class ReflectionContainerTest extends TestCase
     public function testCall(): void
     {
         $container = new ReflectionContainer(Definitions::get());
-        self::assertSame($container->call(static fn () => 1), 1);
+        self::assertSame($container->call(static fn() => 1), 1);
     }
 
     public function testSet(): void
@@ -39,7 +39,7 @@ final class ReflectionContainerTest extends TestCase
         $container = new ReflectionContainer(Definitions::get());
         self::assertSame('', $container->get(InnerDependency::class)->option);
 
-        $container->set(InnerDependency::class, static fn () => new InnerDependency(new \DateTime(), 'testing'));
+        $container->set(InnerDependency::class, static fn() => new InnerDependency(new \DateTime(), 'testing'));
         self::assertSame('testing', $container->get(InnerDependency::class)->option);
     }
 
@@ -65,9 +65,11 @@ final class ReflectionContainerTest extends TestCase
     {
         $container = new ReflectionContainer(Definitions::get());
 
-        $callable = static fn (InnerDependency $id, string $suffix) => $id->option . $suffix;
+        $callable = static fn(InnerDependency $id, string $suffix) => $id->option . $suffix;
 
-        self::assertSame('151515', $container->call($callable, ['suffix' => '151515']));
+        self::assertSame('151515', $container->call($callable, [
+            'suffix' => '151515',
+        ]));
     }
 
     public function testOldCallable(): void
@@ -76,6 +78,8 @@ final class ReflectionContainerTest extends TestCase
 
         $id = $container->get(InnerDependency::class);
 
-        self::assertSame('4321', $container->call([$id, 'reverse'], ['text' => '1234']));
+        self::assertSame('4321', $container->call([$id, 'reverse'], [
+            'text' => '1234',
+        ]));
     }
 }

@@ -14,7 +14,5 @@ class MissingFrame
 
     public string $file = 'unknown';
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 }

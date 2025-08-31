@@ -18,6 +18,5 @@ readonly class Source
         public ?string $media = null,
         public ?string $width = null,
         public ?string $height = null,
-    ) {
-    }
+    ) {}
 }

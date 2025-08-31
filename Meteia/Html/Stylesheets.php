@@ -11,10 +11,11 @@ class Stylesheets implements \Stringable
 {
     private array $stylesheets = [];
 
-    public function __construct(private ApplicationResourcesBaseUri $applicationResourcesBaseUri)
-    {
-    }
+    public function __construct(
+        private ApplicationResourcesBaseUri $applicationResourcesBaseUri,
+    ) {}
 
+    #[\Override]
     public function __toString()
     {
         return implode('', $this->stylesheets);

@@ -8,7 +8,7 @@ use Meteia\Domain\ValueObjects\AggregateRootId;
 
 class CommandMetadata
 {
-    public function __construct(public AggregateRootId $aggregateRootId)
-    {
-    }
+    public function __construct(
+        public AggregateRootId $aggregateRootId,
+    ) {}
 }

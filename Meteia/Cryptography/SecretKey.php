@@ -12,6 +12,7 @@ readonly class SecretKey extends UniqueId
     protected const int LEN_RANDOM = 32;
     protected const int LEN_TIMESTAMP = 0;
 
+    #[\Override]
     public static function prefix(): string
     {
         return 'sk';

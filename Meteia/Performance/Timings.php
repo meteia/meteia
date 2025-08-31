@@ -22,7 +22,7 @@ class Timings
 
     public function all(): array
     {
-        return array_map_assoc(static fn ($k, $v) => [$k => round($v, 4)], $this->timings);
+        return array_map_assoc(static fn($k, $v) => [$k => round($v, 4)], $this->timings);
     }
 
     public function measure(string $category, callable $c)
@@ -36,7 +36,7 @@ class Timings
         } finally {
             $endTime = hrtime(true);
             --$this->timeDepth;
-            $duration = max(0, ($endTime - $startTime) / 1000000 - $this->childDurations);
+            $duration = max(0, (($endTime - $startTime) / 1000000) - $this->childDurations);
             $this->childDurations += $duration;
             if ($this->timeDepth === 0) {
                 $this->childDurations = 0;

@@ -22,6 +22,7 @@ class IntegerLiteral extends ImmutablePrimitiveValueObject
         $this->value = $value;
     }
 
+    #[\Override]
     public function __toString()
     {
         return (string) $this->value;

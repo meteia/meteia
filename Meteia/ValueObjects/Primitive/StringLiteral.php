@@ -14,6 +14,7 @@ abstract class StringLiteral extends PrimitiveValueObject implements \Stringable
         $this->value = (string) $value;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->value;

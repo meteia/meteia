@@ -17,6 +17,5 @@ class Link implements \Stringable
         public ?string $crossorigin = null,
         public ?string $sizes = null,
         public ?string $type = null,
-    ) {
-    }
+    ) {}
 }

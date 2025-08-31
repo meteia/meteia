@@ -13,8 +13,7 @@ class CsrfTokens
     public function __construct(
         private readonly XChaCha20Poly1305 $XChaCha20Poly1305,
         private readonly CsrfSecretKey $secretKey,
-    ) {
-    }
+    ) {}
 
     public function sealedToken(string $name, int $secondsValid): string
     {

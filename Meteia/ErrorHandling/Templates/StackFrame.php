@@ -10,9 +10,11 @@ class StackFrame
 {
     use PhpTemplate;
 
-    public function __construct(private readonly string $path, public readonly int $line, public readonly string $file)
-    {
-    }
+    public function __construct(
+        private readonly string $path,
+        public readonly int $line,
+        public readonly string $file,
+    ) {}
 
     public function fileFragment(): FileFragment
     {

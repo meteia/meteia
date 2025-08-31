@@ -15,6 +15,7 @@ class StandardError extends AbstractLogger
         $this->stderr = fopen('php://stderr', 'w');
     }
 
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         fwrite($this->stderr, $message . PHP_EOL);

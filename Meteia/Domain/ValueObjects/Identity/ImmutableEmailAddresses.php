@@ -12,6 +12,7 @@ class ImmutableEmailAddresses extends ImmutableArrayValueObject implements Email
 {
     public const TYPE = EmailAddress::class;
 
+    #[\Override]
     public function toArray()
     {
         $result = [];

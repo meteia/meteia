@@ -19,6 +19,7 @@ class BinaryResponse extends Response
         parent::__construct($body, $status, $headers);
     }
 
+    #[\Override]
     private function getStream($data): StreamInterface
     {
         $stream = new Stream('php://temp', 'wb+');

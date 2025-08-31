@@ -55,7 +55,8 @@ return [
 
         return CsrfSecretKey::fromToken($value);
     },
-    LogPath::class => static fn (Configuration $configuration, RepositoryPath $repositoryPath): LogPath => new LogPath(
-        $configuration->string('METEIA_LOG_PATH', (string) $repositoryPath),
-    ),
+    LogPath::class => static fn(
+        Configuration $configuration,
+        RepositoryPath $repositoryPath,
+    ): LogPath => new LogPath($configuration->string('METEIA_LOG_PATH', (string) $repositoryPath)),
 ];

@@ -15,6 +15,7 @@ abstract class ImmutablePrimitiveValueObject implements PrimitiveValueObject
         return $this->value;
     }
 
+    #[\Override]
     public function jsonSerialize()
     {
         return $this->toNative();

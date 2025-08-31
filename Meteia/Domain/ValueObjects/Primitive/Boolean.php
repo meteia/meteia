@@ -14,6 +14,7 @@ class Boolean extends ImmutablePrimitiveValueObject implements Comparable, \Json
         $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
+    #[\Override]
     public function __toString()
     {
         if ($this->isTrue()) {
@@ -23,6 +24,7 @@ class Boolean extends ImmutablePrimitiveValueObject implements Comparable, \Json
         return 'FALSE';
     }
 
+    #[\Override]
     public function compareTo(Comparable $other)
     {
         if ($this->toNative() === $other->toNative()) {
@@ -54,6 +56,7 @@ class Boolean extends ImmutablePrimitiveValueObject implements Comparable, \Json
         return new self(true);
     }
 
+    #[\Override]
     public function jsonSerialize()
     {
         return $this->isTrue();

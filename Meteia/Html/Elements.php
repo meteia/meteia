@@ -14,7 +14,7 @@ function attributes(array $attributes): string
     if (\count($attributes) === 0) {
         return '';
     }
-    $attributes = array_filter($attributes, static fn ($val) => !($val === null || $val === false));
+    $attributes = array_filter($attributes, static fn($val) => !($val === null || $val === false));
     $attributes = array_map(
         static function ($k, $v) {
             if (\is_bool($v) && $v) {

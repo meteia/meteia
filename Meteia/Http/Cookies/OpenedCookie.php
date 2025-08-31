@@ -26,7 +26,10 @@ class OpenedCookie extends Cookie
         $ad = implode('_', array_filter([$this->name, $this->associatedData]));
         $result = $XChaCha20Poly1305->encrypt($this->value, $ad, $secret);
 
-        $sealedCookieValue = implode('_', array_filter([$result->ciphertext, $this->associatedData]));
+        $sealedCookieValue = implode('_', array_filter([
+            $result->ciphertext,
+            $this->associatedData,
+        ]));
 
         $cookie = new SealedCookie($this->name, $sealedCookieValue, $this->cookieAttributes);
 
