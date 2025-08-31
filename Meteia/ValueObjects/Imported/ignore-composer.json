@@ -1,34 +1,34 @@
 {
-  "name": "Meteia/yeso",
-  "type": "library",
-  "description": "Small set of reusable ValueObjects",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Jason R. McNeil",
-      "email": "jason@jasonrm.net"
-    }
-  ],
-  "require": {
-    "php": "^7.0",
-    "zendframework/zend-uri": "^2.5",
-    "webmozart/path-util": "^2.3",
-    "ramsey/uuid": "^3.5",
-    "krowinski/bcmath-extended": "^1.3"
-  },
-  "autoload": {
-    "psr-4": {
-      "Meteia\\Yeso\\": "Meteia/Yeso"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Meteia\\Yeso\\Stubs\\": "stubs/"
-    }
-  },
-  "require-dev": {
-    "phpspec/phpspec": "^3.1",
-    "henrikbjorn/phpspec-code-coverage": "^3.0",
-    "symfony/var-dumper": "^3.1"
-  }
+	"name": "Meteia/yeso",
+	"type": "library",
+	"description": "Small set of reusable ValueObjects",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Jason R. McNeil",
+			"email": "jason@jasonrm.net"
+		}
+	],
+	"require": {
+		"php": "^7.0",
+		"zendframework/zend-uri": "^2.5",
+		"webmozart/path-util": "^2.3",
+		"ramsey/uuid": "^3.5",
+		"krowinski/bcmath-extended": "^1.3"
+	},
+	"autoload": {
+		"psr-4": {
+			"Meteia\\Yeso\\": "Meteia/Yeso"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Meteia\\Yeso\\Stubs\\": "stubs/"
+		}
+	},
+	"require-dev": {
+		"phpspec/phpspec": "^3.1",
+		"henrikbjorn/phpspec-code-coverage": "^3.0",
+		"symfony/var-dumper": "^3.1"
+	}
 }
