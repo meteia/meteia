@@ -48,5 +48,24 @@ readonly class ApplicationResources
             return;
         }
         $head->scripts->module($this->prefix . $path);
+        }
+
+        public function requireStyle(string $path, Head $head): void
+        {
+            $path = trim($path, '/');
+            if ($this->knownFiles[$path]['file'] ?? false) {
+                foreach ($this->knownFiles[$path]['imports'] ?? [] as $import) {
+                    $this->requireStyle($import, $head);
+                }
+                $head->stylesheets->load($this->prefix . $this->knownFiles[$path]['file'], null, null);
+
+                foreach ($this->knownFiles[$path]['css'] ?? [] as $css) {
+                    $head->stylesheets->load($this->prefix . $css, null, null);
+                }
+
+                return;
+            }
+            $head->stylesheets->load($this->prefix . $path, null, null);
+        }
     }
 }
