@@ -17,10 +17,6 @@ use Meteia\ErrorHandling\StackTraces\FrameFilters;
 return [
     ErrorClassification::class => StrictErrorClassification::class,
     ErrorEndpoint::class => static function (Container $container, Configuration $configuration): ErrorEndpoint {
-        if (PHP_SAPI === 'cli') {
-            return $container->get(ConsoleErrorEndpoint::class);
-        }
-
         $errorPage = $configuration->string('ERROR_HANDLING_ENDPOINT', 'public');
 
         return match (strtolower($errorPage)) {
