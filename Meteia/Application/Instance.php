@@ -7,10 +7,10 @@ namespace Meteia\Application;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\DependencyInjection\TimedContainer;
-use Meteia\ErrorHandling\Dulce;
-use Meteia\ErrorHandling\Endpoints\ErrorEndpoint;
+use Meteia\ErrorHandling\Middleware\CatchAndReportErrors;
 use Meteia\Http\Middleware\PsrEndpoints;
 use Meteia\Http\Middleware\ServerTimingHeader;
+use Meteia\Http\RequestHandler;
 use Meteia\Performance\Timings;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -58,28 +58,12 @@ readonly class Instance
         return new TimedContainer($timings, $container);
     }
 
-    public function requestHandler(
-        Container $container,
-        array $middleware = [],
-        bool $isErrorHandlingDisabled = false,
-    ): RequestHandlerInterface {
-        if (!$isErrorHandlingDisabled) {
-            Dulce::onFatalError($container, function (\Throwable $throwable): void {
-                // A fresh container is needed to clear out any previous state, layout rendering in particular
-                $freshContainer = $this->container([
-                    \Throwable::class => $throwable,
-                ]);
-                $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
-                $response = $freshContainer->call([
-                    $errorEndpoint,
-                    'response',
-                ], [$throwable]);
-                send($response);
-            });
-        }
-
-        /** @var RequestHandlerInterface $requestHandler */
+    public function requestHandler(Container $container, array $middleware = []): RequestHandlerInterface
+    {
+        /** @var RequestHandler $requestHandler */
         $requestHandler = $container->get(RequestHandlerInterface::class);
+
+        $requestHandler->append(new CatchAndReportErrors($this));
         $requestHandler->append(ServerTimingHeader::class);
         $requestHandler->append(...$middleware);
         $requestHandler->append(PsrEndpoints::class);
