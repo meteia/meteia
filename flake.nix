@@ -9,6 +9,5 @@
   outputs = {chips, ...}:
     chips.lib.use {
       devShellsDir = ./nix/devShells;
-      overlays = [chips.overlays.default];
     };
 }

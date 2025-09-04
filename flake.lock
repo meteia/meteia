@@ -11,11 +11,11 @@
         "utils": "utils_2"
       },
       "locked": {
-        "lastModified": 1756672901,
-        "narHash": "sha256-0AE8Zkwt5wgzf4Cfg0VjSVipbmGOytalO+lY7sWVp3E=",
+        "lastModified": 1756957090,
+        "narHash": "sha256-OLj5V4kET/2iZ7UrYzl/f1Bkuuzd/hP2fb3a4ysVMKY=",
         "owner": "jasonrm",
         "repo": "nix-chips",
-        "rev": "750edf3211d4f084091fe6430885717c0b529924",
+        "rev": "7555366bce2cd1811caafc8a11445be58b9abd5d",
         "type": "github"
       },
       "original": {
@@ -64,11 +64,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1756636162,
-        "narHash": "sha256-mBecwgUTWRgClJYqcF+y4O1bY8PQHqeDpB+zsAn+/zA=",
+        "lastModified": 1756819007,
+        "narHash": "sha256-12V64nKG/O/guxSYnr5/nq1EfqwJCdD2+cIGmhz3nrE=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "37ff64b7108517f8b6ba5705ee5085eac636a249",
+        "rev": "aaff8c16d7fc04991cac6245bee1baa31f72b1e1",
         "type": "github"
       },
       "original": {
