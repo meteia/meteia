@@ -12,7 +12,7 @@ class PlaceholderHeader extends MutableString implements Header
     #[\Override]
     public function title($title): Header
     {
-        $this->replaceContentWith('<h1>' . $title . '</h1>');
+        $this->set('<h1>' . $title . '</h1>');
 
         return $this;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Bluestone;
 
-class MutableString
+abstract class MutableString
 {
     public function __construct(
         private string $string = '',
@@ -20,7 +20,7 @@ class MutableString
         return $this->string;
     }
 
-    public function replaceContentWith(string $string): void
+    public function set(string $string): void
     {
         $this->string = $string;
     }
