@@ -6,9 +6,13 @@ namespace Meteia\Http\Cookies;
 
 use Meteia\Cryptography\SecretKey;
 use Meteia\Cryptography\SecretKey\XChaCha20Poly1305;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 
-class SealedCookie extends Cookie
+readonly class SealedCookie extends PlaintextCookie
 {
+    use CookieString;
+
     public function open(XChaCha20Poly1305 $XChaCha20Poly1305, SecretKey $secret): OpenedCookie
     {
         [$ciphertext, $associatedData] = explode('_', $this->value, 2);
@@ -16,15 +20,6 @@ class SealedCookie extends Cookie
 
         $result = $XChaCha20Poly1305->decrypt($ciphertext, $ad, $secret);
 
-        $cookie = new OpenedCookie($this->name, $result->plaintext, $this->cookieAttributes);
-
-        return $cookie->withAssociatedData($associatedData);
-    }
-
-    public function associatedData(): string
-    {
-        [, $associatedData] = explode('_', $this->value, 2);
-
-        return $associatedData;
+        return new OpenedCookie($this->name, $result->plaintext, $associatedData);
     }
 }

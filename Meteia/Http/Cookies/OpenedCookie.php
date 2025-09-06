@@ -7,19 +7,13 @@ namespace Meteia\Http\Cookies;
 use Meteia\Cryptography\SecretKey;
 use Meteia\Cryptography\SecretKey\XChaCha20Poly1305;
 
-class OpenedCookie extends Cookie
+readonly class OpenedCookie
 {
-    protected string $associatedData = '';
-
     public function __construct(
-        string $name,
-        string $value,
-        ?CookieAttributes $cookieAttributes = null,
-        string $associatedData = '',
-    ) {
-        parent::__construct($name, $value, $cookieAttributes);
-        $this->associatedData = $associatedData;
-    }
+        public string $name,
+        public string $value,
+        public string $associatedData = '',
+    ) {}
 
     public function seal(XChaCha20Poly1305 $XChaCha20Poly1305, ?SecretKey $secret = null): SealCookieResult
     {
@@ -31,21 +25,8 @@ class OpenedCookie extends Cookie
             $this->associatedData,
         ]));
 
-        $cookie = new SealedCookie($this->name, $sealedCookieValue, $this->cookieAttributes);
+        $cookie = new SealedCookie($this->name, $sealedCookieValue);
 
         return new SealCookieResult($cookie, $result->secret);
-    }
-
-    public function withAssociatedData(string $associatedData): self
-    {
-        $copy = clone $this;
-        $copy->associatedData = $associatedData;
-
-        return $copy;
-    }
-
-    public function associatedData(): string
-    {
-        return $this->associatedData;
     }
 }

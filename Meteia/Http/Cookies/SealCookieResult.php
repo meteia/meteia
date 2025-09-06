@@ -6,20 +6,10 @@ namespace Meteia\Http\Cookies;
 
 use Meteia\Cryptography\SecretKey;
 
-class SealCookieResult
+readonly class SealCookieResult
 {
     public function __construct(
-        private SealedCookie $sealedCookie,
-        private SecretKey $secret,
+        public SealedCookie $sealedCookie,
+        public SecretKey $secret,
     ) {}
-
-    public function sealedCookie(): SealedCookie
-    {
-        return $this->sealedCookie;
-    }
-
-    public function secret(): SecretKey
-    {
-        return $this->secret;
-    }
 }

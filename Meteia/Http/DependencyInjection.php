@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Meteia\Application\RepositoryPath;
 use Meteia\Configuration\Configuration;
+use Meteia\Http\Configuration\CookieHost;
 use Meteia\Http\Configuration\LogPath;
 use Meteia\Http\Csrf\CsrfSecretKey;
 use Meteia\Http\EndpointMap;
@@ -47,6 +48,10 @@ return [
 
         return new Host($scheme . '://' . $host);
     },
+    CookieHost::class => static fn(
+        Configuration $configuration,
+        Host $host,
+    ): CookieHost => new CookieHost($configuration->string('COOKIE_HOST', $host->getHost())),
     CsrfSecretKey::class => static function (Configuration $configuration): CsrfSecretKey {
         $value = $configuration->string('METEIA_CSRF_SECRET_KEY', '');
         if ($value === '') {

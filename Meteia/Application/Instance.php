@@ -9,6 +9,7 @@ use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\DependencyInjection\TimedContainer;
 use Meteia\ErrorHandling\Middleware\CatchAndReportErrors;
 use Meteia\Http\Middleware\PsrEndpoints;
+use Meteia\Http\Middleware\ResponseCookies;
 use Meteia\Http\Middleware\ServerTimingHeader;
 use Meteia\Http\RequestHandler;
 use Meteia\Performance\Timings;
@@ -65,6 +66,7 @@ readonly class Instance
 
         $requestHandler->append(new CatchAndReportErrors($this));
         $requestHandler->append(ServerTimingHeader::class);
+        $requestHandler->append(ResponseCookies::class);
         $requestHandler->append(...$middleware);
         $requestHandler->append(PsrEndpoints::class);
 
