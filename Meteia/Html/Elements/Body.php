@@ -9,27 +9,20 @@ use Meteia\Html\Header;
 
 class Body implements \Stringable
 {
+    /**
+     * @param array<string, string|\Stringable|number|boolean> $attributes
+     */
     public function __construct(
         public Header $header,
         public Footer $footer,
-        public string|\Stringable $content = '',
-        public string $className = '',
         public array $attributes = [],
+        public string|\Stringable $content = '',
     ) {}
 
     #[\Override]
     public function __toString(): string
     {
-        return el(
-            'body',
-            [
-                'class' => $this->className,
-                ...$this->attributes,
-            ],
-            $this->header,
-            el('main', [], $this->content),
-            $this->footer,
-        );
+        return el('body', $this->attributes, $this->header, el('main', [], $this->content), $this->footer);
     }
 
     public function content(string|\Stringable $content): void

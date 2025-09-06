@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements\Meta;
 
-class Charset implements \Stringable
+readonly class Charset implements \Stringable
 {
     public function __construct(
-        private readonly string $characterSet = 'UTF-8',
+        private string|\Stringable $characterSet = 'UTF-8',
     ) {}
 
     #[\Override]
     public function __toString(): string
     {
-        return <<<EOF
-        <meta charset="{$this->characterSet}">
-        EOF;
+        return sprintf('<meta charset="%s">', $this->characterSet);
     }
 }
