@@ -66,37 +66,33 @@ readonly class RunWorker implements Command
                     'event' => $event,
                     'handler' => $handler,
                 ]);
-                $this->eventBus->registerEventHandler(
-                    $event,
-                    $handler,
-                    function (
-                        Event $event,
-                        EventId $eventId,
-                        CorrelationId $correlationId,
-                        CausationId $causationId,
-                        ProcessId $processId,
-                    ) use ($handler): void {
-                        $commandContainer = clone $this->container;
-                        $commandContainer->set(CorrelationId::class, $correlationId);
-                        $commandContainer->set(CausationId::class, CausationId::fromHex($processId->hex()));
+                $this->eventBus->registerEventHandler($event, $handler, function (
+                    Event $event,
+                    EventId $eventId,
+                    CorrelationId $correlationId,
+                    CausationId $causationId,
+                    ProcessId $processId,
+                ) use ($handler): void {
+                    $commandContainer = clone $this->container;
+                    $commandContainer->set(CorrelationId::class, $correlationId);
+                    $commandContainer->set(CausationId::class, CausationId::fromHex($processId->hex()));
 
-                        /** @var EventHandler $eventHandler */
-                        $eventHandler = $commandContainer->get($handler);
+                    /** @var EventHandler $eventHandler */
+                    $eventHandler = $commandContainer->get($handler);
 
-                        try {
-                            $eventHandler->handle($event);
+                    try {
+                        $eventHandler->handle($event);
 
-                            //                        $this->log->info('Event succeeded', ['event' => $event::class, 'handler' => $handler]);
-                        } catch (\Throwable $e) {
-                            $this->log->error('Event failed', [
-                                'exception' => $e,
-                            ]);
-                        }
-                        unset($eventHandler, $commandContainer);
+                        //                        $this->log->info('Event succeeded', ['event' => $event::class, 'handler' => $handler]);
+                    } catch (\Throwable $e) {
+                        $this->log->error('Event failed', [
+                            'exception' => $e,
+                        ]);
+                    }
+                    unset($eventHandler, $commandContainer);
 
-                        gc_collect_cycles();
-                    },
-                );
+                    gc_collect_cycles();
+                });
             }
         }
         $this->log->info('Running event worker');

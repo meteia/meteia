@@ -20,10 +20,8 @@ class ServerTimingHeader implements MiddlewareInterface
 
     public function addHeader(ResponseInterface $response): ResponseInterface
     {
-        $value = implode(',', array_map_assoc(
-            static fn($key, $value) => [$key => $key . ';dur=' . round($value, 4)],
-            $this->timings->all(),
-        ));
+        $value = implode(',', array_map_assoc(static fn($key, $value) => [$key =>
+            $key . ';dur=' . round($value, 4)], $this->timings->all()));
 
         return $response->withHeader('Server-Timing', $value);
     }

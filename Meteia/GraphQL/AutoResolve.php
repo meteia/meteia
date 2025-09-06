@@ -52,10 +52,11 @@ class AutoResolve
                 && \is_array($source->{$resolveInfo->fieldName})
                 && $expectsList
             ) {
-                return array_map(
-                    static fn($source) => $resolver->data($source, $args, $requestContext),
-                    $source->{$resolveInfo->fieldName},
-                );
+                return array_map(static fn($source) => $resolver->data(
+                    $source,
+                    $args,
+                    $requestContext,
+                ), $source->{$resolveInfo->fieldName});
             }
 
             return $resolver->data($source, $args, $requestContext);

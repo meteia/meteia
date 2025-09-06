@@ -85,37 +85,34 @@ readonly class BunnyCommandBus implements CommandBus
             'status' => $ok ? 'ok' : 'failed',
         ]);
 
-        $this->channel->consume(
-            function (Message $message, Channel $channel, Client $bunny) use (
-                $commandClassName,
-                $queueName,
-                $handler,
-            ): void {
-                $commandId = CommandId::fromToken($message->headers['message-id']);
-                $correlationId = CorrelationId::fromToken($message->headers['correlation-id']);
-                $causationId = CausationId::fromToken($message->headers['causation-id']);
-                $processId = ProcessId::fromToken($message->headers['process-id']);
-                $this->log->info('Received Command', [
-                    'queueName' => $queueName,
-                    'commandId' => $commandId,
-                    'correlationId' => $correlationId,
-                    'causationId' => $causationId,
-                    'processId' => $processId,
-                ]);
-
-                try {
-                    $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
-                    $handler->handle($command, $commandId, $correlationId, $causationId, $processId);
-                    $channel->ack($message);
-                } catch (\Throwable $t) {
-                    $channel->nack($message, false, false);
-                    $this->log->error($t->getMessage(), [
-                        'queueName' => $queueName,
-                    ]);
-                }
-            },
+        $this->channel->consume(function (Message $message, Channel $channel, Client $bunny) use (
+            $commandClassName,
             $queueName,
-        );
+            $handler,
+        ): void {
+            $commandId = CommandId::fromToken($message->headers['message-id']);
+            $correlationId = CorrelationId::fromToken($message->headers['correlation-id']);
+            $causationId = CausationId::fromToken($message->headers['causation-id']);
+            $processId = ProcessId::fromToken($message->headers['process-id']);
+            $this->log->info('Received Command', [
+                'queueName' => $queueName,
+                'commandId' => $commandId,
+                'correlationId' => $correlationId,
+                'causationId' => $causationId,
+                'processId' => $processId,
+            ]);
+
+            try {
+                $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
+                $handler->handle($command, $commandId, $correlationId, $causationId, $processId);
+                $channel->ack($message);
+            } catch (\Throwable $t) {
+                $channel->nack($message, false, false);
+                $this->log->error($t->getMessage(), [
+                    'queueName' => $queueName,
+                ]);
+            }
+        }, $queueName);
     }
 
     #[\Override]

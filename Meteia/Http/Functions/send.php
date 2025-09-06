@@ -24,7 +24,7 @@ function send(ResponseInterface $response): void
 
         foreach ($response->getHeaders() as $name => $values) {
             foreach ($values as $value) {
-                header("{$name}: {$value}", false);
+                header("$name: $value", false);
             }
         }
     }
