@@ -56,9 +56,4 @@ class PsrEndpointMap implements EndpointMap
     {
         return $this->host->withPath($this->path($endpoint));
     }
-
-    private function classify(string $slug): string
-    {
-        return $slug;
-    }
 }

@@ -1,16 +1,9 @@
 {
-  system,
   pkgs,
   lib,
-  config,
-  chips,
   ...
 }:
 with lib; {
-  imports = [];
-  options = with types; {
-    project = {};
-  };
   config = mkMerge [
     {
       devShell = {

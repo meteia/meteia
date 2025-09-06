@@ -8,11 +8,11 @@ use Meteia\Cryptography\Errors\DecryptionFailed;
 use Meteia\Cryptography\SecretKey\XChaCha20Poly1305;
 use Meteia\Http\Errors\InvalidCsrfToken;
 
-class CsrfTokens
+readonly class CsrfTokens
 {
     public function __construct(
-        private readonly XChaCha20Poly1305 $XChaCha20Poly1305,
-        private readonly CsrfSecretKey $secretKey,
+        private XChaCha20Poly1305 $XChaCha20Poly1305,
+        private CsrfSecretKey $secretKey,
     ) {}
 
     public function sealedToken(string $name, int $secondsValid): string
@@ -29,7 +29,7 @@ class CsrfTokens
             if (time() > $expiresAt) {
                 throw new InvalidCsrfToken('Token Expired');
             }
-        } catch (DecryptionFailed $decryptionFailed) {
+        } catch (DecryptionFailed) {
             throw new InvalidCsrfToken('Token Invalid');
         }
     }

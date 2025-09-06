@@ -53,7 +53,11 @@ class ResponseCookies implements MiddlewareInterface
             'HttpOnly' => $httpOnly ? true : null,
         ]);
 
-        $parts = array_map(static fn($key, $val) => $val === true ? $key : $key . '=' . $val, array_keys($kvParts), $kvParts);
+        $parts = array_map(
+            static fn($key, $val) => $val === true ? $key : $key . '=' . $val,
+            array_keys($kvParts),
+            $kvParts,
+        );
 
         $this->cookies[] = implode('; ', $parts);
     }
