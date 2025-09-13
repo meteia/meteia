@@ -59,7 +59,7 @@
   "require-dev": {
     "phpunit/phpunit": "*",
     "roave/security-advisories": "dev-master",
-    "carthage-software/mago": "1.0.0-beta.12"
+    "carthage-software/mago": "1.0.0-beta.14"
   },
   "config": {
     "allow-plugins": {
