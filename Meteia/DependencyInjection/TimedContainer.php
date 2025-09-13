@@ -6,11 +6,11 @@ namespace Meteia\DependencyInjection;
 
 use Meteia\Performance\Timings;
 
-class TimedContainer implements Container
+readonly class TimedContainer implements Container
 {
     public function __construct(
-        private readonly Timings $timings,
-        private readonly Container $container,
+        private Timings $timings,
+        private Container $container,
     ) {}
 
     #[\Override]

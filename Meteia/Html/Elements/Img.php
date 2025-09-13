@@ -19,7 +19,7 @@ readonly class Img
         public ?string $sizes = null,
         public ?string $className = null,
         public ?string $crossOrigin = null,
-        public ?string $fetchpriority = null,
+        public ?string $fetchPriority = null,
         public ?string $loading = null,
         public ?string $decoding = 'async',
     ) {}
