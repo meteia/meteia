@@ -31,7 +31,7 @@ class ClassVarianceAuthority implements ClassName
 
         // Add variant classes
         foreach ($this->variants as $variantName => $variantOptions) {
-            if (isset($props[$variantName]) && isset($variantOptions[$props[$variantName]])) {
+            if (isset($props[$variantName], $variantOptions[$props[$variantName]])) {
                 $variantClass = $variantOptions[$props[$variantName]];
                 if (is_array($variantClass)) {
                     $classes = array_merge($classes, $variantClass);
