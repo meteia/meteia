@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Primitive;
 
-use Meteia\Domain\Errors\ValueObjectInvalid;
+use Meteia\ValueObjects\Errors\ValueObjectInvalid;
 use Meteia\ValueObjects\PrimitiveValueObject;
 
 abstract class IntegerLiteral extends PrimitiveValueObject
@@ -13,13 +13,13 @@ abstract class IntegerLiteral extends PrimitiveValueObject
 
     public function __construct($value)
     {
-        $value = filter_var($value, FILTER_VALIDATE_INT);
+        $filteredValue = filter_var($value, FILTER_VALIDATE_INT);
 
-        if (!$value) {
+        if ($filteredValue === false) {
             throw new ValueObjectInvalid($value, ['int']);
         }
 
-        $this->value = $value;
+        $this->value = $filteredValue;
     }
 
     public function __toString(): string

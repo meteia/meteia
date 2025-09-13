@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Primitive;
 
-use Meteia\Domain\Errors\ValueObjectInvalid;
+use Meteia\ValueObjects\Errors\ValueObjectInvalid;
 use Meteia\ValueObjects\PrimitiveValueObject;
 
 abstract class FloatLiteral extends PrimitiveValueObject
@@ -13,7 +13,9 @@ abstract class FloatLiteral extends PrimitiveValueObject
 
     public function __construct($value)
     {
-        if (!filter_var($value, FILTER_VALIDATE_FLOAT)) {
+        $filteredValue = filter_var($value, FILTER_VALIDATE_FLOAT);
+
+        if ($filteredValue === false) {
             throw new ValueObjectInvalid($value, ['float']);
         }
 
