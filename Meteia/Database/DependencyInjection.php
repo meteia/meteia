@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Aura\Sql\ExtendedPdoInterface;
 use Meteia\Configuration\Configuration;
 use Meteia\Database\Database;
 use Meteia\Database\MigrationDatabase;
@@ -11,7 +12,7 @@ return [
     Database::class => static function (Configuration $configuration): Database {
         $hostname = $configuration->string('MYSQL_HOST', '127.0.0.1');
         $database = $configuration->string('MYSQL_DATABASE', 'meteia');
-        $port = $configuration->int('MYSQL_PORT', 3306);
+        $port = $configuration->int('MYSQL_TCP_PORT', 3306);
         $username = $configuration->string('MYSQL_USER', 'meteia');
         $password = $configuration->string('MYSQL_PWD', 'meteia');
 
@@ -21,6 +22,11 @@ return [
             PDO::MYSQL_ATTR_FOUND_ROWS => true,
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
+    },
+    ExtendedPdoInterface::class => function (Database $database): ExtendedPdoInterface {
+        $database->exec("SET @@global.time_zone='+00:00';");
+
+        return $database;
     },
     MigrationDatabase::class => static fn(Database $database): MigrationDatabase => $database,
     MigrationsTableName::class =>
