@@ -74,12 +74,9 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
             $columnNameMap = array_map_assoc(static fn($i, $column) => [
                 $column => lcfirst(implode('', array_map(ucfirst(...), explode('_', $column)))),
             ], array_keys($rows[0]));
-            $rows = array_map(
-                static fn($row) => (object) array_map_assoc(static fn($column, $row) => [
-                    $columnNameMap[$column] => $row,
-                ], $row),
-                $rows,
-            );
+            $rows = array_map(static fn($row) => (object) array_map_assoc(static fn($column, $row) => [
+                $columnNameMap[$column] => $row,
+            ], $row), $rows);
         }
 
         return $this->processedRows($rows, $args, $this->cursorOver);

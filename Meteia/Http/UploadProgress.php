@@ -46,10 +46,10 @@ class UploadProgress
             }
             echo
                 json_encode([
-                        'status' => 'working',
-                        'completedWork' => $this->completedWork,
-                        'totalWork' => $this->totalWork,
-                    ]) . PHP_EOL
+                    'status' => 'working',
+                    'completedWork' => $this->completedWork,
+                    'totalWork' => $this->totalWork,
+                ]) . PHP_EOL
             ;
             flush();
         }

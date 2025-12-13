@@ -28,11 +28,15 @@ class Commands implements \IteratorAggregate
     #[\Override]
     public function getIterator(): \Generator
     {
-        $classes = new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, [
-            '.+',
-            'CommandLine',
-            '.*\.php',
-        ]);
+        $classes = new PsrClasses(
+            $this->applicationPath,
+            (string) $this->applicationNamespace,
+            [
+                '.+',
+                'CommandLine',
+                '.*\.php',
+            ],
+        );
         $commandClassnames = new ClassesImplementing($classes, Command::class);
         foreach ($commandClassnames as $commandClassname) {
             $commandName = $this->commandName($commandClassname);
