@@ -11,18 +11,17 @@ use Meteia\Classy\PsrClasses;
 use Meteia\DependencyInjection\Container;
 use Meteia\ErrorHandling\Endpoints\ConsoleErrorEndpoint;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Meteia\Http\Functions\send;
 
-class Commands implements \IteratorAggregate
+final readonly class Commands implements \IteratorAggregate
 {
     public function __construct(
-        private readonly Container $container,
-        private readonly ApplicationNamespace $applicationNamespace,
-        private readonly ApplicationPath $applicationPath,
+        private Container $container,
+        private ApplicationNamespace $applicationNamespace,
+        private ApplicationPath $applicationPath,
     ) {}
 
     #[\Override]
@@ -69,7 +68,7 @@ class Commands implements \IteratorAggregate
         }
     }
 
-    private function commandName($className): string
+    private function commandName(string $className): string
     {
         $commandNameParts = explode('\\', trim($className, '\\'));
         $commandNameParts = array_filter(
@@ -78,15 +77,5 @@ class Commands implements \IteratorAggregate
         );
 
         return implode(':', $commandNameParts);
-    }
-
-    private function inputDefinition(string $className): InputDefinition
-    {
-        $className .= 'InputDefinition';
-        if (!class_exists($className)) {
-            return new InputDefinition();
-        }
-
-        return $this->container->get($className);
     }
 }
