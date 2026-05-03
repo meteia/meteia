@@ -7,6 +7,4 @@ namespace Meteia\Html\Placeholders;
 use Meteia\Html\HtmlLayout;
 use Meteia\Html\Layout;
 
-class PlaceholderLayout extends HtmlLayout implements Layout
-{
-}
+class PlaceholderLayout extends HtmlLayout implements Layout {}

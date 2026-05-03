@@ -27,27 +27,27 @@ function db(): ExtendedPdoInterface
 function init(ExtendedPdoInterface $pdo): PdoEventStream
 {
     $query = <<<'SQL'
-        CREATE TABLE events (
-            aggregate_root_id  BINARY(20)                         NOT NULL,
-            aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
-            event_type_id      BINARY(16)                         NOT NULL,
-            event              MEDIUMTEXT                         NOT NULL,
-            created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-            correlation_id     BINARY(20)                         NOT NULL,
-            causation_id       BINARY(20)                         NOT NULL,
-            CONSTRAINT aggregate_sequence UNIQUE (aggregate_root_id, aggregate_sequence)
-        );
-        CREATE INDEX event_type_id ON events(event_type_id);
+            CREATE TABLE events (
+                aggregate_root_id  BINARY(20)                         NOT NULL,
+                aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
+                event_type_id      BINARY(16)                         NOT NULL,
+                event              MEDIUMTEXT                         NOT NULL,
+                created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                correlation_id     BINARY(20)                         NOT NULL,
+                causation_id       BINARY(20)                         NOT NULL,
+                CONSTRAINT aggregate_sequence UNIQUE (aggregate_root_id, aggregate_sequence)
+            );
+            CREATE INDEX event_type_id ON events(event_type_id);
 
-        CREATE TABLE event_snapshots (
-            aggregate_root_id  BINARY(20)                         NOT NULL,
-            aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
-            aggregate_hash     BINARY(16)                         NOT NULL,
-            snapshot           MEDIUMTEXT                         NOT NULL,
-            created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-            CONSTRAINT aggregate_root_id UNIQUE (aggregate_root_id)
-        );
-    SQL;
+            CREATE TABLE event_snapshots (
+                aggregate_root_id  BINARY(20)                         NOT NULL,
+                aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
+                aggregate_hash     BINARY(16)                         NOT NULL,
+                snapshot           MEDIUMTEXT                         NOT NULL,
+                created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                CONSTRAINT aggregate_root_id UNIQUE (aggregate_root_id)
+            );
+        SQL;
     $pdo->exec($query);
 
     return new PdoEventStream($pdo, new MessageSerializer(), new Timings());
@@ -157,9 +157,7 @@ class CountingAggregateRoot implements EventSourced
     }
 
     #[\Override]
-    public function commitInto(UnitOfWorkContext $unitOfWorkContext): void
-    {
-    }
+    public function commitInto(UnitOfWorkContext $unitOfWorkContext): void {}
 
     #[\Override]
     public function handleEventMessage(AggregateRootId $aggregateRootId, DomainEvent $event, int $eventSequence): void

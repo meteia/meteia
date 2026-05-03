@@ -6,6 +6,4 @@ namespace Meteia\Domain\Exceptions;
 
 use Meteia\Exceptions\Contracts\IdempotentException;
 
-class ArrayContainsMixedTypesException extends \InvalidArgumentException implements IdempotentException
-{
-}
+class ArrayContainsMixedTypesException extends \InvalidArgumentException implements IdempotentException {}

@@ -6,6 +6,4 @@ namespace Meteia\Backblaze\Configuration;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class ApplicationKey extends StringLiteral
-{
-}
+class ApplicationKey extends StringLiteral {}

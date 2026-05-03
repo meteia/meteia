@@ -9,13 +9,12 @@ use Meteia\Application\ApplicationPath;
 use Meteia\Application\ApplicationPublicDir;
 use Meteia\CommandLine\Command as CLICommand;
 use Meteia\Commands\Command;
-use Meteia\Commands\CommandBus;
 use Meteia\Commands\CommandId;
+use Meteia\Commands\CommandInbox;
 use Meteia\Commands\CommandMessageHandler;
 use Meteia\Commands\Commands;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
-use Meteia\Events\EventBus;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\ProcessId;
@@ -28,10 +27,9 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
 
     public function __construct(
         private Commands $commands,
-        private EventBus $eventBus,
         private LoggerInterface $log,
         private ApplicationPath $path,
-        private CommandBus $commandBus,
+        private CommandInbox $commandInbox,
         private ApplicationNamespace $namespace,
         private ApplicationPublicDir $publicDir,
     ) {
@@ -39,8 +37,6 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
             ApplicationNamespace::class => $this->namespace,
             ApplicationPath::class => $this->path,
             ApplicationPublicDir::class => $this->publicDir,
-            EventBus::class => $this->eventBus,
-            CommandBus::class => $this->commandBus,
         ];
         $this->container = ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions);
     }
@@ -64,10 +60,10 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
             $this->log->info('Registering command handler', [
                 'command' => $command,
             ]);
-            $this->commandBus->registerCommandHandler($command, $this);
+            $this->commandInbox->subscribe($command, $this);
         }
         $this->log->info('Running command worker');
-        $this->commandBus->run();
+        $this->commandInbox->run();
     }
 
     #[\Override]

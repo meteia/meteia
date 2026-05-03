@@ -129,11 +129,11 @@ class ObjectStorage implements Storage
                 'headers' => [
                     'Authorization' =>
                         'AWS4-HMAC-SHA256 '
-                        . implode(', ', [
-                            sprintf('Credential=%s/%s', $this->accessKey, $scope),
-                            "SignedHeaders={$signedHeaders}",
-                            "Signature={$signature}",
-                        ]),
+                            . implode(', ', [
+                                sprintf('Credential=%s/%s', $this->accessKey, $scope),
+                                "SignedHeaders={$signedHeaders}",
+                                "Signature={$signature}",
+                            ]),
                     ...$canonicalHeaders,
                 ],
                 'body' => $src->resource(),

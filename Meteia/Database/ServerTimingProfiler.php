@@ -32,14 +32,10 @@ class ServerTimingProfiler implements ProfilerInterface
     }
 
     #[\Override]
-    public function getLogLevel(): string
-    {
-    }
+    public function getLogLevel(): string {}
 
     #[\Override]
-    public function getLogger(): LoggerInterface
-    {
-    }
+    public function getLogger(): LoggerInterface {}
 
     #[\Override]
     public function isActive(): bool
@@ -48,19 +44,13 @@ class ServerTimingProfiler implements ProfilerInterface
     }
 
     #[\Override]
-    public function setActive(bool $active): void
-    {
-    }
+    public function setActive(bool $active): void {}
 
     #[\Override]
-    public function setLogFormat(string $logFormat): void
-    {
-    }
+    public function setLogFormat(string $logFormat): void {}
 
     #[\Override]
-    public function setLogLevel(string $logLevel): void
-    {
-    }
+    public function setLogLevel(string $logLevel): void {}
 
     #[\Override]
     public function start(string $function): void

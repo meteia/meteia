@@ -6,6 +6,4 @@ namespace Meteia\Http;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class Scheme extends StringLiteral
-{
-}
+class Scheme extends StringLiteral {}

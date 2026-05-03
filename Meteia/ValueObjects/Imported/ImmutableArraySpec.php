@@ -95,7 +95,8 @@ class ImmutableArraySpec extends ObjectBehavior
         $this->appendArray([new \stdClass()])->appendArray([
             new \stdClass(),
         ])->shouldHaveCount(2);
-        $this->appendArray([new \stdClass()])
+        $this
+            ->appendArray([new \stdClass()])
             ->appendTraversable(new ImmutableArrayStub([new \stdClass()]))
             ->shouldHaveCount(2);
     }

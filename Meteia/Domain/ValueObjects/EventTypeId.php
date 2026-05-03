@@ -6,6 +6,4 @@ namespace Meteia\Domain\ValueObjects;
 
 use Meteia\Domain\ValueObjects\Identity\UUID;
 
-class EventTypeId extends UUID
-{
-}
+class EventTypeId extends UUID {}

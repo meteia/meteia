@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace Meteia\Yeso\Exceptions;
 
-class MethodNotFound extends \Exception
-{
-}
+class MethodNotFound extends \Exception {}

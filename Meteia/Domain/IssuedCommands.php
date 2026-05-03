@@ -14,7 +14,5 @@ class IssuedCommands
         return [];
     }
 
-    public function append(AggregateRootId $aggregateRootId, Command $command, \DateTimeInterface $deferUntil): void
-    {
-    }
+    public function append(AggregateRootId $aggregateRootId, Command $command, \DateTimeInterface $deferUntil): void {}
 }

@@ -71,9 +71,13 @@ return [
         return $factory;
     },
     AuthenticatorAttestationResponseValidator::class =>
-        static fn(CeremonyStepManagerFactory $factory): AuthenticatorAttestationResponseValidator => AuthenticatorAttestationResponseValidator::create($factory->creationCeremony()),
+        static fn(CeremonyStepManagerFactory $factory): AuthenticatorAttestationResponseValidator => AuthenticatorAttestationResponseValidator::create(
+            $factory->creationCeremony(),
+        ),
     AuthenticatorAssertionResponseValidator::class =>
-        static fn(CeremonyStepManagerFactory $factory): AuthenticatorAssertionResponseValidator => AuthenticatorAssertionResponseValidator::create($factory->requestCeremony()),
+        static fn(CeremonyStepManagerFactory $factory): AuthenticatorAssertionResponseValidator => AuthenticatorAssertionResponseValidator::create(
+            $factory->requestCeremony(),
+        ),
     CredentialSourceRepository::class => PdoCredentialSourceRepository::class,
     UserEntityRepository::class => PdoUserEntityRepository::class,
     EventDispatcher::class => NullEventDispatcher::class,

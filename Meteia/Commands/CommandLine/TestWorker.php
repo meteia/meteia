@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Meteia\Commands\CommandLine;
 
 use Meteia\CommandLine\Command;
-use Meteia\Commands\CommandBus;
+use Meteia\Commands\CommandOutbox;
 use Meteia\Files\Commands\DeleteFile;
 use Symfony\Component\Console\Input\InputDefinition;
 
 readonly class TestWorker implements Command
 {
     public function __construct(
-        private CommandBus $commandBus,
+        private CommandOutbox $commandOutbox,
     ) {}
 
     #[\Override]
     public function execute(): void
     {
         //        while (true) {
-        $this->commandBus->publishCommand(new DeleteFile('/dev/null'));
+        $this->commandOutbox->publish(new DeleteFile('/dev/null'));
 
         //        }
     }

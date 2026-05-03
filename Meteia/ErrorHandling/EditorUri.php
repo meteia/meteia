@@ -6,6 +6,4 @@ namespace Meteia\ErrorHandling;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class EditorUri extends StringLiteral
-{
-}
+class EditorUri extends StringLiteral {}

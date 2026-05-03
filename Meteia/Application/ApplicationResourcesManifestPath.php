@@ -6,6 +6,4 @@ namespace Meteia\Application;
 
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-class ApplicationResourcesManifestPath extends FilesystemPath
-{
-}
+class ApplicationResourcesManifestPath extends FilesystemPath {}

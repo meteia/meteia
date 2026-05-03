@@ -48,9 +48,9 @@ class NewMigration implements Command
         $filename = implode('.', [$id, $migrationType, $filename]);
         $target = $this->applicationPath->join('migrations', $filename);
         $template = <<<'SQL'
-        -- writing your migration in an idempotent fashion is advised (where possible, ALTER for example can't be for MYSQL)
+            -- writing your migration in an idempotent fashion is advised (where possible, ALTER for example can't be for MYSQL)
 
-        SQL;
+            SQL;
         file_put_contents((string) $target, $template);
         $this->output->writeln('Created Migration: ' . $filename);
     }

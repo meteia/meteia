@@ -6,6 +6,4 @@ namespace Meteia\WebAuthn\Configuration;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class RelyingPartyId extends StringLiteral
-{
-}
+class RelyingPartyId extends StringLiteral {}

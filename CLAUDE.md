@@ -15,8 +15,8 @@ Always: `declare(strict_types=1);` at top of every PHP file.
 - **implementation inheritance** — classes are `final`. Share via composition/decorators, not abstract base classes or traits.
 - **public methods without an interface** — every cross-object public method belongs to an interface.
 - **ORM/ActiveRecord in domain** — Eloquent/Doctrine models stay in infrastructure. Map to immutable domain objects at the seam.
-- **`-er` service names** (`UserValidator`, `InvoiceProcessor`, `ResponseBuilder`) — name by role/value (`ValidUserRegistration`, `PaidInvoice`, `JsonEndpoint`).
-- **anemic data objects** — objects do work; they are not bags of fields.
+- **`-er` service names** (`UserValidator`, `InvoiceProcessor`, `ResponseBuilder`) — name by role/value (`ValidUserRegistration`, `PaidInvoice`, `JsonEndpoint`). Includes role-sounding tech words that read like industry standards: `Publisher`/`Subscriber`/`Worker`/`Handler`/`Manager`/`Controller`-as-service. Reach for `Outbox`/`Inbox`/`Endpoint`/`Sink`/`Source`/`Registry`/`Ledger` instead.
+- **anemic data objects** — objects do work; they are not bags of fields. If a caller reads `$obj->x` to assemble its own result, give the object a behavior method that produces the result. Public `readonly` properties are still field exposure.
 
 ## Required patterns
 
@@ -45,6 +45,10 @@ Small scalar-unwrapping value objects (e.g. `PlainPassword::value()` for `passwo
 
 One behavioral assertion per test. Push field-level checks into custom PHPUnit constraints (`EqualsMoney`, etc.) rather than asserting on multiple getters.
 
+## Tooling
+
+`mago format` and `mago lint` are the project gate. Don't loosen `mago.toml` thresholds or disable rules to silence findings on code you just wrote — fix the design. Pre-existing violations don't license new ones. If a rule is genuinely wrong for this codebase, surface it and ask before editing config.
+
 ## Quick checklist before committing PHP
 
 1. `declare(strict_types=1);` present.
@@ -56,3 +60,6 @@ One behavioral assertion per test. Push field-level checks into custom PHPUnit c
 7. Every cross-object public method has an interface.
 8. State transitions use `clone(...)` and carry `#[\NoDiscard]`.
 9. ORM models confined to infrastructure layer.
+10. No `-er`-ending names on new types (incl. `Publisher`/`Worker`/`Handler`-as-service).
+11. Object exposes behavior; callers don't reach in for fields to assemble results.
+12. `mago format` + `mago lint` clean on touched files; no config relaxed to get there.

@@ -6,6 +6,4 @@ namespace Meteia\Http;
 
 use Meteia\ValueObjects\Identity\Uri;
 
-class Host extends Uri
-{
-}
+class Host extends Uri {}

@@ -8,13 +8,12 @@ use Meteia\Application\ApplicationNamespace;
 use Meteia\Application\ApplicationPath;
 use Meteia\Application\ApplicationPublicDir;
 use Meteia\CommandLine\Command;
-use Meteia\Commands\CommandBus;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\Events\Event;
-use Meteia\Events\EventBus;
 use Meteia\Events\EventHandler;
 use Meteia\Events\EventId;
+use Meteia\Events\EventInbox;
 use Meteia\Events\EventToEventHandlersMap;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
@@ -27,10 +26,9 @@ readonly class RunWorker implements Command
     private Container $container;
 
     public function __construct(
-        private EventBus $eventBus,
+        private EventInbox $eventInbox,
         private LoggerInterface $log,
         private ApplicationPath $path,
-        private CommandBus $commandBus,
         private ApplicationNamespace $namespace,
         private ApplicationPublicDir $publicDir,
         private EventToEventHandlersMap $eventToEventHandlersMap,
@@ -39,8 +37,6 @@ readonly class RunWorker implements Command
             ApplicationNamespace::class => $this->namespace,
             ApplicationPath::class => $this->path,
             ApplicationPublicDir::class => $this->publicDir,
-            EventBus::class => $this->eventBus,
-            CommandBus::class => $this->commandBus,
         ];
         $this->container = ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions);
     }
@@ -66,7 +62,7 @@ readonly class RunWorker implements Command
                     'event' => $event,
                     'handler' => $handler,
                 ]);
-                $this->eventBus->registerEventHandler($event, $handler, function (
+                $this->eventInbox->subscribe($event, $handler, function (
                     Event $event,
                     EventId $eventId,
                     CorrelationId $correlationId,
@@ -96,6 +92,6 @@ readonly class RunWorker implements Command
             }
         }
         $this->log->info('Running event worker');
-        $this->eventBus->run();
+        $this->eventInbox->run();
     }
 }

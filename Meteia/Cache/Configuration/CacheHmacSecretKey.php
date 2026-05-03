@@ -6,6 +6,4 @@ namespace Meteia\Cache\Configuration;
 
 use Meteia\Cryptography\SecretKey;
 
-readonly class CacheHmacSecretKey extends SecretKey
-{
-}
+readonly class CacheHmacSecretKey extends SecretKey {}

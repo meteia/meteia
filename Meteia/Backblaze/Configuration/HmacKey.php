@@ -6,6 +6,4 @@ namespace Meteia\Backblaze\Configuration;
 
 use Meteia\Cryptography\SecretKey;
 
-readonly class HmacKey extends SecretKey
-{
-}
+readonly class HmacKey extends SecretKey {}

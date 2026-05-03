@@ -6,6 +6,4 @@ namespace Meteia\WebAuthn\Configuration;
 
 use Meteia\Cryptography\SecretKey;
 
-readonly class WebAuthnSecretKey extends SecretKey
-{
-}
+readonly class WebAuthnSecretKey extends SecretKey {}

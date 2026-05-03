@@ -7,6 +7,7 @@ namespace Meteia\EventSourcing;
 use Meteia\Domain\Contracts\AggregateRoot;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\ValueObjects\AggregateRootId;
+use Meteia\Events\EventOutbox;
 use Meteia\EventSourcing\Contracts\EventStream;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
@@ -19,9 +20,9 @@ class EventMessage
         public int $sequence,
     ) {}
 
-    public function publishTo(EventBus $rabbitMQExchange): void
+    public function publishTo(EventOutbox $outbox): void
     {
-        $rabbitMQExchange->publish($this->event);
+        $outbox->publish($this->event);
     }
 
     public function appendTo(EventStream $eventStream, CausationId $causationId, CorrelationId $correlationId): void

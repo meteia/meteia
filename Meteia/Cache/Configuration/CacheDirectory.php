@@ -6,6 +6,4 @@ namespace Meteia\Cache\Configuration;
 
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-class CacheDirectory extends FilesystemPath
-{
-}
+class CacheDirectory extends FilesystemPath {}

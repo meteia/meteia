@@ -32,10 +32,10 @@ class FileFragment
             $output[] = (object) [
                 'href' =>
                     'idea://open?'
-                    . http_build_query([
-                        'file' => $this->file,
-                        'line' => $offset,
-                    ]),
+                        . http_build_query([
+                            'file' => $this->file,
+                            'line' => $offset,
+                        ]),
                 'number' => $offset,
                 'activeLine' => $offset === $this->line,
                 'source' => $line,

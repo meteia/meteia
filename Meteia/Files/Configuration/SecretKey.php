@@ -6,6 +6,4 @@ namespace Meteia\Files\Configuration;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class SecretKey extends StringLiteral
-{
-}
+class SecretKey extends StringLiteral {}

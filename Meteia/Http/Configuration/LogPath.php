@@ -6,6 +6,4 @@ namespace Meteia\Http\Configuration;
 
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-class LogPath extends FilesystemPath
-{
-}
+class LogPath extends FilesystemPath {}

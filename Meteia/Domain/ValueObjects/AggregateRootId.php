@@ -6,6 +6,4 @@ namespace Meteia\Domain\ValueObjects;
 
 use Meteia\ValueObjects\Identity\UniqueId;
 
-abstract readonly class AggregateRootId extends UniqueId
-{
-}
+abstract readonly class AggregateRootId extends UniqueId {}

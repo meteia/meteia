@@ -6,6 +6,4 @@ namespace Meteia\Application;
 
 use Meteia\ValueObjects\Identity\Uri;
 
-class ApplicationResourcesBaseUri extends Uri
-{
-}
+class ApplicationResourcesBaseUri extends Uri {}

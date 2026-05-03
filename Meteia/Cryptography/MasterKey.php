@@ -6,6 +6,4 @@ namespace Meteia\Cryptography;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class MasterKey extends StringLiteral
-{
-}
+class MasterKey extends StringLiteral {}

@@ -6,6 +6,4 @@ namespace Meteia\Http\Configuration;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class CookieHost extends StringLiteral
-{
-}
+class CookieHost extends StringLiteral {}

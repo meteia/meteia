@@ -34,7 +34,8 @@ class UriSpec extends ObjectBehavior
     public function it_appends_a_query_array(): void
     {
         $this->withQueryArray(['food' => 'potato'])->shouldBeLike('http://example.com/?food=potato');
-        $this->withPath('/hmm')
+        $this
+            ->withPath('/hmm')
             ->withQueryArray(['food' => 'potato'])
             ->shouldBeLike('http://example.com/hmm?food=potato');
     }
@@ -42,7 +43,8 @@ class UriSpec extends ObjectBehavior
     public function it_appends_a_query_string(): void
     {
         $this->withQueryString('food=potato')->shouldBeLike('http://example.com/?food=potato');
-        $this->withPath('/hmm')
+        $this
+            ->withPath('/hmm')
             ->withQueryString('food=potato&color=green')
             ->shouldBeLike('http://example.com/hmm?food=potato&color=green');
     }

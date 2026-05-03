@@ -6,6 +6,4 @@ namespace Meteia\Html;
 
 use Meteia\Bluestone\MutableString;
 
-class HeaderTitle extends MutableString
-{
-}
+class HeaderTitle extends MutableString {}

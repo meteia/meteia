@@ -6,6 +6,4 @@ namespace Meteia\Application;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class ApplicationNamespace extends StringLiteral
-{
-}
+class ApplicationNamespace extends StringLiteral {}

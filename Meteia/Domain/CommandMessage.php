@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Meteia\Domain;
 
 use Meteia\Commands\Command;
+use Meteia\Commands\CommandOutbox;
 use Meteia\Domain\Contracts\AggregateRoot;
-use Meteia\Domain\Transitional\RabbitMQCommandExchange;
 use Meteia\Domain\ValueObjects\AggregateRootId;
 use Meteia\EventSourcing\EventSourcing;
 
@@ -17,9 +17,9 @@ readonly class CommandMessage
         public Command $command,
     ) {}
 
-    public function publishTo(RabbitMQCommandExchange $rabbitMQExchange): void
+    public function publishTo(CommandOutbox $outbox): void
     {
-        $rabbitMQExchange->publish($this->command);
+        $outbox->publish($this->command);
     }
 
     public function appendTo(IssuedCommands $issuedCommands): void

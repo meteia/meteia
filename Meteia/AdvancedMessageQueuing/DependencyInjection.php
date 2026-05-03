@@ -7,62 +7,29 @@ use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\Application\ApplicationNamespace;
 use Meteia\Configuration\Configuration;
-use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
+$connectionOptions = static fn(Configuration $config): array => [
+    'host' => $config->string('RABBITMQ_HOST', '127.0.0.1'),
+    'port' => $config->int('RABBITMQ_PORT', 5672),
+    'vhost' => $config->string('RABBITMQ_VIRTUALHOST', '/'),
+    'user' => $config->string('RABBITMQ_USERNAME', 'guest'),
+    'password' => $config->string('RABBITMQ_PASSWORD', 'guest'),
+    'timeout' => $config->int('RABBITMQ_TIMEOUT', 1),
+    'heartbeat' => $config->float('RABBITMQ_HEARTBEAT', 60.0),
+    'keepAlive' => $config->boolean('RABBITMQ_KEEPALIVE', false),
+];
+
 return [
-    Client::class => static function (Configuration $config): Client {
-        $hostname = $config->string('RABBITMQ_HOST', '127.0.0.1');
-        $port = $config->int('RABBITMQ_PORT', 5672);
-        $username = $config->string('RABBITMQ_USERNAME', 'guest');
-        $password = $config->string('RABBITMQ_PASSWORD', 'guest');
-        $virtualHost = $config->string('RABBITMQ_VIRTUALHOST', '/');
-        $timeout = $config->int('RABBITMQ_TIMEOUT', 1);
-        $heartbeat = $config->float('RABBITMQ_HEARTBEAT', 60.0);
-        $keepAlive = $config->boolean('RABBITMQ_KEEPALIVE', false);
+    Client::class => static fn(Configuration $config): Client => new Client($connectionOptions($config)),
+    Bunny\Async\Client::class => static fn(
+        LoopInterface $loop,
+        Configuration $config,
+    ): Bunny\Async\Client => new Bunny\Async\Client($loop, $connectionOptions($config)),
+    Channel::class => static function (Client $client): Channel {
+        $client->connect();
 
-        return new Client([
-            'host' => $hostname,
-            'port' => $port,
-            'vhost' => $virtualHost,
-            'user' => $username,
-            'password' => $password,
-            'timeout' => $timeout,
-            'heartbeat' => $heartbeat,
-            'keepAlive' => $keepAlive,
-        ]);
-    },
-    Bunny\Async\Client::class => static function (LoopInterface $loop, Configuration $config): Bunny\Async\Client {
-        $hostname = $config->string('RABBITMQ_HOST', '127.0.0.1');
-        $port = $config->int('RABBITMQ_PORT', 5672);
-        $username = $config->string('RABBITMQ_USERNAME', 'guest');
-        $password = $config->string('RABBITMQ_PASSWORD', 'guest');
-        $virtualHost = $config->string('RABBITMQ_VIRTUALHOST', '/');
-        $timeout = $config->int('RABBITMQ_TIMEOUT', 1);
-        $heartbeat = $config->float('RABBITMQ_HEARTBEAT', 60.0);
-        $keepAlive = $config->boolean('RABBITMQ_KEEPALIVE', false);
-
-        return new Bunny\Async\Client($loop, [
-            'host' => $hostname,
-            'port' => $port,
-            'vhost' => $virtualHost,
-            'user' => $username,
-            'password' => $password,
-            'timeout' => $timeout,
-            'heartbeat' => $heartbeat,
-            'keepAlive' => $keepAlive,
-        ]);
-    },
-    Channel::class => static function (LoggerInterface $log, Client $client): Channel {
-        try {
-            $client->connect();
-
-            return $client->channel();
-        } catch (Throwable $e) {
-            $log->warning('Failed to connect to RabbitMQ: ' . $e->getMessage(), ['exception' => $e]);
-
-            exit(1);
-        }
+        return $client->channel();
     },
     CommandsExchangeName::class => static fn(
         Configuration $configuration,

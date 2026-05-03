@@ -6,6 +6,4 @@ namespace Meteia\AdvancedMessageQueuing\Configuration;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class CommandsExchangeName extends StringLiteral
-{
-}
+final class CommandsExchangeName extends StringLiteral {}

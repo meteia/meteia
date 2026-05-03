@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use Meteia\Commands\CommandOutbox;
 use Meteia\Domain\Contracts\UnitOfWork;
-use Meteia\Domain\Transitional\RabbitMQCommandExchange;
+use Meteia\Events\EventOutbox;
 use Meteia\EventSourcing\Contracts\EventStream;
-use Meteia\EventSourcing\EventBus;
 use Meteia\EventSourcing\EventMessage;
 use Meteia\EventSourcing\EventMessages;
 use Meteia\ValueObjects\Identity\CausationId;
@@ -22,8 +22,8 @@ class ImmediateUnitOfWork implements UnitOfWork
     public function __construct(
         private EventStream $eventStream,
         private IssuedCommands $issuedCommands,
-        private EventBus $rabbitMQExchange,
-        private RabbitMQCommandExchange $commandExchange,
+        private EventOutbox $eventOutbox,
+        private CommandOutbox $commandOutbox,
     ) {
         $this->pendingEventMessages = new EventMessages();
         $this->pendingCommandMessages = new CommandMessages();
@@ -41,14 +41,14 @@ class ImmediateUnitOfWork implements UnitOfWork
         /** @var EventMessage $eventMessage */
         foreach ($this->pendingEventMessages as $eventMessage) {
             $eventMessage->appendTo($this->eventStream, $causationId, $correlationId);
-            $eventMessage->publishTo($this->rabbitMQExchange);
+            $eventMessage->publishTo($this->eventOutbox);
         }
         $this->pendingEventMessages = new EventMessages();
 
         /** @var CommandMessage $commandMessage */
         foreach ($this->pendingCommandMessages as $commandMessage) {
             $commandMessage->appendTo($this->issuedCommands);
-            $commandMessage->publishTo($this->commandExchange);
+            $commandMessage->publishTo($this->commandOutbox);
         }
         $this->pendingCommandMessages = new CommandMessages();
     }

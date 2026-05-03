@@ -10,7 +10,5 @@ use Meteia\WebAuthn\Contracts\EventDispatcher;
 class NullEventDispatcher implements EventDispatcher
 {
     #[\Override]
-    public function dispatch(Event $event): void
-    {
-    }
+    public function dispatch(Event $event): void {}
 }

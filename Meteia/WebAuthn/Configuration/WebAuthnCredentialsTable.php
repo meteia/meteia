@@ -6,6 +6,4 @@ namespace Meteia\WebAuthn\Configuration;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class WebAuthnCredentialsTable extends StringLiteral
-{
-}
+class WebAuthnCredentialsTable extends StringLiteral {}

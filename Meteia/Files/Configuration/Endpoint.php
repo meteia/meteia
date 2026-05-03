@@ -6,6 +6,4 @@ namespace Meteia\Files\Configuration;
 
 use Meteia\ValueObjects\Identity\Uri;
 
-class Endpoint extends Uri
-{
-}
+class Endpoint extends Uri {}
