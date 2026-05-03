@@ -23,7 +23,7 @@ class Endpoints extends ListOfType implements QueryField, Resolver
     #[\Override]
     public function data(mixed $root, array $args, RequestContext $requestContext): array
     {
-        $set = $requestContext->requestingUser()->isAnonymous() ? $args['anon'] : $args['user'];
+        $set = $requestContext->requestingUser()->pick($args['anon'], $args['user']);
 
         $links = array_map(function ($slug) {
             $endpoint = $this->namedEndpoints->forKey($slug);
