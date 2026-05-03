@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Meteia\Application\RepositoryPath;
+use Meteia\Bootstrap\RepositoryPath;
 use Meteia\Configuration\Configuration;
 use Meteia\Http\Configuration\CookieHost;
 use Meteia\Http\Configuration\LogPath;

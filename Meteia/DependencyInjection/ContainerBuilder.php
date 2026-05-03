@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\DependencyInjection;
 
-use Meteia\Application\ApplicationNamespace;
-use Meteia\Application\ApplicationPath;
+use Meteia\Bootstrap\ApplicationNamespace;
+use Meteia\Bootstrap\ApplicationPath;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
 abstract class ContainerBuilder

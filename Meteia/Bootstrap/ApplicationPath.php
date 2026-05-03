@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Bootstrap;
 
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
@@ -13,7 +13,7 @@ class ApplicationPath extends FilesystemPath
         parent::__construct(...$paths);
         $value = realpath($this->value);
         if (!$value) {
-            throw new \Exception("Invalid ApplicationPath: {$this->value}");
+            throw new InvalidApplicationPath($this->value);
         }
         $this->value = $value;
     }

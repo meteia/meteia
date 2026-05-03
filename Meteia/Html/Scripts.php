@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-use Meteia\Application\ApplicationResourcesBaseUri;
 use Meteia\Html\Elements\Script;
+use Meteia\Resources\ResourceBaseUri;
 
 class Scripts implements \Stringable
 {
     private array $scripts = [];
 
     public function __construct(
-        private ApplicationResourcesBaseUri $applicationResourcesBaseUri,
+        private ResourceBaseUri $resourceBaseUri,
     ) {}
 
     #[\Override]
@@ -30,7 +30,7 @@ class Scripts implements \Stringable
     ): void {
         $src = (string) $src;
         if (str_starts_with($src, '/')) {
-            $src = (string) $this->applicationResourcesBaseUri->withPath($src);
+            $src = (string) $this->resourceBaseUri->withPath($src);
         }
         $this->scripts[$src] = new Script($src, $async, $defer, '', $integrity, $crossorigin);
     }
@@ -39,7 +39,7 @@ class Scripts implements \Stringable
     {
         $src = (string) $src;
         if (str_starts_with($src, '/')) {
-            $src = (string) $this->applicationResourcesBaseUri->withPath($src);
+            $src = (string) $this->resourceBaseUri->withPath($src);
         }
         $this->scripts[$src] = new Script($src, false, false, 'module');
     }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\ErrorHandling\Templates;
 
-use Meteia\Application\RepositoryPath;
 use Meteia\Bluestone\PhpTemplate;
+use Meteia\Bootstrap\RepositoryPath;
 
 use function Meteia\Polyfills\without_prefix;
 

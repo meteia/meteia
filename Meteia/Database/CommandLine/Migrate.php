@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Database\CommandLine;
 
-use Meteia\Application\ApplicationPath;
+use Meteia\Bootstrap\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Meteia\Database\MigrationDatabase;
 use Meteia\Database\MigrationsTableName;

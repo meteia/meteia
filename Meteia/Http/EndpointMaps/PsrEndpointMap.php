@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Http\EndpointMaps;
 
-use Meteia\Application\ApplicationNamespace;
+use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Http\Endpoint;
 use Meteia\Http\EndpointMap;
 use Meteia\Http\Host;

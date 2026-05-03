@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Meteia\Application\RepositoryPath;
+use Meteia\Bootstrap\RepositoryPath;
 use Meteia\Cache\Configuration\CacheDirectory;
 use Meteia\Cache\Configuration\CacheHmacSecretKey;
 use Meteia\Configuration\Configuration;

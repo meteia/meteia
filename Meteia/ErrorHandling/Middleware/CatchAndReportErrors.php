@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\ErrorHandling\Middleware;
 
-use Meteia\Application\Instance;
+use Meteia\Bootstrap\MeteiaKernel;
 use Meteia\ErrorHandling\DulceErrorException;
 use Meteia\ErrorHandling\Endpoints\ErrorEndpoint;
 use Meteia\ErrorHandling\ErrorClassifications\ErrorClassification;
@@ -23,9 +23,9 @@ class CatchAndReportErrors implements MiddlewareInterface
     private ErrorClassification $errorClassification;
 
     public function __construct(
-        private Instance $instance,
+        private MeteiaKernel $kernel,
     ) {
-        $container = $instance->container();
+        $container = $kernel->container();
         $this->logger = $container->get(LoggerInterface::class);
         $this->errorClassification = $container->get(ErrorClassification::class);
 
@@ -79,7 +79,7 @@ class CatchAndReportErrors implements MiddlewareInterface
     {
         $this->handleError($throwable);
 
-        $freshContainer = $this->instance->container([
+        $freshContainer = $this->kernel->container([
             \Throwable::class => $throwable,
         ]);
         $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);

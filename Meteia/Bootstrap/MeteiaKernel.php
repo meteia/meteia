@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Bootstrap;
 
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
@@ -18,7 +18,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 use function Meteia\Http\Functions\send;
 
-readonly class Instance
+readonly class MeteiaKernel
 {
     public function __construct(
         private ApplicationNamespace $namespace,

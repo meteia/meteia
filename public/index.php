@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Meteia\Application\ApplicationNamespace;
-use Meteia\Application\ApplicationPath;
-use Meteia\Application\ApplicationPublicDir;
-use Meteia\Application\Instance;
+use Meteia\Bootstrap\ApplicationNamespace;
+use Meteia\Bootstrap\ApplicationPath;
+use Meteia\Bootstrap\ApplicationPublicDir;
+use Meteia\Bootstrap\MeteiaKernel;
 use Meteia\Http\Middleware\ParseBody;
 
 (function (): void {
@@ -15,6 +15,6 @@ use Meteia\Http\Middleware\ParseBody;
     $path = new ApplicationPath(__DIR__, '..', 'ExampleApp');
     $publicDir = new ApplicationPublicDir(__DIR__, '..', 'public');
 
-    $application = new Instance($namespace, $path, $publicDir);
-    $application->run([ParseBody::class]);
+    $kernel = new MeteiaKernel($namespace, $path, $publicDir);
+    $kernel->run([ParseBody::class]);
 })();

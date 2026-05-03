@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Bunny\Channel;
 use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
-use Meteia\Application\ApplicationNamespace;
+use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Configuration\Configuration;
 use React\EventLoop\LoopInterface;
 

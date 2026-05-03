@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Bootstrap;
 
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-class RepositoryPath extends FilesystemPath {}
+class ApplicationPublicDir extends FilesystemPath {}

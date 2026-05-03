@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\CommandLine;
 
-use Meteia\Application\ApplicationNamespace;
-use Meteia\Application\ApplicationPath;
+use Meteia\Bootstrap\ApplicationNamespace;
+use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\Classy\PsrClasses;
 use Meteia\DependencyInjection\Container;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Commands\CommandLine;
 
-use Meteia\Application\ApplicationNamespace;
-use Meteia\Application\ApplicationPath;
-use Meteia\Application\ApplicationPublicDir;
+use Meteia\Bootstrap\ApplicationNamespace;
+use Meteia\Bootstrap\ApplicationPath;
+use Meteia\Bootstrap\ApplicationPublicDir;
 use Meteia\CommandLine\Command as CLICommand;
 use Meteia\Commands\Command;
 use Meteia\Commands\CommandId;

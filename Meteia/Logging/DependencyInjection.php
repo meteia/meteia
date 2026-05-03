@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Meteia\Application\RepositoryPath;
+use Meteia\Bootstrap\RepositoryPath;
 use Meteia\Logging\DecoratedLog;
 use Meteia\Logging\StandardError;
 use Meteia\Logging\UdpSystemLog;

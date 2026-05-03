@@ -6,7 +6,7 @@ namespace Meteia\Images;
 
 use GuzzleHttp\Client;
 use kornrunner\Blurhash\Blurhash;
-use Meteia\Application\ApplicationPublicDir;
+use Meteia\Bootstrap\ApplicationPublicDir;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
 readonly class Images

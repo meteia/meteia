@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Files;
 
-use Meteia\Application\ApplicationPublicDir;
+use Meteia\Bootstrap\ApplicationPublicDir;
 use Meteia\Files\Contracts\Storage;
 use Meteia\Http\Host;
 use Meteia\ValueObjects\Identity\FilesystemPath;

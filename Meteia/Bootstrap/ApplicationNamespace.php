@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Bootstrap;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
 

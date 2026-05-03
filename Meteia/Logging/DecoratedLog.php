@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Logging;
 
-use Meteia\Application\RepositoryPath;
+use Meteia\Bootstrap\RepositoryPath;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\ProcessId;
