@@ -46,14 +46,12 @@ readonly class Migrate implements Command
                 $this->output->writeln('PDOException: ' . $exception->getMessage());
                 $this->output->writeln('Database not available, retrying in ' . $retryCount . ' seconds...');
                 if ($retryCount > 10) {
-                    $this->output->writeln('database not available');
-
-                    exit(1);
+                    throw new \RuntimeException('Database not available');
                 }
             }
             sleep($retryCount);
         }
-        $migrationsTableName = '`' . $this->migrationsTableName . '`';
+        $migrationsTableName = $this->quotedTableName((string) $this->migrationsTableName);
 
         $this->db->exec("
             CREATE TABLE IF NOT EXISTS {$migrationsTableName} (
@@ -87,7 +85,13 @@ readonly class Migrate implements Command
         /** @var \SplFileInfo $file */
         foreach ($allMigrationFiles as $file) {
             $filename = $file->getBasename('.sql');
-            [$id, $type, $name] = explode('.', $filename, 3);
+            if (!preg_match('/^(?<id>\d{14})\.(?<type>i|ni)\.(?<name>.+)$/', $filename, $matches)) {
+                throw new \RuntimeException('Invalid migration filename: ' . $file->getBasename());
+            }
+
+            $id = $matches['id'];
+            $type = $matches['type'];
+            $name = $matches['name'];
             if (\in_array($id, $migrationIds, true)) {
                 $this->output->writeln(\sprintf('existing : %s', $filename));
 
@@ -98,6 +102,9 @@ readonly class Migrate implements Command
                 continue;
             }
             $sql = file_get_contents($realPath);
+            if ($sql === false) {
+                throw new \RuntimeException('Unable to read migration: ' . $realPath);
+            }
 
             try {
                 $this->output->writeln(\sprintf('applying : %s', $filename));
@@ -107,9 +114,11 @@ readonly class Migrate implements Command
                 if ($type === 'ni') {
                     $this->output->writeln(\sprintf('ignoring error during non-idempotent migration %s', $filename));
                     $this->output->writeln(\sprintf("\t%s", $t->getMessage()));
-                } else {
-                    throw $t;
+
+                    continue;
                 }
+
+                throw $t;
             }
 
             if (!$this->input->getOption(self::ARG_DEV)) {
@@ -120,6 +129,20 @@ readonly class Migrate implements Command
                 $this->output->writeln(\sprintf('recorded : %s', $filename));
             }
         }
+    }
+
+    private function quotedTableName(string $table): string
+    {
+        $parts = explode('.', $table);
+        $parts = array_map(static function (string $part): string {
+            if ($part === '') {
+                throw new \InvalidArgumentException('Database table names must be non-empty strings');
+            }
+
+            return '`' . str_replace('`', '``', $part) . '`';
+        }, $parts);
+
+        return implode('.', $parts);
     }
 
     #[\Override]

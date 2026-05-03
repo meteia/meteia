@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
-use Meteia\Database\Database;
+use Meteia\Database\DatabaseTables;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\GraphQL\Types\ConnectionField;
@@ -16,7 +16,7 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
     use ConnectionResolver;
 
     public function __construct(
-        private readonly Database $db,
+        private readonly DatabaseTables $db,
         private readonly string $table,
         private readonly array $cursorOver = ['id'],
     ) {}
@@ -74,12 +74,9 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
             $columnNameMap = array_map_assoc(static fn($i, $column) => [
                 $column => lcfirst(implode('', array_map(ucfirst(...), explode('_', $column)))),
             ], array_keys($rows[0]));
-            $rows = array_map(
-                static fn($row) => (object) array_map_assoc(static fn($column, $row) => [
-                    $columnNameMap[$column] => $row,
-                ], $row),
-                $rows,
-            );
+            $rows = array_map(static fn($row) => (object) array_map_assoc(static fn($column, $row) => [
+                $columnNameMap[$column] => $row,
+            ], $row), $rows);
         }
 
         return $this->processedRows($rows, $args, $this->cursorOver);

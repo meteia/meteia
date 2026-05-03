@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Aura\Sql\ExtendedPdoInterface;
 use Meteia\Configuration\Configuration;
 use Meteia\Database\Database;
+use Meteia\Database\DatabaseTables;
 use Meteia\Database\MigrationDatabase;
 use Meteia\Database\MigrationsTableName;
 
@@ -24,10 +25,11 @@ return [
         ]);
     },
     ExtendedPdoInterface::class => function (Database $database): ExtendedPdoInterface {
-        $database->exec("SET @@global.time_zone='+00:00';");
+        $database->exec("SET time_zone='+00:00';");
 
         return $database;
     },
+    DatabaseTables::class => static fn(Database $database): DatabaseTables => $database,
     MigrationDatabase::class => static fn(Database $database): MigrationDatabase => $database,
     MigrationsTableName::class =>
         static fn(Configuration $configuration): MigrationsTableName => new MigrationsTableName($configuration->string(

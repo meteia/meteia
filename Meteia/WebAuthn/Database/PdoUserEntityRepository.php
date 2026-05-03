@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\WebAuthn\Database;
 
-use Meteia\Database\Database;
+use Meteia\Database\DatabaseTables;
 use Meteia\WebAuthn\Configuration\WebAuthnUsersTable;
 use Meteia\WebAuthn\Contracts\UserEntityRepository;
 use Webauthn\PublicKeyCredentialUserEntity;
@@ -12,7 +12,7 @@ use Webauthn\PublicKeyCredentialUserEntity;
 readonly class PdoUserEntityRepository implements UserEntityRepository
 {
     public function __construct(
-        private Database $db,
+        private DatabaseTables $db,
         private WebAuthnUsersTable $table,
     ) {}
 

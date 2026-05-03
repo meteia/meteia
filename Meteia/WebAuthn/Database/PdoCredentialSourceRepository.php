@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\WebAuthn\Database;
 
-use Meteia\Database\Database;
+use Meteia\Database\DatabaseTables;
 use Meteia\WebAuthn\Configuration\WebAuthnCredentialsTable;
 use Meteia\WebAuthn\Contracts\CredentialSourceRepository;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -14,7 +14,7 @@ use Webauthn\PublicKeyCredentialUserEntity;
 readonly class PdoCredentialSourceRepository implements CredentialSourceRepository
 {
     public function __construct(
-        private Database $db,
+        private DatabaseTables $db,
         private WebAuthnCredentialsTable $table,
         private SerializerInterface $serializer,
     ) {}

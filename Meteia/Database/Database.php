@@ -5,140 +5,116 @@ declare(strict_types=1);
 namespace Meteia\Database;
 
 use Aura\Sql\ExtendedPdo;
-use Meteia\Cryptography\Hash;
-use Meteia\ValueObjects\Identity\UniqueId;
 
-class Database extends ExtendedPdo implements MigrationDatabase
+final class Database extends ExtendedPdo implements DatabaseTables, MigrationDatabase
 {
+    #[\Override]
     public function delete(string $table, array $whereBindings): void
     {
         if (\count($whereBindings) === 0) {
-            throw new \Exception('Missing where bindings for delete');
+            throw new \InvalidArgumentException('Missing where bindings for delete');
         }
-        $whereColumn = implode(' AND ', array_map(
-            static fn($column) => "`{$column}`=:{$column}",
-            array_keys($whereBindings),
-        ));
-        $query = \sprintf('DELETE FROM %s WHERE %s', $this->quoteTableName($table), $whereColumn);
-        $bindings = $this->prepareBindings($whereBindings);
-        $this->perform($query, $bindings);
+
+        $where = new SqlBoundColumns($whereBindings, 'where');
+        $query = \sprintf('DELETE FROM %s WHERE %s', $this->table($table), $where->comparisons());
+        $this->perform($query, $this->prepareBindings($where->bindings()));
     }
 
+    #[\Override]
     public function insert(string $table, array $bindings): void
     {
         if (\count($bindings) === 0) {
-            throw new \Exception('Missing where bindings for insert');
+            throw new \InvalidArgumentException('Missing bindings for insert');
         }
 
-        $columns = implode(', ', array_map(static fn($column) => "`{$column}`", array_keys($bindings)));
-        $columnBindings = implode(', ', array_map(static fn($column) => ":{$column}", array_keys($bindings)));
-
-        $query = \sprintf('INSERT INTO %s (%s) VALUES (%s)', $this->quoteTableName($table), $columns, $columnBindings);
-        $bindings = $this->prepareBindings($bindings);
-        $this->perform($query, $bindings);
+        $insert = new SqlBoundColumns($bindings, 'insert');
+        $query = \sprintf(
+            'INSERT INTO %s (%s) VALUES (%s)',
+            $this->table($table),
+            $insert->columns(),
+            $insert->placeholders(),
+        );
+        $this->perform($query, $this->prepareBindings($insert->bindings()));
     }
 
+    #[\Override]
     public function prepareBindings(array $values): array
     {
-        return array_map($this->prepareBoundValue(...), $values);
+        return array_map(static fn(mixed $value): mixed => new SqlValue($value)->bound(), $values);
     }
 
+    #[\Override]
     public function select(string $table, array $whereBindings): array
     {
         if (\count($whereBindings) === 0) {
-            throw new \Exception('Missing where bindings for select');
+            throw new \InvalidArgumentException('Missing where bindings for select');
         }
 
-        $whereColumn = implode(' AND ', array_map(
-            static fn($column) => "`{$column}` = :{$column}",
-            array_keys($whereBindings),
-        ));
-        $query = \sprintf('SELECT * FROM %s WHERE %s', $this->quoteTableName($table), $whereColumn);
-        $bindings = $this->prepareBindings($whereBindings);
+        $where = new SqlBoundColumns($whereBindings, 'where');
+        $query = \sprintf('SELECT * FROM %s WHERE %s', $this->table($table), $where->comparisons());
 
-        return $this->fetchObjects($query, $bindings);
+        return $this->fetchObjects($query, $this->prepareBindings($where->bindings()));
     }
 
+    #[\Override]
     public function update(string $table, array $setBindings, array $whereBindings): void
     {
         if (\count($setBindings) === 0 || \count($whereBindings) === 0) {
-            throw new \Exception('Missing set and/or where bindings for update');
+            throw new \InvalidArgumentException('Missing set and/or where bindings for update');
         }
 
-        $setColumns = implode(', ', array_map(
-            static fn($column) => "`{$column}`=:{$column}",
-            array_keys($setBindings),
-        ));
-        $whereColumn = implode(' AND ', array_map(
-            static fn($column) => "`{$column}`=:{$column}",
-            array_keys($whereBindings),
-        ));
-        $query = \sprintf('UPDATE %s SET %s WHERE %s', $this->quoteTableName($table), $setColumns, $whereColumn);
-        $bindings = $this->prepareBindings([
-            ...$setBindings,
-            ...$whereBindings,
-        ]);
-        $this->fetchAffected($query, $bindings);
+        $set = new SqlBoundColumns($setBindings, 'set');
+        $where = new SqlBoundColumns($whereBindings, 'where');
+        $query = \sprintf(
+            'UPDATE %s SET %s WHERE %s',
+            $this->table($table),
+            $set->assignments(),
+            $where->comparisons(),
+        );
+        $this->fetchAffected($query, $this->prepareBindings([...$set->bindings(), ...$where->bindings()]));
     }
 
+    #[\Override]
     public function upsert(string $table, array $setBindings, array $whereBindings): void
     {
-        try {
-            $this->insert($table, [...$setBindings, ...$whereBindings]);
-        } catch (\PDOException $exception) {
-            $setBindings = array_filter(
-                $setBindings,
-                static fn($key) => !\array_key_exists($key, $whereBindings),
-                ARRAY_FILTER_USE_KEY,
+        if (\count($setBindings) === 0 && \count($whereBindings) === 0) {
+            throw new \InvalidArgumentException('Missing bindings for upsert');
+        }
+
+        $insertBindings = [...$setBindings, ...$whereBindings];
+        $insert = new SqlBoundColumns($insertBindings, 'insert');
+        $setBindings = array_filter(
+            $setBindings,
+            static fn(int|string $key): bool => !\array_key_exists($key, $whereBindings),
+            ARRAY_FILTER_USE_KEY,
+        );
+
+        if (\count($setBindings) === 0) {
+            $query = \sprintf(
+                'INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s',
+                $this->table($table),
+                $insert->columns(),
+                $insert->placeholders(),
+                $insert->selfAssignment(),
             );
-            if (\count($setBindings) === 0) {
-                // Nothing to update
-                return;
-            }
+            $this->perform($query, $this->prepareBindings($insert->bindings()));
 
-            match ($exception->getCode()) {
-                // 23000 = MySQL duplicate-key error
-                '23000' => $this->update($table, $setBindings, $whereBindings),
-                default => throw $exception,
-            };
+            return;
         }
+
+        $update = new SqlBoundColumns($setBindings, 'update');
+        $query = \sprintf(
+            'INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s',
+            $this->table($table),
+            $insert->columns(),
+            $insert->placeholders(),
+            $update->assignments(),
+        );
+        $this->perform($query, $this->prepareBindings([...$insert->bindings(), ...$update->bindings()]));
     }
 
-    private function prepareBoundValue(mixed $value): mixed
+    private function table(string $table): string
     {
-        if (\is_array($value)) {
-            return array_map($this->prepareBoundValue(...), $value);
-        }
-        if (!\is_object($value)) {
-            return $value;
-        }
-        if ($value instanceof UniqueId) {
-            return $value->bytes;
-        }
-        if ($value instanceof Hash) {
-            return $value->binary();
-        }
-        if ($value instanceof \BackedEnum) {
-            return $value->value;
-        }
-        if ($value instanceof \DateTime) {
-            return $value->format(MySQL::DATE);
-        }
-        if ($value instanceof \DateTimeInterface) {
-            return $value->format(MySQL::DATETIME);
-        }
-        if ($value instanceof \Stringable) {
-            return (string) $value;
-        }
-
-        return $value;
-    }
-
-    private function quoteTableName(string $table): string
-    {
-        $parts = explode('.', $table, 2);
-        array_map(static fn($part) => "`{$part}`", $parts);
-
-        return implode('.', $parts);
+        return new SqlTableName($table)->quoted();
     }
 }
