@@ -15,7 +15,7 @@ with lib; {
       programs.taskfile.enable = true;
       programs.nodejs.enable = true;
       programs.php = {
-        pkg = pkgs.php84;
+        pkg = pkgs.php85;
         extraConfig = ''
           output_buffering = 4096
           post_max_size = 100M
@@ -33,7 +33,6 @@ with lib; {
               apcu
               event
               imagick
-              igbinary
             ];
         enable = true;
       };

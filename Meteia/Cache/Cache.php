@@ -12,9 +12,11 @@ use Meteia\ValueObjects\Identity\FilesystemPath;
 readonly class Cache
 {
     public function __construct(
-        private CacheDirectory $path,
+        private CacheDirectory     $path,
         private CacheHmacSecretKey $secretKey,
-    ) {}
+    )
+    {
+    }
 
     public function remember(string $key, \DateTimeInterface $expires, callable $default): mixed
     {
@@ -28,7 +30,7 @@ readonly class Cache
                 if ($expiresAt->isFuture()) {
                     $data = $dataPath->read();
 
-                    return igbinary_unserialize($data);
+                    return unserialize(gzuncompress($data));
                 }
             }
 
@@ -37,7 +39,7 @@ readonly class Cache
             }
 
             $data = $default();
-            $dataPath->write(igbinary_serialize($data));
+            $dataPath->write(gzcompress(serialize($data)));
             $metadataPath->writeJson([
                 'key' => $key,
                 'expires' => $expires->format(\DateTimeInterface::RFC3339),
