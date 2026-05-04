@@ -13,7 +13,6 @@ with lib; {
 
       programs.lefthook.enable = true;
       programs.taskfile.enable = true;
-      programs.nodejs.enable = true;
       programs.php = {
         pkg = pkgs.php85;
         extraConfig = ''

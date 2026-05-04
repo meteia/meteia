@@ -44,11 +44,7 @@ final readonly class HtmlEncoder
             $serialized = match ($value) {
                 null, false, '' => null,
                 true => (string) $name,
-                default => sprintf(
-                    '%s="%s"',
-                    $name === 'className' ? 'class' : $name,
-                    $this->escape((string) $value),
-                ),
+                default => sprintf('%s="%s"', $name === 'className' ? 'class' : $name, $this->escape((string) $value)),
             };
             if ($serialized !== null) {
                 $parts[] = $serialized;
