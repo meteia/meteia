@@ -7,6 +7,8 @@ namespace Meteia\Html;
 use Meteia\Html\Elements\Body;
 use Meteia\Html\Elements\Head;
 
+use function Meteia\Html\Elements\el;
+
 class HtmlLayout implements Layout
 {
     public function __construct(
@@ -15,15 +17,9 @@ class HtmlLayout implements Layout
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return <<<EOF
-            <!DOCTYPE html>
-            <html lang="en">
-            {$this->head}
-            {$this->body}
-            </html>
-            EOF;
+        return Children::of('<!DOCTYPE html>', el('html', ['lang' => 'en'], $this->head, $this->body));
     }
 
     #[\Override]

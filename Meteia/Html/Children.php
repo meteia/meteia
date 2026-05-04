@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace Meteia\Html;
 
 /**
- * @implements \IteratorAggregate<int, string|\Stringable>
+ * @implements \IteratorAggregate<int, string|\Stringable|Component>
  */
 final readonly class Children implements Node, \IteratorAggregate
 {
     /**
-     * @param list<string|\Stringable> $nodes
+     * @param list<string|\Stringable|Component> $nodes
      */
     public function __construct(
         public array $nodes = [],
     ) {}
 
-    public static function of(string|\Stringable ...$nodes): self
+    public static function of(string|\Stringable|Component ...$nodes): self
     {
         return new self(array_values($nodes));
     }
 
     /**
-     * @param callable(): (string|\Stringable|iterable<string|\Stringable>) $produce
+     * @param callable(): (string|\Stringable|Component|iterable<string|\Stringable|Component>) $produce
      */
     #[\NoDiscard]
     public function when(bool $condition, callable $produce): self
@@ -38,7 +38,7 @@ final readonly class Children implements Node, \IteratorAggregate
 
     /**
      * @param iterable<mixed> $items
-     * @param callable(mixed, int|string): (string|\Stringable) $render
+     * @param callable(mixed, int|string): (string|\Stringable|Component) $render
      */
     #[\NoDiscard]
     public function each(iterable $items, callable $render): self
@@ -52,7 +52,7 @@ final readonly class Children implements Node, \IteratorAggregate
     }
 
     #[\NoDiscard]
-    public function append(string|\Stringable ...$more): self
+    public function append(string|\Stringable|Component ...$more): self
     {
         return clone($this, ['nodes' => [...$this->nodes, ...array_values($more)]]);
     }

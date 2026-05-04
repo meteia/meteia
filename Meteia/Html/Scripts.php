@@ -7,8 +7,9 @@ namespace Meteia\Html;
 use Meteia\Html\Elements\Script;
 use Meteia\Resources\ResourceBaseUri;
 
-class Scripts implements \Stringable
+class Scripts implements Component
 {
+    /** @var array<string, Script> */
     private array $scripts = [];
 
     public function __construct(
@@ -16,9 +17,9 @@ class Scripts implements \Stringable
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return implode('', $this->scripts);
+        return Children::of(...array_values($this->scripts));
     }
 
     public function load(

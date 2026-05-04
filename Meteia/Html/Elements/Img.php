@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
+use Meteia\Html\Component;
 use Meteia\Html\Node;
 
-final readonly class Img implements Node
+final readonly class Img implements Component
 {
     public function __construct(
         public string $src,
@@ -23,9 +24,9 @@ final readonly class Img implements Node
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return (string) el('img', [
+        return el('img', [
             'src' => $this->src,
             'alt' => $this->alt,
             'width' => $this->width,

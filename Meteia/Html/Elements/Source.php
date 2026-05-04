@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
+use Meteia\Html\Component;
 use Meteia\Html\Node;
 
-final readonly class Source implements Node
+final readonly class Source implements Component
 {
     public function __construct(
         public string $type,
@@ -19,9 +20,9 @@ final readonly class Source implements Node
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return (string) el('source', [
+        return el('source', [
             'type' => $this->type,
             'src' => $this->src,
             'srcset' => $this->srcSet,

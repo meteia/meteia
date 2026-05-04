@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
+use Meteia\Html\Component;
 use Meteia\Html\Metadata;
+use Meteia\Html\Node;
 use Meteia\Html\Scripts;
 use Meteia\Html\Stylesheets;
 
-class Head implements \Stringable
+class Head implements Component
 {
     public function __construct(
         public Title $title,
@@ -18,7 +20,7 @@ class Head implements \Stringable
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
         return el('head', [], $this->title, $this->metadata, $this->scripts, $this->stylesheets);
     }

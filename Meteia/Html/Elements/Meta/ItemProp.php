@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements\Meta;
 
-readonly class ItemProp implements \Stringable
+use Meteia\Html\Component;
+use Meteia\Html\Node;
+
+use function Meteia\Html\Elements\el;
+
+readonly class ItemProp implements Component
 {
     public function __construct(
         private string|\Stringable $name,
@@ -12,8 +17,8 @@ readonly class ItemProp implements \Stringable
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return sprintf('<meta itemprop="%s" content="%s">', $this->name, $this->content);
+        return el('meta', ['itemprop' => (string) $this->name, 'content' => (string) $this->content]);
     }
 }

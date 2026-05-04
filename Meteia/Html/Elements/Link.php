@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
+use Meteia\Html\Component;
 use Meteia\Html\Node;
 
-final readonly class Link implements Node
+final readonly class Link implements Component
 {
     public function __construct(
         public string $rel,
@@ -18,9 +19,9 @@ final readonly class Link implements Node
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return (string) el('link', [
+        return el('link', [
             'rel' => $this->rel,
             'href' => (string) $this->href,
             'integrity' => $this->integrity,

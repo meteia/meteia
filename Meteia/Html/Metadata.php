@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-class Metadata implements \Stringable
+class Metadata implements Component
 {
+    /** @var list<string|\Stringable|Component> */
     private array $tags = [];
 
     #[\Override]
-    public function __toString()
+    public function render(): Node
     {
-        return implode('', $this->tags);
+        return Children::of(...$this->tags);
     }
 
-    public function include(\Stringable $view): void
+    public function include(\Stringable|Component $view): void
     {
         $this->tags[] = $view;
     }

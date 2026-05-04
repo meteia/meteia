@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-class Title implements \Stringable
+use Meteia\Html\Children;
+use Meteia\Html\Component;
+use Meteia\Html\Node;
+
+class Title implements Component
 {
     protected string $prefix;
 
@@ -15,9 +19,9 @@ class Title implements \Stringable
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return '<title>' . html($this->title) . '</title>';
+        return Children::of('<title>' . html($this->title) . '</title>');
     }
 
     public function prefix(string $prefix): void

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
+use Meteia\Html\Component;
 use Meteia\Html\Footer;
 use Meteia\Html\Header;
+use Meteia\Html\Node;
 
-class Body implements \Stringable
+class Body implements Component
 {
     /**
      * @param array<string, string|\Stringable|number|boolean> $attributes
@@ -16,16 +18,16 @@ class Body implements \Stringable
         public Header $header,
         public Footer $footer,
         public array $attributes = [],
-        public string|\Stringable $content = '',
+        public string|\Stringable|Component $content = '',
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
         return el('body', $this->attributes, $this->header, el('main', [], $this->content), $this->footer);
     }
 
-    public function content(string|\Stringable $content): void
+    public function content(string|\Stringable|Component $content): void
     {
         $this->content = $content;
     }

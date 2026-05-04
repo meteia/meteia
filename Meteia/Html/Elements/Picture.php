@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-readonly class Picture
+use Meteia\Html\Component;
+use Meteia\Html\Node;
+
+readonly class Picture implements Component
 {
     /**
      * @param array<int, Source> $sources
@@ -14,13 +17,9 @@ readonly class Picture
         public array $sources,
     ) {}
 
-    public function __toString(): string
+    #[\Override]
+    public function render(): Node
     {
-        return \sprintf(
-            '<%s>%s</%s>' . PHP_EOL,
-            'picture',
-            implode("\n", array_map('strval', [...$this->sources, $this->img])),
-            'picture',
-        );
+        return el('picture', [], ...[...$this->sources, $this->img]);
     }
 }

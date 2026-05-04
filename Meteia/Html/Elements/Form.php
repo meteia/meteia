@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-class Form implements \Stringable
+use Meteia\Html\Component;
+use Meteia\Html\Node;
+
+class Form implements Component
 {
     public function __construct(
         private readonly string $action,
         private readonly string $method,
-        private readonly \Stringable $content,
+        private readonly string|\Stringable|Component $content,
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return <<<EOF
-            <form action="{$this->action}" method="{$this->method}">
-                {$this->content}
-            </form>
-            EOF;
+        return el('form', ['action' => $this->action, 'method' => $this->method], $this->content);
     }
 }

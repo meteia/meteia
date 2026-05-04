@@ -7,8 +7,9 @@ namespace Meteia\Html;
 use Meteia\Html\Elements\Link;
 use Meteia\Resources\ResourceBaseUri;
 
-class Stylesheets implements \Stringable
+class Stylesheets implements Component
 {
+    /** @var array<string, Link> */
     private array $stylesheets = [];
 
     public function __construct(
@@ -16,9 +17,9 @@ class Stylesheets implements \Stringable
     ) {}
 
     #[\Override]
-    public function __toString()
+    public function render(): Node
     {
-        return implode('', $this->stylesheets);
+        return Children::of(...array_values($this->stylesheets));
     }
 
     public function load($href, ?string $integrity = null, ?string $crossorigin = null): void

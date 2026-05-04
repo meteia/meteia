@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
+use Meteia\Html\Component;
 use Meteia\Html\Node;
 
-final readonly class Script implements Node
+final readonly class Script implements Component
 {
     public function __construct(
         public string $src,
@@ -18,9 +19,9 @@ final readonly class Script implements Node
     ) {}
 
     #[\Override]
-    public function __toString(): string
+    public function render(): Node
     {
-        return (string) el('script', [
+        return el('script', [
             'src' => $this->src,
             'async' => $this->async,
             'defer' => $this->defer,

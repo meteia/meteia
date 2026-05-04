@@ -6,9 +6,10 @@ namespace Meteia\Html;
 
 final readonly class HtmlEncoder
 {
-    public function encode(string|\Stringable $node): string
+    public function encode(string|\Stringable|Component $node): string
     {
         return match (true) {
+            $node instanceof Component => $this->encode($node->render()),
             $node instanceof Tag => $this->encodeTag($node),
             $node instanceof Children => $this->encodeChildren($node),
             default => (string) $node,
@@ -31,7 +32,7 @@ final readonly class HtmlEncoder
     {
         $parts = [];
         foreach ($children as $child) {
-            $parts[] = $child instanceof Tag || $child instanceof Children ? $this->encode($child) : (string) $child;
+            $parts[] = $this->encode($child);
         }
 
         return implode(\PHP_EOL, $parts);

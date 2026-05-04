@@ -44,4 +44,17 @@ final class HtmlEncoderTest extends TestCase
     {
         static::assertSame('<div><span>x</span></div>', (string) el('div', [], el('span', [], 'x')));
     }
+
+    public function testComponentChildIsRenderedRecursively(): void
+    {
+        $component = new class implements Component {
+            #[\Override]
+            public function render(): Node
+            {
+                return el('span', [], 'x');
+            }
+        };
+
+        static::assertSame('<div><span>x</span></div>', new HtmlEncoder()->encode(el('div', [], $component)));
+    }
 }
