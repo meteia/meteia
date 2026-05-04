@@ -27,7 +27,7 @@
   "name": "meteia/meteia",
   "require": {
     "aura/sql": "^6.0.0",
-    "bunny/bunny": "^0.5.5",
+    "bunny/bunny": "0.6.x-dev",
     "cakephp/chronos": "^3.0",
     "ext-apcu": "*",
     "ext-gd": "*",
