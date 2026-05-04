@@ -4,13 +4,28 @@ declare(strict_types=1);
 
 namespace Meteia\Resources;
 
-use Meteia\Html\Elements\Head;
+use Meteia\Html\Elements\Link;
+use Meteia\Html\Elements\Script;
 
 interface Resources
 {
-    public function requireEntry(EntryTarget $entry, Head $head): void;
+    /**
+     * @return iterable<Script>
+     */
+    public function scriptsFor(EntryTarget $entry): iterable;
 
-    public function requireModule(string $path, Head $head): void;
+    /**
+     * @return iterable<Link>
+     */
+    public function stylesheetsFor(EntryTarget $entry): iterable;
 
-    public function requireStyle(string $path, Head $head): void;
+    /**
+     * @return iterable<Script>
+     */
+    public function moduleScripts(string $path): iterable;
+
+    /**
+     * @return iterable<Link>
+     */
+    public function styleLinks(string $path): iterable;
 }

@@ -6,9 +6,10 @@ namespace Meteia\ValueObjects\Identity;
 
 use Meteia\Cryptography\Hash;
 use Meteia\Cryptography\SecretKey;
+use Meteia\ValueObjects\Contracts\Path;
 use Meteia\ValueObjects\Primitive\StringLiteral;
 
-class FilesystemPath extends StringLiteral
+class FilesystemPath extends StringLiteral implements Path
 {
     public function __construct(...$paths)
     {
@@ -68,7 +69,7 @@ class FilesystemPath extends StringLiteral
 
     public function join(...$paths): self
     {
-        return new self($this->value, ...$paths);
+        return new self((string) $this, ...$paths);
     }
 
     /**

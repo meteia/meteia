@@ -7,13 +7,13 @@ namespace Meteia\Html;
 use Meteia\Html\Elements\Script;
 use Meteia\Resources\ResourceBaseUri;
 
-class Scripts implements Component
+final class Scripts implements Component
 {
     /** @var array<string, Script> */
     private array $scripts = [];
 
     public function __construct(
-        private ResourceBaseUri $resourceBaseUri,
+        private readonly ResourceBaseUri $resourceBaseUri,
     ) {}
 
     #[\Override]
@@ -22,26 +22,47 @@ class Scripts implements Component
         return Children::of(...array_values($this->scripts));
     }
 
+    public function add(Script $script): void
+    {
+        $src = $this->normalize($script->src);
+        if ($src === $script->src) {
+            $this->scripts[$src] = $script;
+
+            return;
+        }
+        $this->scripts[$src] = new Script(
+            $src,
+            $script->async,
+            $script->defer,
+            $script->type,
+            $script->integrity,
+            $script->crossorigin,
+        );
+    }
+
     public function load(
         string|\Stringable $src,
-        $async = false,
-        $defer = false,
+        bool $async = false,
+        bool $defer = false,
         string $integrity = '',
         string $crossorigin = '',
     ): void {
-        $src = (string) $src;
-        if (str_starts_with($src, '/')) {
-            $src = (string) $this->resourceBaseUri->withPath($src);
-        }
+        $src = $this->normalize((string) $src);
         $this->scripts[$src] = new Script($src, $async, $defer, '', $integrity, $crossorigin);
     }
 
     public function module(string|\Stringable $src): void
     {
-        $src = (string) $src;
-        if (str_starts_with($src, '/')) {
-            $src = (string) $this->resourceBaseUri->withPath($src);
-        }
+        $src = $this->normalize((string) $src);
         $this->scripts[$src] = new Script($src, false, false, 'module');
+    }
+
+    private function normalize(string $src): string
+    {
+        if (str_starts_with($src, '/')) {
+            return (string) $this->resourceBaseUri->withPath($src);
+        }
+
+        return $src;
     }
 }

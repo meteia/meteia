@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Identity;
 
-use Meteia\ValueObjects\Contracts\HasPrefix;
+use Meteia\ValueObjects\Contracts\Identifier;
 use Tuupola\Base62;
 
-abstract readonly class UniqueId implements HasPrefix, \JsonSerializable
+abstract readonly class UniqueId implements Identifier
 {
     protected const int EPOCH = 1577836800;
     protected const int LEN_ENCODED = 27;

@@ -27,7 +27,7 @@ readonly class PublicErrorEndpoint implements ErrorEndpoint
             ], 500);
         }
 
-        $this->layout->head()->title->set('Server Error');
+        $this->layout->head()->title->rename('Server Error');
         $this->layout->body()->header->title('Server Error');
 
         $body = el('p', [], 'An error has occurred. Please try again later.');

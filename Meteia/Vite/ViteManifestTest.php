@@ -22,12 +22,12 @@ use PHPUnit\Framework\TestCase;
  */
 final class ViteManifestTest extends TestCase
 {
-    public function testUsesManifestWhenDevelopmentServerIsDisabled(): void
+    public function testEmitsManifestEntryWhenDevelopmentServerIsDisabled(): void
     {
-        $head = $this->head();
         $manifest = new ViteManifest($this->source(), $this->configuration());
+        $head = $this->head();
 
-        $manifest->requireModule('/App/Pages/HomeEntry.ts', $head);
+        $head->addScripts($manifest->moduleScripts('/App/Pages/HomeEntry.ts'));
 
         static::assertSame(
             "<head><title>Untitled</title>\n\n<script src=\"/dist/App/Pages/HomeEntry-abc123.js\" type=\"module\"></script>\n</head>",
@@ -35,14 +35,14 @@ final class ViteManifestTest extends TestCase
         );
     }
 
-    public function testIgnoresManifestWhenDevelopmentServerIsEnabled(): void
+    public function testEmitsRawPathWhenDevelopmentServerIsEnabled(): void
     {
-        $head = $this->head();
         $manifest = new ViteManifest($this->source(), $this->configuration([
             'VITE_BASE_URI' => 'https://example.test/dist/',
         ]));
+        $head = $this->head();
 
-        $manifest->requireModule('/App/Pages/HomeEntry.ts', $head);
+        $head->addScripts($manifest->moduleScripts('/App/Pages/HomeEntry.ts'));
 
         static::assertSame(
             "<head><title>Untitled</title>\n\n<script src=\"/dist/App/Pages/HomeEntry.ts\" type=\"module\"></script>\n</head>",

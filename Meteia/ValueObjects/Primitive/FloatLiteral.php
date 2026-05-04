@@ -19,12 +19,12 @@ abstract class FloatLiteral extends PrimitiveValueObject
             throw new ValueObjectInvalid($value, ['float']);
         }
 
-        $this->value = $value;
+        parent::__construct($filteredValue);
     }
 
     public function __toString()
     {
-        return (string) $this->value;
+        return (string) $this->toNative();
     }
 
     public function add($amount)

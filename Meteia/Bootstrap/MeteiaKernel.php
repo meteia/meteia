@@ -11,22 +11,24 @@ use Meteia\ErrorHandling\Middleware\CatchAndReportErrors;
 use Meteia\Http\Middleware\PsrEndpoints;
 use Meteia\Http\Middleware\ResponseCookies;
 use Meteia\Http\Middleware\ServerTimingHeader;
+use Meteia\Http\PsrResponseSink;
 use Meteia\Http\RequestHandler;
+use Meteia\Http\ResponseSink;
 use Meteia\Performance\Timings;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function Meteia\Http\Functions\send;
-
-readonly class MeteiaKernel
+final readonly class MeteiaKernel implements Kernel
 {
     public function __construct(
         private ApplicationNamespace $namespace,
         private ApplicationPath $path,
         private ApplicationPublicDir $publicDir,
+        private ResponseSink $sink = new PsrResponseSink(),
     ) {}
 
-    public function run(array $middleware = []): void
+    #[\Override]
+    public function run(MiddlewareList $middleware = new MiddlewareList()): void
     {
         $container = $this->container();
 
@@ -34,9 +36,10 @@ readonly class MeteiaKernel
         $serverRequest = $container->get(ServerRequestInterface::class);
         $response = $requestHandler->handle($serverRequest);
 
-        send($response);
+        $this->sink->send($response);
     }
 
+    #[\Override]
     public function container(array $definitions = []): Container
     {
         $timings = new Timings();
@@ -59,7 +62,8 @@ readonly class MeteiaKernel
         return new TimedContainer($timings, $container);
     }
 
-    public function requestHandler(Container $container, array $middleware = []): RequestHandlerInterface
+    #[\Override]
+    public function requestHandler(Container $container, MiddlewareList $middleware = new MiddlewareList()): RequestHandlerInterface
     {
         /** @var RequestHandler $requestHandler */
         $requestHandler = $container->get(RequestHandlerInterface::class);
@@ -67,7 +71,7 @@ readonly class MeteiaKernel
         $requestHandler->append(new CatchAndReportErrors($this));
         $requestHandler->append(ServerTimingHeader::class);
         $requestHandler->append(ResponseCookies::class);
-        $requestHandler->append(...$middleware);
+        $middleware->appendInto($requestHandler);
         $requestHandler->append(PsrEndpoints::class);
 
         return $requestHandler;

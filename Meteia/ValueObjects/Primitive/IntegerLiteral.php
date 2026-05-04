@@ -19,12 +19,12 @@ abstract class IntegerLiteral extends PrimitiveValueObject
             throw new ValueObjectInvalid($value, ['int']);
         }
 
-        $this->value = $filteredValue;
+        parent::__construct($filteredValue);
     }
 
     public function __toString(): string
     {
-        return (string) $this->value;
+        return (string) $this->toNative();
     }
 
     public function equalTo($integer): bool
@@ -44,6 +44,6 @@ abstract class IntegerLiteral extends PrimitiveValueObject
 
     public function asInteger(): int
     {
-        return (int) $this->value;
+        return (int) $this->toNative();
     }
 }

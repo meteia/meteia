@@ -5,23 +5,31 @@ declare(strict_types=1);
 namespace Meteia\ValueObjects\Primitive;
 
 use Meteia\Domain\Contracts\Comparable;
+use Meteia\ValueObjects\Contracts\Text;
 use Meteia\ValueObjects\PrimitiveValueObject;
 
-abstract class StringLiteral extends PrimitiveValueObject implements \Stringable
+abstract class StringLiteral extends PrimitiveValueObject implements Text
 {
     public function __construct($value)
     {
-        $this->value = (string) $value;
+        parent::__construct((string) $value);
+    }
+
+    #[\Override]
+    public function toNative(): string
+    {
+        return (string) parent::toNative();
     }
 
     #[\Override]
     public function __toString(): string
     {
-        return $this->value;
+        return $this->toNative();
     }
 
-    public function compareTo(Comparable $other)
+    #[\Override]
+    public function compareTo(Comparable $other): int
     {
-        return strcasecmp($this->toNative(), $other->toNative());
+        return strcasecmp($this->toNative(), (string) $other->toNative());
     }
 }

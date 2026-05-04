@@ -6,7 +6,9 @@ namespace Meteia\ValueObjects;
 
 abstract class PrimitiveValueObject implements \JsonSerializable
 {
-    protected mixed $value;
+    public function __construct(
+        protected readonly mixed $value,
+    ) {}
 
     public function toNative(): mixed
     {

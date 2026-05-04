@@ -31,7 +31,7 @@ class DeveloperErrorEndpoint implements ErrorEndpoint
             ], 500);
         }
 
-        $this->layout->head()->title->set($throwable->getMessage());
+        $this->layout->head()->title->rename($throwable->getMessage());
         $this->layout->body()->header->title($throwable->getMessage());
 
         $this->layout->body()->content($this->stackTrace->for($throwable));

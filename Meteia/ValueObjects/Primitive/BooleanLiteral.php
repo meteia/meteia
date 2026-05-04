@@ -11,30 +11,18 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
 {
     public function __construct($value)
     {
-        $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        parent::__construct(filter_var($value, FILTER_VALIDATE_BOOLEAN));
     }
 
     public function __toString()
     {
-        if ($this->isTrue()) {
-            return 'TRUE';
-        }
-
-        return 'FALSE';
+        return $this->isTrue() ? 'TRUE' : 'FALSE';
     }
 
     #[\Override]
     public function compareTo(Comparable $other)
     {
-        if ($this->toNative() === $other->toNative()) {
-            return 0;
-        }
-
-        if ($this->toNative() < $other->toNative()) {
-            return -1;
-        }
-
-        return 1;
+        return $this->toNative() <=> $other->toNative();
     }
 
     #[\Override]
@@ -43,22 +31,18 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
         return $this->isTrue();
     }
 
-    public function isTrue()
+    public function isTrue(): bool
     {
-        return (bool) $this->value;
+        return (bool) $this->toNative();
     }
 
-    public function isFalse()
+    public function isFalse(): bool
     {
-        return $this->isTrue() ? false : true;
+        return !$this->isTrue();
     }
 
-    public function not()
+    public function not(): static
     {
-        if ($this->isTrue()) {
-            return new static(false);
-        }
-
-        return new static(true);
+        return new static(!$this->isTrue());
     }
 }

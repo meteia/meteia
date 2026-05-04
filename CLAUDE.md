@@ -12,7 +12,7 @@ Always: `declare(strict_types=1);` at top of every PHP file.
 - **mutable objects** — default to `final readonly class`. Mutation only at infrastructure edges (PDO, streams, caches, HTTP clients).
 - **static methods** — wrap in objects. Static named constructors (`fromString`) tolerated at boundaries; prefer parser objects when practical.
 - **`instanceof` / type casting** for branching — use polymorphism. `match` only at outer boundary (controller, CLI, deserializer) to convert raw input into polymorphic objects.
-- **implementation inheritance** — classes are `final`. Share via composition/decorators, not abstract base classes or traits.
+- **implementation inheritance** — no template methods, no overriding for behavior, no subtype mutation of inherited state. Share via composition/decorators, not base classes or traits. **Exception — nominal subtypes:** a `final` class that extends a value-object base **solely to give it a domain name** is permitted. The subtype must add **zero methods, zero properties**, and the parent's state must be `readonly` (so subtypes can read but cannot rewrite it). The moment a subclass adds behavior or rewrites parent state, switch to composition.
 - **public methods without an interface** — every cross-object public method belongs to an interface.
 - **ORM/ActiveRecord in domain** — Eloquent/Doctrine models stay in infrastructure. Map to immutable domain objects at the seam.
 - **`-er` service names** (`UserValidator`, `InvoiceProcessor`, `ResponseBuilder`) — name by role/value (`ValidUserRegistration`, `PaidInvoice`, `JsonEndpoint`). Includes role-sounding tech words that read like industry standards: `Publisher`/`Subscriber`/`Worker`/`Handler`/`Manager`/`Controller`-as-service. Reach for `Outbox`/`Inbox`/`Endpoint`/`Sink`/`Source`/`Registry`/`Ledger` instead.
@@ -35,6 +35,15 @@ Always: `declare(strict_types=1);` at top of every PHP file.
 - Use the **URI extension** (`Uri\Rfc3986\Uri`) instead of raw URL strings inside the domain.
 - Decision methods do the work: prefer `grantAccessTo(Resource $r): Decision` over `canAccess(): bool` followed by branching.
 
+## Immutable objects vs. entities (locator pattern)
+
+Immutable objects are not passive data; they animate mutable data located elsewhere. An object's properties hold the *stable knowledge* needed to find and control that data. The mutable business data lives in the represented resource (file, row, stream) or in another value-object instance.
+
+- Value object change returns a new object (`withX(): self`, `#[\NoDiscard]`, `clone(...)`).
+- Entity/proxy change updates the represented resource and returns `void`. The object itself stays unchanged.
+- Prefer behavior names over setters: `rename(Title)`, `changeEmail(Email)`, `publish()`. Reserve `with*` for value-object transitions only.
+- `#[\NoDiscard]` marks value-returning transitions only; never mark void command methods that mutate external state.
+
 ## Boundaries
 
 Nullable types, arrays, JSON, raw HTTP requests, ORM rows, scalar config — all permitted **at boundaries**. Convert to domain objects immediately on entry; convert back to scalars/JSON only in adapter/read-model objects (e.g. a dedicated `UserJson` encoder), never in domain objects.
@@ -56,10 +65,11 @@ One behavioral assertion per test. Push field-level checks into custom PHPUnit c
 3. No `?T` returns in domain interfaces.
 4. No `getX()`/`setX()` on domain objects.
 5. No `instanceof` branching outside boundary code.
-6. No `extends` of a project abstract class.
+6. Any `extends` of a value-object base is a *nominal subtype only*: zero added methods, zero added properties, parent state is `readonly`.
 7. Every cross-object public method has an interface.
 8. State transitions use `clone(...)` and carry `#[\NoDiscard]`.
 9. ORM models confined to infrastructure layer.
 10. No `-er`-ending names on new types (incl. `Publisher`/`Worker`/`Handler`-as-service).
 11. Object exposes behavior; callers don't reach in for fields to assemble results.
 12. `mago format` + `mago lint` clean on touched files; no config relaxed to get there.
+13. Mutable business data lives in the represented resource (entity), not as a property on a value object.
