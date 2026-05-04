@@ -46,7 +46,7 @@ final readonly class SqlValue
     private function boundBinaryObject(): mixed
     {
         if ($this->value instanceof UniqueId) {
-            return $this->value->bytes;
+            return $this->value->bytes();
         }
         if ($this->value instanceof Hash) {
             return $this->value->binary();

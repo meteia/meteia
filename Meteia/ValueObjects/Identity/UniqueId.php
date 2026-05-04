@@ -14,10 +14,10 @@ abstract readonly class UniqueId implements Identifier
     protected const int LEN_RANDOM = 16;
     protected const int LEN_TIMESTAMP = 4;
 
-    public string $token;
+    private string $token;
 
-    public function __construct(
-        public string $bytes,
+    final public function __construct(
+        private string $bytes,
     ) {
         \assert(
             \strlen($bytes) === (static::LEN_TIMESTAMP + static::LEN_RANDOM),
@@ -29,6 +29,16 @@ abstract readonly class UniqueId implements Identifier
         $this->token = implode('_', [static::prefix(), $token]);
     }
 
+    public function bytes(): string
+    {
+        return $this->bytes;
+    }
+
+    public function token(): string
+    {
+        return $this->token;
+    }
+
     public function __toString(): string
     {
         return $this->token;
@@ -37,7 +47,6 @@ abstract readonly class UniqueId implements Identifier
     public static function random(): static
     {
         $data = static::LEN_TIMESTAMP ? pack('N', time() - static::EPOCH) : '';
-        // $data = pack("N", random_int(0, PHP_INT_MAX));
         $data .= random_bytes(static::LEN_RANDOM);
 
         return new static($data);
@@ -45,7 +54,7 @@ abstract readonly class UniqueId implements Identifier
 
     public static function fromToken(string $token): static
     {
-        // Discard any additional data on the token (e.g. a selector)
+        // Discard any additional data on the token (e.g. a selector).
         [$prefix, $token] = explode('_', $token, 3);
         \assert($prefix === static::prefix(), 'Expected token with prefix ' . static::prefix());
         $token = ltrim($token, '0');
@@ -73,22 +82,23 @@ abstract readonly class UniqueId implements Identifier
         return substr($this->bytes, -$len);
     }
 
+    #[\Override]
     public function hex(): string
     {
         return bin2hex($this->bytes);
     }
 
+    #[\Override]
     public function hash(): string
     {
-        $hash = $this->binaryHash();
-
         return implode('_', [
             static::prefix(),
             'hash',
-            new Base62()->encode($hash),
+            new Base62()->encode($this->binaryHash()),
         ]);
     }
 
+    #[\Override]
     public function binaryHash(): string
     {
         return hash('sha256', $this->bytes, true);

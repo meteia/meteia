@@ -10,9 +10,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class RequestHandler implements RequestHandlerInterface, MiddlewareInterface
+final class RequestHandler implements RequestHandlerInterface, MiddlewareInterface
 {
-    private $middleware = [];
+    /** @var array<int, MiddlewareInterface|class-string> */
+    private array $middleware = [];
 
     public function __construct(
         private Container $container,

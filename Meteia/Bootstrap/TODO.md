@@ -1,100 +1,81 @@
-# Bootstrap / Resources / Vite — Deferred Refactors
+# Outstanding Elegant-Objects design debt
 
-Tracks Elegant-Objects rule violations the user explicitly chose to defer.
-Re-evaluate when the surrounding code is touched.
+Each entry is a known violation of CLAUDE.md that we've chosen not to fix
+yet. Re-evaluate when the surrounding code is touched. Resolved items
+live in `git log`, not here.
 
-## Resolved (this PR)
+## `UniqueId` template-method LEN_\* constants
+**Files:** `Meteia/ValueObjects/Identity/UniqueId.php`,
+`Meteia/Cryptography/SecretKey.php`.
 
-- ✅ `MeteiaKernel` is `final readonly` and implements `Meteia\Bootstrap\Kernel`.
-- ✅ `MeteiaKernel::run` no longer calls `send()` directly — injects
-  `Meteia\Http\ResponseSink` (default `PsrResponseSink`).
-- ✅ `ApplicationPath::__construct` no longer mutates `$this->value`. Path
-  resolution moved to `Meteia\Bootstrap\ResolveApplicationPath::from(...)`.
-  Entry points updated.
-- ✅ `ApplicationResources` rename completed previously; the new
-  `Meteia\Resources\Resources` interface is now a stream source
-  (`scriptsFor`/`stylesheetsFor`/`moduleScripts`/`styleLinks`) returning
-  `iterable<Script>` / `iterable<Link>`.
-- ✅ `Meteia\Vite\ViteFileManifestSource` is `final readonly`; memoization
-  pushed into `Meteia\Resources\InProcessManifestCache` (entity).
-- ✅ `Head` is `final` with `public readonly` sub-entities; chainable
-  `addScripts(iterable)` / `addStylesheets(iterable)` accumulators added.
-- ✅ `Title::set()` renamed to `rename()` per the locator rule (behavior
-  name, not setter).
-- ✅ Inheritance rule narrowed in CLAUDE.md to permit *nominal subtypes*:
-  `final` extends with zero added methods/properties and a `readonly`
-  parent state. Real harm (`ApplicationPath` mutating inherited state) is
-  now blocked at the language level.
-- ✅ `MiddlewareList` value object replaces raw `array $middleware`.
-- ✅ `Meteia\Application` use-case layer scaffolding landed:
-  `Command`/`Query`/`CommandResult`/`Accepted`/`Rejected`/`CommandBus`/
-  `QueryBus`/`CommandEndpoint`/`QueryEndpoint`. Renamed `Handler` →
-  `Endpoint` per CLAUDE.md `-er` rule.
+`UniqueId` reads `static::EPOCH`, `static::LEN_TIMESTAMP`,
+`static::LEN_RANDOM`, `static::LEN_ENCODED` via late static binding;
+`SecretKey` overrides them to 0/32/43. Strict reading of CLAUDE.md says
+no template methods. We've ruled this *parameterisation* (data, not
+behavior) and accepted it. Fix when we want truly nominal subtypes:
+introduce a parser object `Identifiers::random(string $prefix, IdShape
+$shape): UniqueId` so subtypes don't carry shape, and drop
+`MyId::random()`/`fromHex()`/`fromToken()` ergonomics.
 
-## Still deferred
-
-### Subclasses that add methods/state — convert to composition
-**Files:** `Meteia/Cryptography/Hash.php`, `Meteia/Cryptography/SecretKey.php`,
+## Subclasses that add methods — convert to composition
+**Files:** `Meteia/Cryptography/Hash.php`,
 `Meteia/ValueObjects/Identity/TemporaryFilesystemPath.php`,
-`Meteia/ValueObjects/Identity/EmailAddress.php`,
-`Meteia/ValueObjects/Identity/ProcessId.php`,
-`Meteia/ValueObjects/Identity/CausationId.php`.
+`Meteia/ValueObjects/Identity/EmailAddress.php`.
 
-These compile today (parent state is `protected readonly`, so reads still
-work) but they violate the new "zero added methods" nominal-subtype rule:
-- `Hash` adds 5 encoding methods.
-- `SecretKey` (Cryptography) adds `hmac()` + LEN_* constants used by
-  parent via late-static-binding (template-method pattern).
-- `TemporaryFilesystemPath` adds `__destruct` + static factories.
-- `EmailAddress` extends `ValueObject` with `getAddress`/`getDisplayName`
-  getters (also a getter rule violation).
-- `ProcessId` / `CausationId` add `fromCommandId`/`fromEventId` parsers —
-  relocate as `final readonly` parser objects (`ProcessIdFromCommandId`,
-  `CausationIdFromEventId`) per CLAUDE.md "prefer parser objects".
+- `Hash` extends `StringLiteral` with 5 encoding methods (`fromBase62`,
+  `fromBinary`, `base62`, `base64`, `binary`, `hex`). Convert to
+  `final readonly class Hash implements Text` composing a string.
+- `TemporaryFilesystemPath` extends `FilesystemPath` with a
+  `__destruct` cleanup + static factories. Legitimate entity (lifecycle
+  via destructor); convert to composition over `Path` with the
+  forwarders we'd need for the call sites.
+- `EmailAddress` extends `ValueObject` (not one of our 4 bases) with
+  `getAddress`/`getDisplayName` getters — getter rule violation
+  separate from the inheritance rule.
 
-`SecretKey` is the awkward one — its constants tune `UniqueId`'s
-template-method behavior. A clean fix needs `UniqueId` itself to take
-length parameters via constructor, eliminating the template-method
-pattern. Out of scope for this PR.
+## `RequestHandler` mutator entity has no interface
+**File:** `Meteia/Http/RequestHandler.php`. `final` now, but
+`append`/`prepend` aren't part of any contract. Document as locator
+behavior or extract a `Middlewares` interface used by
+`MeteiaKernel::requestHandler()` and `MiddlewareList::appendInto()`.
 
-### `UniqueId` exposes `public string $bytes` / `$token`
-The whole `UniqueId` family uses public field access (CLAUDE.md rule 11
-forbids field exposure) and template-method constants. Cross-cutting
-refactor — left untouched here.
+## `EventSourcing` namespace cleanup
+**Files:** `Meteia/EventSourcing/Contracts/EventStream.php`,
+`Meteia/EventSourcing/PdoEventStream.php`,
+`Meteia/EventSourcing/EventMessage.php`,
+`Meteia/EventSourcing/EventMetadata.php`.
 
-### `RequestHandler` is mutable + has no interface
-`Meteia/Http/RequestHandler.php` mutates an internal `$middleware` array
-via `append`/`prepend`. Class isn't `final`, no interface beyond PSR
-ones. Treat as entity for now; document.
+- Tighten `EventStream` to `append(StreamId, ExpectedVersion,
+  RecordedEvent...)` / `read(StreamId, FromVersion = First):
+  EventStream`.
+- Add `StreamId` (nominal `UniqueId`), `StreamVersion`
+  (`IntegerLiteral`), `ExpectedVersion` polymorphic value:
+  `Any` / `Empty` / `ExactlyAt(StreamVersion)`.
+- Fold `EventMetadata` into a single `RecordedEvent` carrying causation,
+  correlation, occurredAt, sequence.
+- Add `Meteia\Projections`: `Projection` / `Checkpoint` /
+  `CheckpointStore` (+ `PdoCheckpointStore`).
+- Make the snapshot policy explicit (current 15ms+25ev threshold is
+  opaque magic).
 
-### Mago lint rule for nominal-subtype enforcement
-Once mago grows a primitive for "subclass of X declares no new
-methods/properties", add a rule keyed off `StringLiteral`,
-`FilesystemPath`, `Uri`, `UniqueId`, `PrimitiveValueObject`. The
-hand-rolled architecture test was rejected as a regex hack; rely on
-review + CLAUDE.md until mago can express it.
+## Wire `Meteia\Application\CommandBus` to AMQP
+**Files:** `Meteia/Application/CommandBus.php`,
+`Meteia/Commands/CommandOutbox.php`,
+`Meteia/AdvancedMessageQueuing/Bunny/`.
 
-### Consolidate event-sourcing namespaces
-`Meteia\EventSourcing` (existing PDO-backed) overlaps with the planned
-`Meteia\EventStore`/`Meteia\Projections` greenfield namespaces. Don't
-fork — refactor `EventSourcing\Contracts\EventStream` into the new
-shape (`StreamId`/`StreamVersion`/`ExpectedVersion`/`RecordedEvent`)
-inside the existing namespace.
+- `Meteia\Commands\Command` is the AMQP-published transport marker
+  (existing implementers); leave it.
+- Add `InProcessCommandBus` (DI-resolved `CommandEndpoint<T>`,
+  invoke synchronously).
+- Add `AmqpCommandBus` / `OutboxedCommandBus` that serialises
+  `Application\Command` to the existing `CommandOutbox`. Receiving
+  worker invokes the matching `CommandEndpoint`.
+- Decide whether to rename `Meteia\Commands\Command` (e.g. to
+  `TransportEnvelope`) so `Application\Command` owns the user-facing
+  name.
 
-### Wire `Meteia\Application\CommandBus` to `Meteia\Commands` transport
-Application-layer `CommandBus` is the use-case dispatcher; the existing
-`Meteia\Commands` AMQP infrastructure is the transport. Adapter that
-serializes `Application\Command` onto the AMQP exchange goes in a later
-PR.
-
-### `Head`/`Body` etc. are still mutable entities (locator pattern)
-The user values DX of in-place mutation across nested partials, and the
-new locator rule legitimizes this — Head is an entity that animates
-mutable presentation state. If/when the value-object shape becomes
-desirable (e.g. for caching), revisit.
-
-### `RequestHandler::append` mutators inside `MeteiaKernel::requestHandler`
-Currently four `append(...)` calls in `MeteiaKernel::requestHandler()`.
-Cleaner if `RequestHandler` had a `with(...)` value-object shape — but
-since `RequestHandler::process` consumes via `array_shift` it's
-intrinsically entity. Keep mutators; document as locator behavior.
+## Mago lint primitive for nominal subtypes
+When mago supports "subclass of X declares no new methods/properties",
+add a rule keyed off `StringLiteral` / `FilesystemPath` / `Uri` /
+`UniqueId` / `PrimitiveValueObject`. Reject hand-rolled regex/test
+hacks until then.

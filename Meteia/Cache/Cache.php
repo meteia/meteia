@@ -18,7 +18,7 @@ readonly class Cache
 
     public function remember(string $key, \DateTimeInterface $expires, callable $default): mixed
     {
-        $hashedKey = hash_hmac('sha256', $key, $this->secretKey->bytes);
+        $hashedKey = hash_hmac('sha256', $key, $this->secretKey->bytes());
         $dataPath = $this->path->join(substr($hashedKey, 0, 2), $hashedKey);
         $metadataPath = new FilesystemPath($dataPath . '.meta');
         while (true) {

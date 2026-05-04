@@ -15,7 +15,7 @@ class UniqueIdNormalizer implements NormalizerInterface, DenormalizerInterface
     {
         \assert($object instanceof UniqueId);
 
-        return $object->token;
+        return $object->token();
     }
 
     #[\Override]

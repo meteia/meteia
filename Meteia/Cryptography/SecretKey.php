@@ -17,9 +17,4 @@ readonly class SecretKey extends UniqueId
     {
         return 'sk';
     }
-
-    public function hmac(string $algorithm, string $data): Hash
-    {
-        return new Hash(hash_hmac($algorithm, $data, $this->bytes));
-    }
 }

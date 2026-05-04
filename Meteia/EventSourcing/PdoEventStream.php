@@ -112,13 +112,7 @@ class PdoEventStream implements EventStream
         foreach ($messageRows as $row) {
             /** @var DomainEvent $event */
             $event = $this->messageSerializer->unserialize($row->event);
-            $eventMessage = new EventMessage(
-                $aggregateRootId,
-                $event,
-                (int) $row->aggregate_sequence,
-                new CausationId($row->causation_id),
-                new CorrelationId($row->correlation_id),
-            );
+            $eventMessage = new EventMessage($aggregateRootId, $event, (int) $row->aggregate_sequence);
             $eventMessage->applyTo($target);
         }
         $replayDelta = (microtime(true) - $replayStart) * 1000;
