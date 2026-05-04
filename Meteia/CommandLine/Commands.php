@@ -30,11 +30,7 @@ final readonly class Commands implements \IteratorAggregate
         $classes = new PsrClasses(
             $this->applicationPath,
             (string) $this->applicationNamespace,
-            [
-                '.+',
-                'CommandLine',
-                '.*\.php',
-            ],
+            ['.+', 'CommandLine', '.*\.php'],
         );
         $commandClassnames = new ClassesImplementing($classes, Command::class);
         foreach ($commandClassnames as $commandClassname) {

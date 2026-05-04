@@ -42,8 +42,11 @@ class PsrEndpoints implements MiddlewareInterface
 
         // FIXME: This is code path is very slow
         $className = $this->endpointMap->classNameFor($path);
-        $bestMatchingClass = $this->bestMatchingClass->in($className, Endpoint::class, ['\\Index']);
+        $endpoint = $this->bestMatchingClass
+            ->matching($className, Endpoint::class, ['\\Index'])
+            ->resolveIn($this->container);
+        \assert($endpoint instanceof Endpoint, 'container binding for endpoint class must produce an Endpoint');
 
-        return $this->container->get($bestMatchingClass);
+        return $endpoint;
     }
 }

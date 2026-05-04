@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
+use Meteia\Classy\MergedClasses;
 use Meteia\Classy\PsrClasses;
 use Meteia\DependencyInjection\Container;
 use Meteia\GraphQL\Contracts\Field;
@@ -18,13 +19,15 @@ return [
         Container $container,
     ): SchemaFields {
         $meteiaPath = new FilesystemPath(__DIR__, '..', '..')->realpath();
-        $meteiaClasses = new PsrClasses($meteiaPath, 'Meteia', ['.+', 'GraphQL', '.+\.php']);
+        $regex = ['.+', 'GraphQL', '.+\.php'];
 
-        $applicationClasses = new PsrClasses($applicationPath, (string) $namespace, ['.+', 'GraphQL', '.+\.php']);
-        $classes = new ClassesImplementing([
-            ...iterator_to_array($meteiaClasses),
-            ...iterator_to_array($applicationClasses),
-        ], Field::class);
+        $classes = new ClassesImplementing(
+            new MergedClasses(
+                new PsrClasses($meteiaPath, 'Meteia', $regex),
+                new PsrClasses($applicationPath, (string) $namespace, $regex),
+            ),
+            Field::class,
+        );
 
         return new SchemaFields($container, $classes);
     },

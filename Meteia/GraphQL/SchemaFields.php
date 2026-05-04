@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Meteia\GraphQL;
 
 use GraphQL\Type\Definition\Type;
+use Meteia\Classy\Classes;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\DependencyInjection\Container;
 use Meteia\GraphQL\Contracts\QueryField;
 
-class SchemaFields
+final readonly class SchemaFields
 {
     public function __construct(
-        private readonly Container $container,
-        private readonly iterable $fieldClasses,
+        private Container $container,
+        private Classes $fieldClasses,
     ) {}
 
     public function implementing(string $interface): \Generator

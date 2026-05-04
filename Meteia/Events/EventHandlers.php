@@ -7,10 +7,11 @@ namespace Meteia\Events;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
+use Meteia\Classy\MergedClasses;
 use Meteia\Classy\PsrClasses;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-readonly class EventHandlers implements \IteratorAggregate
+final readonly class EventHandlers implements \IteratorAggregate
 {
     public function __construct(
         private ApplicationPath $applicationPath,
@@ -20,29 +21,14 @@ readonly class EventHandlers implements \IteratorAggregate
     #[\Override]
     public function getIterator(): \Traversable
     {
-        $meteiaClasses = new PsrClasses(
-            new FilesystemPath(__DIR__, '..', '..'),
-            'Meteia',
-            [
-                '.+',
-                'EventHandlers',
-                '.*\.php',
-            ],
+        $regex = ['.+', 'EventHandlers', '.*\.php'];
+
+        yield from new ClassesImplementing(
+            new MergedClasses(
+                new PsrClasses(new FilesystemPath(__DIR__, '..', '..'), 'Meteia', $regex),
+                new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, $regex),
+            ),
+            EventHandler::class,
         );
-        foreach (new ClassesImplementing($meteiaClasses, EventHandler::class) as $class) {
-            yield $class;
-        }
-        $appClasses = new PsrClasses(
-            $this->applicationPath,
-            (string) $this->applicationNamespace,
-            [
-                '.+',
-                'EventHandlers',
-                '.*\.php',
-            ],
-        );
-        foreach (new ClassesImplementing($appClasses, EventHandler::class) as $class) {
-            yield $class;
-        }
     }
 }

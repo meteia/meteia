@@ -6,7 +6,7 @@ namespace Meteia\Classy;
 
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-readonly class PsrClasses implements \IteratorAggregate
+final readonly class PsrClasses implements Classes
 {
     public function __construct(
         private FilesystemPath $baseDirectory,
@@ -30,12 +30,12 @@ readonly class PsrClasses implements \IteratorAggregate
         }
     }
 
-    private function fileToClassName($file): string
+    private function fileToClassName(string $file): string
     {
-        $className = str_replace('.php', '', $file);
-        $className = str_replace(\DIRECTORY_SEPARATOR, '\\', $className);
-        $className = trim($className, '\\');
-
-        return trim($this->namespacePrefix . '\\' . $className, '\\');
+        return $file
+            |> (static fn(string $f): string => str_replace('.php', '', $f))
+            |> (static fn(string $f): string => str_replace(\DIRECTORY_SEPARATOR, '\\', $f))
+            |> (static fn(string $f): string => trim($f, '\\'))
+            |> (fn(string $f): string => trim($this->namespacePrefix . '\\' . $f, '\\'));
     }
 }

@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Meteia\Classy;
 
-use Meteia\Classy\Errors\MatchingClassNotFound;
+use Meteia\Classy\Matched\FoundClass;
+use Meteia\Classy\Matched\MissingClass;
 
-class BestMatchingClass
+final readonly class BestMatchingClass
 {
-    public function in(string $name, string $implementing, array $postFixes = []): string
+    public function matching(string $name, string $implementing, array $postFixes = []): MatchedClass
     {
         $pathParts = explode('\\', trim($name, '\\'));
-        $contentAndPathNames = array_map(static fn($part) => "\\$part", [
+        $contentAndPathNames = array_map(static fn($part) => "\\{$part}", [
             $pathParts[1],
             ...\array_slice($pathParts, 3),
         ]);
@@ -21,15 +22,15 @@ class BestMatchingClass
         for ($i = \count($pathParts); $i > 1; --$i) {
             $possibleClassName = implode('\\', \array_slice($pathParts, 0, $i));
 
-            $possibleClassNames = array_map(static fn($postfix) => "$possibleClassName$postfix", $postFixes);
+            $possibleClassNames = array_map(static fn($postfix) => "{$possibleClassName}{$postfix}", $postFixes);
 
             foreach ($possibleClassNames as $possibleClassName) {
                 if (is_subclass_of($possibleClassName, $implementing)) {
-                    return $possibleClassName;
+                    return new FoundClass($possibleClassName);
                 }
             }
         }
 
-        throw new MatchingClassNotFound('No Matching Class Found');
+        return new MissingClass();
     }
 }

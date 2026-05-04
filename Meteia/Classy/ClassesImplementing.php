@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\Classy;
 
-class ClassesImplementing implements \IteratorAggregate
+final readonly class ClassesImplementing implements Classes
 {
     public function __construct(
-        private readonly iterable $classes,
-        private readonly string $implementing,
+        private Classes $classes,
+        private string $implementing,
     ) {}
 
     #[\Override]
