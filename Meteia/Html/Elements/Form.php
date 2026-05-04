@@ -16,9 +16,9 @@ class Form implements \Stringable
     public function __toString(): string
     {
         return <<<EOF
-            <form action="{$this->action}" method="{$this->method}">
-                {$this->content}
-            </form>
-            EOF;
+        <form action="{$this->action}" method="{$this->method}">
+            {$this->content}
+        </form>
+        EOF;
     }
 }

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Html\VoidElement;
+use Meteia\Html\Node;
 
-readonly class Source
+final readonly class Source implements Node
 {
-    use VoidElement;
-
     public function __construct(
         public string $type,
         public ?string $src = null,
@@ -19,4 +17,18 @@ readonly class Source
         public ?string $width = null,
         public ?string $height = null,
     ) {}
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return (string) el('source', [
+            'type' => $this->type,
+            'src' => $this->src,
+            'srcset' => $this->srcSet,
+            'sizes' => $this->sizes,
+            'media' => $this->media,
+            'width' => $this->width,
+            'height' => $this->height,
+        ]);
+    }
 }

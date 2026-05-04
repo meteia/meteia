@@ -6,7 +6,13 @@ namespace Meteia\Html;
 
 interface ClassName
 {
-    public function use(array $props): string;
+    /**
+     * @param array<string, mixed> $props
+     */
+    public function use(array $props): ClassList;
 
+    /**
+     * @param array<string, mixed> $props
+     */
     public function attribute(array $props): ClassAttribute;
 }

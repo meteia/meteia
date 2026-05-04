@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Html\VoidElement;
+use Meteia\Html\Node;
 
-class Link implements \Stringable
+final readonly class Link implements Node
 {
-    use VoidElement;
-
     public function __construct(
         public string $rel,
         public string|\Stringable $href,
@@ -18,4 +16,17 @@ class Link implements \Stringable
         public ?string $sizes = null,
         public ?string $type = null,
     ) {}
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return (string) el('link', [
+            'rel' => $this->rel,
+            'href' => (string) $this->href,
+            'integrity' => $this->integrity,
+            'crossorigin' => $this->crossorigin,
+            'sizes' => $this->sizes,
+            'type' => $this->type,
+        ]);
+    }
 }

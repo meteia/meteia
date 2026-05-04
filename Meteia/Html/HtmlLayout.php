@@ -18,12 +18,12 @@ class HtmlLayout implements Layout
     public function __toString(): string
     {
         return <<<EOF
-            <!DOCTYPE html>
-            <html lang="en">
-            {$this->head}
-            {$this->body}
-            </html>
-            EOF;
+        <!DOCTYPE html>
+        <html lang="en">
+        {$this->head}
+        {$this->body}
+        </html>
+        EOF;
     }
 
     #[\Override]

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Html\Element;
+use Meteia\Html\Node;
 
-readonly class Img
+final readonly class Img implements Node
 {
-    use Element;
-
     public function __construct(
         public string $src,
         public ?string $alt = null,
@@ -23,4 +21,22 @@ readonly class Img
         public ?string $loading = null,
         public ?string $decoding = 'async',
     ) {}
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return (string) el('img', [
+            'src' => $this->src,
+            'alt' => $this->alt,
+            'width' => $this->width,
+            'height' => $this->height,
+            'srcset' => $this->srcSet,
+            'sizes' => $this->sizes,
+            'class' => $this->className,
+            'crossorigin' => $this->crossOrigin,
+            'fetchpriority' => $this->fetchPriority,
+            'loading' => $this->loading,
+            'decoding' => $this->decoding,
+        ]);
+    }
 }

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Html\Element;
+use Meteia\Html\Node;
 
-class Script
+final readonly class Script implements Node
 {
-    use Element;
-
     public function __construct(
         public string $src,
         public bool $async = false,
@@ -18,4 +16,17 @@ class Script
         public string $integrity = '',
         public string $crossorigin = '',
     ) {}
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return (string) el('script', [
+            'src' => $this->src,
+            'async' => $this->async,
+            'defer' => $this->defer,
+            'type' => $this->type,
+            'integrity' => $this->integrity,
+            'crossorigin' => $this->crossorigin,
+        ]);
+    }
 }

@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace Meteia\Html\Elements;
 
-use Meteia\Html\CustomElement;
+use Meteia\Html\Node;
 
-readonly class Button extends CustomElement
+final readonly class Button implements Node
 {
     /**
-     * @param array<string, string|\Stringable|number|boolean> $attributes
+     * @param array<int|string, mixed> $attributes
      */
-    public function __construct(array $attributes = [], null|string|\Stringable $children = null)
+    public function __construct(
+        public array $attributes = [],
+        public null|string|\Stringable $children = null,
+    ) {}
+
+    #[\Override]
+    public function __toString(): string
     {
-        parent::__construct('button', $attributes, $children);
+        return (string) el('button', $this->attributes, $this->children ?? '');
     }
 }

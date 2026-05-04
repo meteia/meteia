@@ -20,60 +20,58 @@ class ClassVarianceAuthority implements ClassName
     ) {}
 
     #[\Override]
-    public function use(array $props): string
+    public function use(array $props): ClassList
     {
         $props = array_merge($this->defaultVariants, $props);
 
-        $classes = [];
+        $list = ClassList::of($this->class);
 
-        // Add base classes
-        $classes = array_merge($classes, explode(' ', $this->class));
-
-        // Add variant classes
         foreach ($this->variants as $variantName => $variantOptions) {
-            if (isset($props[$variantName], $variantOptions[$props[$variantName]])) {
-                $variantClass = $variantOptions[$props[$variantName]];
-                if (is_array($variantClass)) {
-                    $classes = array_merge($classes, $variantClass);
-                } elseif (is_string($variantClass)) {
-                    $classes = array_merge($classes, explode(' ', $variantClass));
-                }
+            if (!isset($props[$variantName], $variantOptions[$props[$variantName]])) {
+                continue;
             }
+            $list = $list->merge(self::asList($variantOptions[$props[$variantName]]));
         }
 
-        // Add compound variant classes
         foreach ($this->compoundVariants as $compound) {
-            $matches = true;
-            foreach ($compound as $key => $value) {
-                if ($key === 'class' || $key === 'className') {
-                    continue;
-                }
-                if (!isset($props[$key]) || $props[$key] !== $value) {
-                    $matches = false;
-                    break;
-                }
+            if (!self::matches($compound, $props)) {
+                continue;
             }
-            if ($matches) {
-                $compoundClass = $compound['class'] ?? $compound['className'] ?? '';
-                if (is_array($compoundClass)) {
-                    $classes = array_merge($classes, $compoundClass);
-                } elseif (is_string($compoundClass)) {
-                    $classes = array_merge($classes, explode(' ', $compoundClass));
-                }
-            }
+            $list = $list->merge(self::asList($compound['class'] ?? $compound['className'] ?? ''));
         }
 
-        // Clean and unique
-        $classes = array_map('trim', $classes);
-        $classes = array_filter($classes, static fn($c) => $c !== '');
-        $classes = array_unique($classes);
-
-        return implode(' ', $classes);
+        return $list;
     }
 
     #[\Override]
     public function attribute(array $props): ClassAttribute
     {
         return new ClassAttribute($this->use($props));
+    }
+
+    /**
+     * @param array<int, string>|string $value
+     */
+    private static function asList(array|string $value): ClassList
+    {
+        return \is_array($value) ? ClassList::of(implode(' ', $value)) : ClassList::of($value);
+    }
+
+    /**
+     * @param array<string, mixed> $compound
+     * @param array<string, mixed> $props
+     */
+    private static function matches(array $compound, array $props): bool
+    {
+        foreach ($compound as $key => $value) {
+            if ($key === 'class' || $key === 'className') {
+                continue;
+            }
+            if (!isset($props[$key]) || $props[$key] !== $value) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
