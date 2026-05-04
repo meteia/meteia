@@ -42,9 +42,14 @@ class ResponseCookies implements MiddlewareInterface
         SameSite $sameSite = SameSite::Lax,
     ): void {
         $maxAge = $expiresAt ? $expiresAt->getTimestamp() - time() : null;
+        $expiresGmt = $expiresAt
+            ? \DateTimeImmutable::createFromInterface($expiresAt)
+                ->setTimezone(new \DateTimeZone('GMT'))
+                ->format('D, d M Y H:i:s \G\M\T')
+            : null;
         $kvParts = array_filter([
             $cookie->name => $cookie->value,
-            'Expires' => $expiresAt?->format(DATE_RFC7231),
+            'Expires' => $expiresGmt,
             'Max-Age' => $maxAge,
             'Domain' => $this->cookieHost,
             'Path' => '/',
