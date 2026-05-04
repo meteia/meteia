@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Meteia\Configuration\Configuration;
 use Meteia\WebAuthn\Configuration\RelyingPartyId;
+use Meteia\WebAuthn\Configuration\RelyingPartyName;
 use Meteia\WebAuthn\Configuration\RelyingPartyOrigins;
 use Meteia\WebAuthn\Configuration\WebAuthnCredentialsTable;
 use Meteia\WebAuthn\Configuration\WebAuthnSecretKey;
@@ -24,6 +25,11 @@ use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
 use Webauthn\Denormalizer\WebauthnSerializerFactory;
 
 return [
+    RelyingPartyName::class =>
+        static fn(Configuration $configuration): RelyingPartyName => new RelyingPartyName($configuration->string(
+            'WEBAUTHN_RP_NAME',
+            'Meteia',
+        )),
     RelyingPartyId::class =>
         static fn(Configuration $configuration): RelyingPartyId => new RelyingPartyId($configuration->string(
             'WEBAUTHN_RP_ID',
