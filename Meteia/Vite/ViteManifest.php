@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Vite;
 
+use Meteia\Configuration\Configuration;
 use Meteia\Html\Elements\Head;
 use Meteia\Resources\EntryTarget;
 use Meteia\Resources\ManifestSource;
@@ -15,6 +16,7 @@ final readonly class ViteManifest implements Resources
 
     public function __construct(
         private ManifestSource $source,
+        private Configuration $configuration,
     ) {}
 
     #[\Override]
@@ -27,7 +29,7 @@ final readonly class ViteManifest implements Resources
     public function requireModule(string $path, Head $head): void
     {
         $path = trim($path, '/');
-        $entries = $this->source->entries();
+        $entries = $this->entries();
         if ($entries[$path]['file'] ?? false) {
             foreach ($entries[$path]['imports'] ?? [] as $import) {
                 $this->requireModule($import, $head);
@@ -47,7 +49,7 @@ final readonly class ViteManifest implements Resources
     public function requireStyle(string $path, Head $head): void
     {
         $path = trim($path, '/');
-        $entries = $this->source->entries();
+        $entries = $this->entries();
         if ($entries[$path]['file'] ?? false) {
             foreach ($entries[$path]['imports'] ?? [] as $import) {
                 $this->requireStyle($import, $head);
@@ -61,5 +63,14 @@ final readonly class ViteManifest implements Resources
             return;
         }
         $head->stylesheets->load(self::PREFIX . $path);
+    }
+
+    private function entries(): array
+    {
+        if ($this->configuration->string('VITE_BASE_URI', '') !== '') {
+            return [];
+        }
+
+        return $this->source->entries();
     }
 }
