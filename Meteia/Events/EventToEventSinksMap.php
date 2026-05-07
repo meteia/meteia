@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Meteia\Events;
 
-readonly class EventToEventHandlersMap implements \IteratorAggregate
+readonly class EventToEventSinksMap implements \IteratorAggregate
 {
     public function __construct(
         public Events $events,
-        public EventHandlers $eventHandlers,
+        public EventSinks $eventSinks,
     ) {}
 
     #[\Override]
     public function getIterator(): \Traversable
     {
-        $eventHandlers = iterator_to_array($this->eventHandlers);
+        $sinks = iterator_to_array($this->eventSinks);
         foreach ($this->events as $event) {
             $normalizedEvent = $this->normalizedEvent($event);
 
             yield $event => array_filter(
-                $eventHandlers,
-                fn(string $eventHandler) => $normalizedEvent === $this->normalizedEventHandler($eventHandler),
+                $sinks,
+                fn(string $sink): bool => $normalizedEvent === $this->normalizedEventSink($sink),
             );
         }
     }
@@ -33,7 +33,7 @@ readonly class EventToEventHandlersMap implements \IteratorAggregate
         return implode('.', $parts);
     }
 
-    private function normalizedEventHandler(string $className): string
+    private function normalizedEventSink(string $className): string
     {
         $parts = explode('\\', $className);
         array_pop($parts);

@@ -6,7 +6,7 @@ namespace Meteia\Events;
 
 interface EventInbox
 {
-    public function subscribe(string $eventClassName, string $eventHandlerClassName, callable $eventHandler): void;
+    public function subscribe(string $eventClassName, string $sinkClassName, EventSink $sink): void;
 
     public function run(): void;
 }

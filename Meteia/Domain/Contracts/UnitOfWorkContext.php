@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Meteia\Domain\Contracts;
 
-use Meteia\Domain\CommandMessages;
-use Meteia\EventSourcing\EventMessages;
+use Meteia\Domain\PendingCommands;
+use Meteia\EventSourcing\PendingEvents;
 
 interface UnitOfWorkContext
 {
-    public function caused(EventMessages $eventMessages);
+    public function caused(PendingEvents $events): void;
 
-    public function wantsTo(CommandMessages $commandMessages);
+    public function wantsTo(PendingCommands $commands): void;
 }

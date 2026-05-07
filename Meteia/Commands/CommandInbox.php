@@ -6,7 +6,7 @@ namespace Meteia\Commands;
 
 interface CommandInbox
 {
-    public function subscribe(string $commandClassName, CommandMessageHandler $handler): void;
+    public function subscribe(string $commandClassName, CommandSink $sink): void;
 
     public function run(): void;
 }

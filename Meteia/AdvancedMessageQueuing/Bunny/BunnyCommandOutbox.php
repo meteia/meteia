@@ -10,6 +10,7 @@ use Meteia\AdvancedMessageQueuing\MessageContext;
 use Meteia\Commands\Command;
 use Meteia\Commands\CommandId;
 use Meteia\Commands\CommandOutbox;
+use Meteia\ValueObjects\Identity\MessageScopeSource;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -20,7 +21,7 @@ final readonly class BunnyCommandOutbox implements CommandOutbox
         private LoggerInterface $log,
         private CommandsExchangeName $exchangeName,
         private SerializerInterface $serializer,
-        private MessageContext $context,
+        private MessageScopeSource $scopeSource,
     ) {}
 
     #[\Override]
@@ -29,9 +30,10 @@ final readonly class BunnyCommandOutbox implements CommandOutbox
         $this->channel->exchangeDeclare((string) $this->exchangeName, durable: true);
         $queueName = str_replace('\\', '.', $command::class);
         $payload = $this->serializer->serialize($command, 'json');
+        $context = MessageContext::fromScope($this->scopeSource->current());
         $this->channel->publish(
             $payload,
-            $this->context->headersWithMessageId((string) CommandId::random()),
+            $context->headersWithMessageId((string) CommandId::random()),
             $this->exchangeName,
             $queueName,
         );

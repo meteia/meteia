@@ -18,6 +18,11 @@ final readonly class BunnyMessageLoop
         private LoggerInterface $log,
     ) {}
 
+    public function channel(): Channel
+    {
+        return $this->channel;
+    }
+
     public function runUntilShutdown(string $shutdownExchangeName): void
     {
         $this->channel->exchangeDeclare($shutdownExchangeName, exchangeType: 'fanout', durable: true);

@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace Meteia\Domain;
 
 use Meteia\Commands\CommandOutbox;
+use Meteia\Domain\Contracts\IssuedCommands;
 use Meteia\Domain\Contracts\UnitOfWork;
 use Meteia\Events\EventOutbox;
+use Meteia\EventSourcing\AnyVersion;
 use Meteia\EventSourcing\Contracts\EventStream;
-use Meteia\EventSourcing\EventMessage;
-use Meteia\EventSourcing\EventMessages;
-use Meteia\ValueObjects\Identity\CausationId;
-use Meteia\ValueObjects\Identity\CorrelationId;
+use Meteia\EventSourcing\PendingEvent;
+use Meteia\EventSourcing\PendingEvents;
+use Meteia\EventSourcing\RecordedEvent;
+use Meteia\ValueObjects\Identity\MessageScope;
 
 class ImmediateUnitOfWork implements UnitOfWork
 {
-    private EventMessages $pendingEventMessages;
+    private PendingEvents $pendingEvents;
 
-    private CommandMessages $pendingCommandMessages;
+    private PendingCommands $pendingCommands;
 
     public function __construct(
         private EventStream $eventStream,
@@ -25,37 +27,49 @@ class ImmediateUnitOfWork implements UnitOfWork
         private EventOutbox $eventOutbox,
         private CommandOutbox $commandOutbox,
     ) {
-        $this->pendingEventMessages = new EventMessages();
-        $this->pendingCommandMessages = new CommandMessages();
+        $this->pendingEvents = new PendingEvents();
+        $this->pendingCommands = new PendingCommands();
     }
 
     #[\Override]
-    public function caused(EventMessages $eventMessages): void
+    public function caused(PendingEvents $events): void
     {
-        $this->pendingEventMessages = $this->pendingEventMessages->merge($eventMessages);
+        $this->pendingEvents = $this->pendingEvents->merge($events);
     }
 
     #[\Override]
-    public function complete(CausationId $causationId, CorrelationId $correlationId): void
+    public function wantsTo(PendingCommands $commands): void
     {
-        /** @var EventMessage $eventMessage */
-        foreach ($this->pendingEventMessages as $eventMessage) {
-            $eventMessage->appendTo($this->eventStream, $causationId, $correlationId);
-            $eventMessage->publishTo($this->eventOutbox);
+        $this->pendingCommands = $this->pendingCommands->merge($commands);
+    }
+
+    #[\Override]
+    public function complete(MessageScope $scope): void
+    {
+        $occurredAt = new \DateTimeImmutable();
+        $byStream = [];
+        /** @var PendingEvent $pending */
+        foreach ($this->pendingEvents as $pending) {
+            $key = $pending->streamId()->hex();
+            $byStream[$key][] = $pending->recordedWith($scope->causationId(), $scope->correlationId(), $occurredAt);
         }
-        $this->pendingEventMessages = new EventMessages();
-
-        /** @var CommandMessage $commandMessage */
-        foreach ($this->pendingCommandMessages as $commandMessage) {
-            $commandMessage->appendTo($this->issuedCommands);
-            $commandMessage->publishTo($this->commandOutbox);
+        foreach ($byStream as $recorded) {
+            /** @var RecordedEvent $first */
+            $first = $recorded[0];
+            $this->eventStream->append($first->streamId(), new AnyVersion(), ...$recorded);
+            foreach ($recorded as $event) {
+                $this->eventOutbox->publish($event->event());
+            }
         }
-        $this->pendingCommandMessages = new CommandMessages();
-    }
+        $this->pendingEvents = new PendingEvents();
 
-    #[\Override]
-    public function wantsTo(CommandMessages $commandMessages): void
-    {
-        $this->pendingCommandMessages = $this->pendingCommandMessages->merge($commandMessages);
+        $issuedAt = new \DateTimeImmutable();
+        /** @var PendingCommand $pending */
+        foreach ($this->pendingCommands as $pending) {
+            $message = $pending->issuedWith($scope->causationId(), $scope->correlationId(), $issuedAt);
+            $message->appendInto($this->issuedCommands);
+            $message->publishTo($this->commandOutbox);
+        }
+        $this->pendingCommands = new PendingCommands();
     }
 }

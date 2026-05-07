@@ -5,141 +5,84 @@ declare(strict_types=1);
 namespace Meteia\MessageStreams;
 
 use Aura\Sql\ExtendedPdoInterface;
-use Meteia\EventSourcing\Contracts\EventSourced;
 use Meteia\MessageStreams\Contracts\Message;
 use Meteia\MessageStreams\Contracts\MessageStream;
 use Meteia\MessageStreams\Exceptions\FailedToAppendMessage;
-use Meteia\Performance\Timings;
+use Meteia\ValueObjects\Identity\CausationId;
+use Meteia\ValueObjects\Identity\CorrelationId;
+use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\UniqueId;
 
-class PdoMessageStream implements MessageStream
+final readonly class PdoMessageStream implements MessageStream
 {
-    private array $snapshotVersions = [];
-
     public function __construct(
         private ExtendedPdoInterface $db,
         private MessageSerializer $messageSerializer,
-        private Timings $timings,
     ) {}
 
+    #[\Override]
     public function append(
         UniqueId $messageStreamId,
-        MessageStreamSequence $messageStreamSequence,
+        MessageStreamSequence $sequence,
         MessageTypeId $messageTypeId,
         Message $message,
+        MessageScope $scope,
     ): void {
-        $query = '
-            INSERT INTO message_streams (message_stream_id, message_stream_sequence, message_type_id, message)
-            VALUE (UNHEX(:messageStreamId), :messageStreamSequence, UUID_TO_BIN(:messageTypeId), :message);
-        ';
-        $bindings = [
-            'messageStreamId' => $messageStreamId->hex(),
-            'messageStreamSequence' => (string) $messageStreamSequence,
-            'messageTypeId' => (string) $messageTypeId,
+        $success = $this->db->fetchAffected('
+            INSERT INTO message_streams (
+                message_stream_id, message_stream_sequence, message_type_id, message,
+                causation_id, correlation_id, occurred_at
+            )
+            VALUES (
+                :messageStreamId, :sequence, :messageTypeId, :message,
+                :causationId, :correlationId, :occurredAt
+            )
+        ', [
+            'messageStreamId' => $messageStreamId->bytes(),
+            'sequence' => $sequence->asInt(),
+            'messageTypeId' => $messageTypeId->bytes(),
             'message' => $this->messageSerializer->serialize($message),
-        ];
-        $success = $this->db->perform($query, $bindings);
+            'causationId' => $scope->causationId()->bytes(),
+            'correlationId' => $scope->correlationId()->bytes(),
+            'occurredAt' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
+        ]);
         if (!$success) {
             throw new FailedToAppendMessage('SQL Issue : ' . $this->db->getPdo()->errorInfo()[2]);
         }
     }
 
-    public function replay(UniqueId $messageStreamId, EventSourced $target): EventSourced
+    #[\Override]
+    public function read(UniqueId $messageStreamId): RecordedMessages
     {
-        return $this->loadLatestSnapshot($messageStreamId, $target);
+        $rows = $this->db->fetchObjects('
+            SELECT message_stream_id, message_stream_sequence, message,
+                   causation_id, correlation_id, occurred_at
+            FROM message_streams
+            WHERE message_stream_id = :messageStreamId
+            ORDER BY message_stream_sequence ASC
+        ', ['messageStreamId' => $messageStreamId->bytes()]);
+
+        return new RecordedMessages(array_map(fn(\stdClass $row): RecordedMessage => $this->hydrate(
+            $messageStreamId,
+            $row,
+        ), $rows));
     }
 
-    private function loadLatestSnapshot(UniqueId $messageStreamId, EventSourced $target): EventSourced
+    private function hydrate(UniqueId $messageStreamId, \stdClass $row): RecordedMessage
     {
-        // TODO: Use APCu or similar cache? (benchmark first, PHP OpCache might be enough)
-        if (!isset($this->snapshotVersions[$target::class])) {
-            $rc = new \ReflectionClass($target);
-            $hash = substr(hash_file('sha256', $rc->getFileName()), 0, 32);
-            $this->snapshotVersions[$target::class] = $hash;
-        }
+        /** @var Message $message */
+        $message = $this->messageSerializer->unserialize($row->message);
+        $pending = new PendingMessage(
+            $messageStreamId,
+            new MessageStreamSequence((int) $row->message_stream_sequence),
+            $message,
+        );
 
-        // dump($this->snapshotVersions[$target::class]);
-        $query = '
-            SELECT snapshot, message_stream_sequence
-            FROM message_stream_snapshots
-            WHERE message_stream_id = UNHEX(:messageStreamId) AND snapshot_version = UNHEX(:snapshotVersion)
-            ORDER BY message_stream_sequence DESC
-            LIMIT 1
-        ';
-        $bindings = [
-            'messageStreamId' => $messageStreamId->hex(),
-            'snapshotVersion' => $this->snapshotVersions[$target::class],
-        ];
-        $snapshotRow = $this->db->fetchObject($query, $bindings);
-        if ($snapshotRow) {
-            $target = $this->messageSerializer->unserialize($snapshotRow->snapshot);
-
-            $query = '
-                SELECT *
-                FROM message_streams
-                WHERE message_stream_id = UNHEX(:messageStreamId)
-                AND message_stream_sequence > :messageStreamSequence
-                ORDER BY message_stream_sequence;
-            ';
-            $bindings = [
-                'messageStreamId' => $messageStreamId->hex(),
-                'messageStreamSequence' => (string) $snapshotRow->message_stream_sequence,
-            ];
-        } else {
-            $query = '
-                SELECT *
-                FROM message_streams
-                WHERE message_stream_id = UNHEX(:messageStreamId)
-                ORDER BY message_stream_sequence;
-            ';
-            $bindings = [
-                'messageStreamId' => $messageStreamId->hex(),
-            ];
-        }
-
-        $messageRows = $this->db->fetchObjects($query, $bindings);
-
-        $replayStart = microtime(true);
-        foreach ($messageRows as $messageRow) {
-            /** @var Message $message */
-            $message = $this->messageSerializer->unserialize($messageRow->message);
-            $message->applyTo($target);
-        }
-        $replayDelta = (microtime(true) - $replayStart) * 1000;
-        $this->timings->add($target::class . '.replay', $replayDelta);
-        $this->timings->add($target::class . '.replayCount', \count($messageRows));
-
-        if ($replayDelta > 15 && \count($messageRows) > 25) {
-            $lastMessageRow = end($messageRows);
-            $this->createSnapshot(
-                $messageStreamId,
-                new MessageStreamSequence($lastMessageRow->message_stream_sequence),
-                $target,
-            );
-        }
-
-        return $target;
-    }
-
-    private function createSnapshot(
-        UniqueId $messageStreamId,
-        MessageStreamSequence $messageStreamSequence,
-        $target,
-    ): void {
-        $this->timings->add($target::class . '.snapshotUpdate', 1);
-        $query = '
-            INSERT INTO message_stream_snapshots (message_stream_id, message_stream_sequence, snapshot_version, snapshot)
-            VALUES (UNHEX(:messageStreamId), :messageStreamSequence, UNHEX(:snapshotVersion), :snapshot)
-            ON DUPLICATE KEY UPDATE message_stream_sequence = VALUES(message_stream_sequence),
-                                 snapshot_version = VALUES(snapshot_version),
-                                 snapshot = VALUES(snapshot)
-        ';
-        $bindings = [
-            'messageStreamId' => $messageStreamId->hex(),
-            'messageStreamSequence' => (string) $messageStreamSequence,
-            'snapshotVersion' => $this->snapshotVersions[$target::class],
-            'snapshot' => $this->messageSerializer->serialize($target),
-        ];
-        $this->db->perform($query, $bindings);
+        return new RecordedMessage(
+            $pending,
+            new CausationId($row->causation_id),
+            new CorrelationId($row->correlation_id),
+            new \DateTimeImmutable((string) $row->occurred_at),
+        );
     }
 }

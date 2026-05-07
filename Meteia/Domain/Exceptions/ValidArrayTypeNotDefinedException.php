@@ -6,4 +6,6 @@ namespace Meteia\Domain\Exceptions;
 
 use Meteia\Exceptions\Contracts\IdempotentException;
 
-class ValidArrayTypeNotDefinedException extends \InvalidArgumentException implements IdempotentException {}
+class ValidArrayTypeNotDefinedException extends \InvalidArgumentException implements IdempotentException
+{
+}

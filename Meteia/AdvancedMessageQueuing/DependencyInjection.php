@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 use Bunny\Channel;
 use Bunny\Client;
+use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Configuration\Configuration;
+use Meteia\ValueObjects\Identity\MessageScope;
+use Meteia\ValueObjects\Identity\MessageScopeSource;
 use React\EventLoop\LoopInterface;
 
 $connectionOptions = static fn(Configuration $config): array => [
@@ -38,4 +41,7 @@ return [
         'METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME',
         $applicationNamespace . '.Commands',
     )),
+    AmbientMessageScopeSource::class =>
+        static fn(MessageScope $scope): AmbientMessageScopeSource => new AmbientMessageScopeSource($scope),
+    MessageScopeSource::class => static fn(AmbientMessageScopeSource $source): MessageScopeSource => $source,
 ];

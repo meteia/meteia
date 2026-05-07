@@ -7,4 +7,6 @@ namespace Meteia\Application;
 /**
  * @template TResult
  */
-interface Query {}
+interface Query
+{
+}

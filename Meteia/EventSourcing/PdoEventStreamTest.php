@@ -8,200 +8,236 @@ use Aura\Sql\ExtendedPdo;
 use Aura\Sql\ExtendedPdoInterface;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
-use Meteia\Domain\ValueObjects\AggregateRootId;
 use Meteia\EventSourcing\Contracts\EventSourced;
+use Meteia\EventSourcing\Exceptions\OptimisticConcurrencyFailure;
 use Meteia\MessageStreams\MessageSerializer;
 use Meteia\Performance\Timings;
+use Meteia\Projections\GlobalSequence;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
+use Meteia\ValueObjects\Identity\UniqueId;
+use PHPUnit\Framework\TestCase;
 
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
-
-return;
-function db(): ExtendedPdoInterface
+/**
+ * @internal
+ */
+final class PdoEventStreamTest extends TestCase
 {
-    return new ExtendedPdo('sqlite::memory:');
-}
+    public function testAppendingAndReplayingPreservesEvents(): void
+    {
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $event = new RecordedSomething();
 
-function init(ExtendedPdoInterface $pdo): PdoEventStream
-{
-    $query = <<<'SQL'
-            CREATE TABLE events (
-                aggregate_root_id  BINARY(20)                         NOT NULL,
-                aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
-                event_type_id      BINARY(16)                         NOT NULL,
-                event              MEDIUMTEXT                         NOT NULL,
-                created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                correlation_id     BINARY(20)                         NOT NULL,
-                causation_id       BINARY(20)                         NOT NULL,
-                CONSTRAINT aggregate_sequence UNIQUE (aggregate_root_id, aggregate_sequence)
-            );
-            CREATE INDEX event_type_id ON events(event_type_id);
+        $stream->append($streamId, new EmptyStream(), $this->record($streamId, 0, $event));
 
-            CREATE TABLE event_snapshots (
-                aggregate_root_id  BINARY(20)                         NOT NULL,
-                aggregate_sequence BIGINT UNSIGNED                    NOT NULL,
-                aggregate_hash     BINARY(16)                         NOT NULL,
-                snapshot           MEDIUMTEXT                         NOT NULL,
-                created            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                CONSTRAINT aggregate_root_id UNIQUE (aggregate_root_id)
-            );
-        SQL;
-    $pdo->exec($query);
+        $target = new CountingTarget();
+        $stream->replay($streamId, $target);
+        static::assertSame(1, $target->count);
+    }
 
-    return new PdoEventStream($pdo, new MessageSerializer(), new Timings());
-}
+    public function testReadReturnsRecordedEventsWithIdsIntact(): void
+    {
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $causation = CausationId::random();
+        $correlation = CorrelationId::random();
+        $pending = new PendingEvent($streamId, new StreamVersion(0), new RecordedSomething());
+        $stream->append(
+            $streamId,
+            new AnyVersion(),
+            new RecordedEvent($pending, $causation, $correlation, new \DateTimeImmutable()),
+        );
 
-// class FakeUnitOfWorkContext implements UnitOfWorkContext
-// {
-//    public CommandMessages $commandMessages;
+        $events = $stream->read($streamId);
+        static::assertCount(1, $events);
+        $first = $events[0];
+        static::assertSame((string) $causation, (string) $first->causedBy());
+        static::assertSame((string) $correlation, (string) $first->correlatedTo());
+    }
 
-//    public EventMessages $eventMessages;
+    public function testEmptyStreamRejectsNonZeroVersion(): void
+    {
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $stream->append($streamId, new EmptyStream(), $this->record($streamId, 0, new RecordedSomething()));
 
-//    public function commitCommandMessages(CommandMessages $commandMessages)
-//    {
-//        $this->commandMessages = $commandMessages;
-//    }
+        $this->expectException(OptimisticConcurrencyFailure::class);
+        $stream->append($streamId, new EmptyStream(), $this->record($streamId, 1, new RecordedSomething()));
+    }
 
-//    public function commitEventMessages(EventMessages $eventMessages)
-//    {
-//        $this->eventMessages = $eventMessages;
-//    }
-// }
+    public function testExactlyAtMismatchRaisesConcurrencyFailure(): void
+    {
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $stream->append($streamId, new AnyVersion(), $this->record($streamId, 0, new RecordedSomething()));
 
-it('appends and', static function (): void {
-    /** @var \TestCase $this */
-
-    // Arrange
-    $db = db();
-    $messageStream = init($db);
-    $agid = TestAggregateRootId::random();
-    $event = new TestDomainEvent();
-    $tar = new CountingAggregateRoot([$event]);
-
-    // Act
-    $messageStream->append($agid, 0, EventTypeId::random(), $event, CausationId::random(), CorrelationId::random());
-    $messageStream->replay($agid, $tar);
-
-    // Assert
-    $tar->assertReplayed();
-});
-
-it('supports snapshots', static function (): void {
-    /** @var \TestCase $this */
-
-    // Arrange
-    $db = db();
-    $messageStream = init($db);
-    $agid = TestAggregateRootId::random();
-    $event = new TestDomainEvent();
-
-    $i = 0;
-
-    // Act
-    $expectedEvents = [];
-    for (; $i < random_int(30, 50); ++$i) {
-        $expectedEvents[] = $event;
-        $messageStream->append(
-            $agid,
-            $i,
-            EventTypeId::random(),
-            $event,
-            CausationId::random(),
-            CorrelationId::random(),
+        $this->expectException(OptimisticConcurrencyFailure::class);
+        $stream->append(
+            $streamId,
+            new ExactlyAt(new StreamVersion(5)),
+            $this->record($streamId, 1, new RecordedSomething()),
         );
     }
 
-    // First replay to trigger snapshot creation
-    $tar = new CountingAggregateRoot($expectedEvents);
-    $tar = $messageStream->replay($agid, $tar);
-    for (; $i < random_int(50, 80); ++$i) {
-        $expectedEvents[] = $event;
-        $messageStream->append(
-            $agid,
-            $i,
-            EventTypeId::random(),
-            $event,
-            CausationId::random(),
-            CorrelationId::random(),
+    public function testExactlyAtMatchAccepts(): void
+    {
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $stream->append($streamId, new AnyVersion(), $this->record($streamId, 0, new RecordedSomething()));
+
+        $stream->append(
+            $streamId,
+            new ExactlyAt(new StreamVersion(1)),
+            $this->record($streamId, 1, new RecordedSomething()),
         );
+
+        static::assertCount(2, $stream->read($streamId));
     }
 
-    // Second replay
-    $tar = new CountingAggregateRoot($expectedEvents);
-    $tar = $messageStream->replay($agid, $tar);
-
-    // Assert
-    $tar->assertSnapshot();
-});
-
-/**
- * @codeCoverageIgnore
- */
-class CountingAggregateRoot implements EventSourced
-{
-    private $sequence = -1;
-
-    private $actualEvents = [];
-
-    private bool $wakeupCalled = false;
-
-    public function __construct(
-        private array $expectedEvents,
-    ) {}
-
-    public function __wakeup(): void
+    public function testReadAfterReturnsLaterEventsOnly(): void
     {
-        $this->wakeupCalled = true;
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $stream->append(
+            $streamId,
+            new AnyVersion(),
+            $this->record($streamId, 0, new RecordedSomething()),
+            $this->record($streamId, 1, new RecordedSomething()),
+            $this->record($streamId, 2, new RecordedSomething()),
+        );
+
+        $tail = $stream->read($streamId, new FromAfter(new StreamVersion(0)));
+        static::assertCount(2, $tail);
     }
 
-    #[\Override]
-    public function commitInto(UnitOfWorkContext $unitOfWorkContext): void {}
-
-    #[\Override]
-    public function handleEventMessage(AggregateRootId $aggregateRootId, DomainEvent $event, int $eventSequence): void
+    public function testReadGloballyReturnsEventsAcrossAllStreamsInCommitOrder(): void
     {
-        // FIXME: Better way to force snapshots
-        usleep(1000);
-        assertEquals($this->sequence + 1, $eventSequence);
-        $this->sequence = $eventSequence;
-        $this->actualEvents[] = $event;
+        $db = $this->bootstrappedDatabase();
+        $stream = new PdoEventStream($db, $this->serializer(), new Timings());
+        $global = new PdoGlobalEventStream($db, $this->serializer());
+        $first = StreamId::random();
+        $second = StreamId::random();
+
+        $stream->append($first, new AnyVersion(), $this->record($first, 0, new RecordedSomething()));
+        $stream->append($second, new AnyVersion(), $this->record($second, 0, new RecordedSomething()));
+        $stream->append($first, new AnyVersion(), $this->record($first, 1, new RecordedSomething()));
+
+        $all = $global->readGlobally();
+        static::assertCount(3, $all);
     }
 
-    public function assertReplayed(): void
+    public function testReadGloballyHonorsStartingPosition(): void
     {
-        assertEquals($this->expectedEvents, $this->actualEvents);
+        $db = $this->bootstrappedDatabase();
+        $stream = new PdoEventStream($db, $this->serializer(), new Timings());
+        $global = new PdoGlobalEventStream($db, $this->serializer());
+        $streamId = StreamId::random();
+
+        $stream->append(
+            $streamId,
+            new AnyVersion(),
+            $this->record($streamId, 0, new RecordedSomething()),
+            $this->record($streamId, 1, new RecordedSomething()),
+            $this->record($streamId, 2, new RecordedSomething()),
+        );
+
+        $tail = $global->readGlobally(new GlobalSequence(1));
+        static::assertCount(2, $tail);
     }
 
-    public function assertSnapshot(): void
+    private function record(StreamId $streamId, int $version, DomainEvent $event): RecordedEvent
     {
-        assertTrue($this->wakeupCalled);
+        $pending = new PendingEvent($streamId, new StreamVersion($version), $event);
+
+        return new RecordedEvent($pending, CausationId::random(), CorrelationId::random(), new \DateTimeImmutable());
+    }
+
+    private function stream(): PdoEventStream
+    {
+        return new PdoEventStream($this->bootstrappedDatabase(), $this->serializer(), new Timings());
+    }
+
+    private function serializer(): MessageSerializer
+    {
+        return new class extends MessageSerializer {
+            public function __construct() {}
+
+            #[\Override]
+            public function serialize(mixed $value): string
+            {
+                return base64_encode(serialize($value));
+            }
+
+            #[\Override]
+            public function unserialize(string $value): mixed
+            {
+                return unserialize(base64_decode($value, true), ['allowed_classes' => true]);
+            }
+        };
+    }
+
+    private function bootstrappedDatabase(): ExtendedPdoInterface
+    {
+        $db = new ExtendedPdo('sqlite::memory:');
+        $db->exec('
+            CREATE TABLE domain_events (
+                id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+                aggregate_root_id  BLOB NOT NULL,
+                aggregate_sequence INTEGER NOT NULL,
+                event_type_id      BLOB NOT NULL,
+                event              TEXT NOT NULL,
+                created            TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                correlation_id     BLOB NOT NULL,
+                causation_id       BLOB NOT NULL,
+                UNIQUE (aggregate_root_id, aggregate_sequence)
+            );
+        ');
+        $db->exec('
+            CREATE TABLE domain_event_snapshots (
+                aggregate_root_id  BLOB NOT NULL,
+                aggregate_sequence INTEGER NOT NULL,
+                aggregate_hash     BLOB NOT NULL,
+                snapshot           TEXT NOT NULL,
+                created            TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                UNIQUE (aggregate_root_id)
+            );
+        ');
+
+        return $db;
     }
 }
 
 /**
- * @codeCoverageIgnore
+ * @internal
  */
-class TestAggregateRootId extends AggregateRootId
+final readonly class RecordedSomething implements DomainEvent
 {
-    #[\Override]
-    public static function prefix(): string
-    {
-        return 'tar';
-    }
-}
-
-/**
- * @codeCoverageIgnore
- */
-class TestDomainEvent implements DomainEvent
-{
-    public function __construct() {}
-
     #[\Override]
     public static function eventTypeId(): EventTypeId
     {
         return EventTypeId::random();
+    }
+}
+
+/**
+ * @internal
+ */
+final class CountingTarget implements EventSourced
+{
+    public int $count = 0;
+
+    public int $sequence = -1;
+
+    #[\Override]
+    public function commitInto(UnitOfWorkContext $unitOfWorkContext): void
+    {
+    }
+
+    #[\Override]
+    public function handleEventMessage(UniqueId $streamId, DomainEvent $event, int $eventSequence): void
+    {
+        ++$this->count;
+        $this->sequence = $eventSequence;
     }
 }

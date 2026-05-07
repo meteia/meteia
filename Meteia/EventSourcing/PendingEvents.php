@@ -6,7 +6,7 @@ namespace Meteia\EventSourcing;
 
 use Meteia\Domain\ValueObjects\ImmutableArrayValueObject;
 
-class EventParentVersions extends ImmutableArrayValueObject
+final readonly class PendingEvents extends ImmutableArrayValueObject
 {
-    public const TYPE = EventVersion::class;
+    public const string TYPE = PendingEvent::class;
 }

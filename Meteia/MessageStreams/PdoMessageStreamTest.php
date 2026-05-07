@@ -6,108 +6,90 @@ namespace Meteia\MessageStreams;
 
 use Aura\Sql\ExtendedPdo;
 use Aura\Sql\ExtendedPdoInterface;
-use Meteia\Domain\ValueObjects\AggregateRootId;
 use Meteia\MessageStreams\Contracts\Message;
-use Meteia\MessageStreams\Contracts\MessageStream;
-
-return;
-function db(): ExtendedPdoInterface
-{
-    return new ExtendedPdo('sqlite::memory:');
-}
-
-function init(ExtendedPdoInterface $pdo): PdoEventStream
-{
-    $query = <<<'SQL'
-        CREATE TABLE message_streams (
-            message_stream_id       BINARY(20)                         NOT NULL,
-            message_stream_sequence BIGINT UNSIGNED                    NOT NULL,
-            message_type_id         BINARY(20)                         NOT NULL,
-            message                 MEDIUMTEXT                         NOT NULL,
-            created                 DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
-            CONSTRAINT message_stream_id UNIQUE (message_stream_id, message_stream_sequence)
-        );
-        CREATE INDEX message_type_id ON message_streams(message_type_id);
-        SQL;
-    $pdo->exec($query);
-
-    return new PdoEventStream($pdo, new MessageSerializer());
-}
-
-// class FakeUnitOfWorkContext implements UnitOfWorkContext
-// {
-//    public CommandMessages $commandMessages;
-
-//    public EventMessages $eventMessages;
-
-//    public function commitCommandMessages(CommandMessages $commandMessages)
-//    {
-//        $this->commandMessages = $commandMessages;
-//    }
-
-//    public function commitEventMessages(EventMessages $eventMessages)
-//    {
-//        $this->eventMessages = $eventMessages;
-//    }
-// }
-
-it('stores a stream on commit', static function (): void {
-    /** @var \TestCase $this */
-
-    // Arrange
-    $db = db();
-    $messageStream = init($db);
-
-    $agid = new AggregateRootId();
-
-    $tm = new TestMessage($agid, 1);
-
-    $tm->appendTo($messageStream);
-});
+use Meteia\ValueObjects\Identity\CausationId;
+use Meteia\ValueObjects\Identity\CorrelationId;
+use Meteia\ValueObjects\Identity\MessageScope;
+use Meteia\ValueObjects\Identity\ProcessId;
+use Meteia\ValueObjects\Identity\UniqueId;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @codeCoverageIgnore
+ * @internal
  */
-class TestEntity
+final class PdoMessageStreamTest extends TestCase
 {
-    private int $value = 0;
-
-    public function increaseValue(): void
+    public function testAppendAndReadRoundTripsCorrelationAndCausation(): void
     {
-        ++$this->value;
+        $stream = new PdoMessageStream($this->bootstrappedDatabase(), $this->serializer());
+        $streamId = StubStreamId::random();
+        $causation = CausationId::random();
+        $correlation = CorrelationId::random();
+        $scope = new MessageScope($correlation, $causation, ProcessId::random());
+
+        $stream->append($streamId, new MessageStreamSequence(0), MessageTypeId::random(), new SimpleMessage(), $scope);
+
+        $messages = $stream->read($streamId);
+        static::assertCount(1, $messages);
+        $first = $messages[0];
+        static::assertSame((string) $causation, (string) $first->causedBy());
+        static::assertSame((string) $correlation, (string) $first->correlatedTo());
     }
 
-    public function currentValue(): int
+    private function serializer(): MessageSerializer
     {
-        return $this->value;
+        return new class extends MessageSerializer {
+            public function __construct() {}
+
+            #[\Override]
+            public function serialize(mixed $value): string
+            {
+                return base64_encode(serialize($value));
+            }
+
+            #[\Override]
+            public function unserialize(string $value): mixed
+            {
+                return unserialize(base64_decode($value, true), ['allowed_classes' => true]);
+            }
+        };
+    }
+
+    private function bootstrappedDatabase(): ExtendedPdoInterface
+    {
+        $db = new ExtendedPdo('sqlite::memory:');
+        $db->exec('
+            CREATE TABLE message_streams (
+                message_stream_id       BLOB NOT NULL,
+                message_stream_sequence INTEGER NOT NULL,
+                message_type_id         BLOB NOT NULL,
+                message                 TEXT NOT NULL,
+                causation_id            BLOB NOT NULL,
+                correlation_id          BLOB NOT NULL,
+                occurred_at             TEXT NOT NULL,
+                UNIQUE (message_stream_id, message_stream_sequence)
+            );
+        ');
+
+        return $db;
     }
 }
 
 /**
- * @codeCoverageIgnore
+ * @internal
  */
-class TestMessage implements Message
+final readonly class StubStreamId extends UniqueId
 {
-    public function __construct(
-        private AggregateRootId $someId,
-        private int $sequence,
-    ) {}
-
-    public function appendTo(MessageStream $messageStream): void
+    #[\Override]
+    public static function prefix(): string
     {
-        $messageStream->append(
-            new MessageStreamId($this->someId),
-            new MessageStreamSequence($this->sequence),
-            new MessageTypeId('30FA63C6-FB9B-430A-B4E3-4FE98E37E853'),
-            $this,
-        );
+        return 'msg';
     }
+}
 
-    /**
-     * @param TestEntity $target
-     */
-    public function applyTo($target): void
-    {
-        $target->increaseValue();
-    }
+/**
+ * @internal
+ */
+final readonly class SimpleMessage implements Message
+{
 }

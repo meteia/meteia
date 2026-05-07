@@ -9,6 +9,7 @@ use Meteia\AdvancedMessageQueuing\MessageContext;
 use Meteia\Events\Event;
 use Meteia\Events\EventId;
 use Meteia\Events\EventOutbox;
+use Meteia\ValueObjects\Identity\MessageScopeSource;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -18,7 +19,7 @@ final readonly class BunnyEventOutbox implements EventOutbox
         private Channel $channel,
         private LoggerInterface $log,
         private SerializerInterface $serializer,
-        private MessageContext $context,
+        private MessageScopeSource $scopeSource,
     ) {}
 
     #[\Override]
@@ -26,11 +27,8 @@ final readonly class BunnyEventOutbox implements EventOutbox
     {
         $exchangeName = str_replace('\\', '.', $event::class);
         $payload = $this->serializer->serialize($event, 'json');
-        $this->channel->publish(
-            $payload,
-            $this->context->headersWithMessageId((string) EventId::random()),
-            $exchangeName,
-        );
+        $context = MessageContext::fromScope($this->scopeSource->current());
+        $this->channel->publish($payload, $context->headersWithMessageId((string) EventId::random()), $exchangeName);
         $this->log->info('Published Event', [
             'event' => $event::class,
             'exchange' => $exchangeName,

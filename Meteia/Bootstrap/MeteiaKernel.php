@@ -10,6 +10,7 @@ use Meteia\DependencyInjection\TimedContainer;
 use Meteia\ErrorHandling\Middleware\CatchAndReportErrors;
 use Meteia\Http\Middleware\PsrEndpoints;
 use Meteia\Http\Middleware\ResponseCookies;
+use Meteia\Http\Middleware\SeedMessageScope;
 use Meteia\Http\Middleware\ServerTimingHeader;
 use Meteia\Http\PsrResponseSink;
 use Meteia\Http\RequestHandler;
@@ -63,11 +64,14 @@ final readonly class MeteiaKernel implements Kernel
     }
 
     #[\Override]
-    public function requestHandler(Container $container, MiddlewareList $middleware = new MiddlewareList()): RequestHandlerInterface
-    {
+    public function requestHandler(
+        Container $container,
+        MiddlewareList $middleware = new MiddlewareList(),
+    ): RequestHandlerInterface {
         /** @var RequestHandler $requestHandler */
         $requestHandler = $container->get(RequestHandlerInterface::class);
 
+        $requestHandler->append(SeedMessageScope::class);
         $requestHandler->append(new CatchAndReportErrors($this));
         $requestHandler->append(ServerTimingHeader::class);
         $requestHandler->append(ResponseCookies::class);

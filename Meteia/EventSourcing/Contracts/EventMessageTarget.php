@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Meteia\EventSourcing\Contracts;
 
 use Meteia\Domain\Contracts\DomainEvent;
-use Meteia\Domain\ValueObjects\AggregateRootId;
+use Meteia\ValueObjects\Identity\UniqueId;
 
 interface EventMessageTarget
 {
-    public function handleEventMessage(AggregateRootId $aggregateRootId, DomainEvent $event, int $eventSequence);
+    public function handleEventMessage(UniqueId $streamId, DomainEvent $event, int $eventSequence): void;
 }

@@ -8,7 +8,9 @@ class CanonicalLog
 {
     private string $logLine = '';
 
-    public function log(string|\Stringable $message, array $context = []): void {}
+    public function log(string|\Stringable $message, array $context = []): void
+    {
+    }
 
     public function toString(): string
     {

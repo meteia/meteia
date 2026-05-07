@@ -6,4 +6,6 @@ namespace Meteia\Domain\ValueObjects;
 
 use Meteia\Domain\ValueObjects\Identity\UUID;
 
-class CommandTypeId extends UUID {}
+class CommandTypeId extends UUID
+{
+}

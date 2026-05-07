@@ -6,4 +6,6 @@ namespace Meteia\Domain\Contracts;
 
 use IteratorAggregate;
 
-interface ValueObject extends \JsonSerializable, IteratorAggregate {}
+interface ValueObject extends \JsonSerializable, IteratorAggregate
+{
+}

@@ -11,7 +11,7 @@ use Meteia\Classy\MergedClasses;
 use Meteia\Classy\PsrClasses;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-final readonly class EventHandlers implements \IteratorAggregate
+final readonly class EventSinks implements \IteratorAggregate
 {
     public function __construct(
         private ApplicationPath $applicationPath,
@@ -21,14 +21,14 @@ final readonly class EventHandlers implements \IteratorAggregate
     #[\Override]
     public function getIterator(): \Traversable
     {
-        $regex = ['.+', 'EventHandlers', '.*\.php'];
+        $regex = ['.+', 'EventSinks', '.*\.php'];
 
         yield from new ClassesImplementing(
             new MergedClasses(
                 new PsrClasses(new FilesystemPath(__DIR__, '..', '..'), 'Meteia', $regex),
                 new PsrClasses($this->applicationPath, (string) $this->applicationNamespace, $regex),
             ),
-            EventHandler::class,
+            EventSink::class,
         );
     }
 }

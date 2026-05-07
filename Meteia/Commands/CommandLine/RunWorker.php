@@ -9,19 +9,16 @@ use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Bootstrap\ApplicationPublicDir;
 use Meteia\CommandLine\Command as CLICommand;
 use Meteia\Commands\Command;
-use Meteia\Commands\CommandId;
 use Meteia\Commands\CommandInbox;
-use Meteia\Commands\CommandMessageHandler;
 use Meteia\Commands\Commands;
+use Meteia\Commands\CommandSink;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
-use Meteia\ValueObjects\Identity\CausationId;
-use Meteia\ValueObjects\Identity\CorrelationId;
-use Meteia\ValueObjects\Identity\ProcessId;
+use Meteia\ValueObjects\Identity\MessageScope;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 
-readonly class RunWorker implements CLICommand, CommandMessageHandler
+readonly class RunWorker implements CLICommand, CommandSink
 {
     private Container $container;
 
@@ -57,9 +54,7 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
     public function execute(): void
     {
         foreach ($this->commands as $command) {
-            $this->log->info('Registering command handler', [
-                'command' => $command,
-            ]);
+            $this->log->info('Registering command sink', ['command' => $command]);
             $this->commandInbox->subscribe($command, $this);
         }
         $this->log->info('Running command worker');
@@ -67,28 +62,14 @@ readonly class RunWorker implements CLICommand, CommandMessageHandler
     }
 
     #[\Override]
-    public function handle(
-        Command $command,
-        CommandId $commandId,
-        CorrelationId $correlationId,
-        CausationId $causationId,
-        ProcessId $processId,
-    ): void {
-        $this->log->info('Incoming CorrelationId: ' . $correlationId);
-        $this->log->info('Incoming CausationId: ' . $causationId);
-        $this->log->info('Incoming ProcessId: ' . $processId);
-        // TODO: Just how bad of an idea is this...
-        $commandContainer = clone $this->container;
-        $commandContainer->set(CorrelationId::class, $correlationId);
-        $commandContainer->set(CausationId::class, CausationId::fromHex($processId->hex()));
-
+    public function drain(Command $command, MessageScope $scope): void
+    {
         try {
             \assert(method_exists($command, 'invoke'));
-            $commandContainer->call($command->invoke(...));
+            $this->container->call($command->invoke(...));
         } catch (\Throwable $e) {
             $this->log->error('Command failed', ['exception' => $e]);
         }
-        unset($command, $commandContainer);
 
         gc_collect_cycles();
     }

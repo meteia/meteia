@@ -6,6 +6,7 @@ namespace Meteia\AdvancedMessageQueuing;
 
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
+use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
 
 final readonly class MessageContext
@@ -15,6 +16,11 @@ final readonly class MessageContext
         private CorrelationId $correlationId,
         private ProcessId $processId,
     ) {}
+
+    public static function fromScope(MessageScope $scope): self
+    {
+        return new self($scope->causationId(), $scope->correlationId(), $scope->processId());
+    }
 
     /**
      * @return array<string, string>

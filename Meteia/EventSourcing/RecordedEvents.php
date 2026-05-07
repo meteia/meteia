@@ -6,7 +6,7 @@ namespace Meteia\EventSourcing;
 
 use Meteia\Domain\ValueObjects\ImmutableArrayValueObject;
 
-class EventMessages extends ImmutableArrayValueObject
+final readonly class RecordedEvents extends ImmutableArrayValueObject
 {
-    public const TYPE = EventMessage::class;
+    public const string TYPE = RecordedEvent::class;
 }

@@ -6,4 +6,6 @@ namespace Meteia\Domain\Exceptions;
 
 use Meteia\Exceptions\Contracts\IdempotentException;
 
-class ImmutableEntityException extends \Exception implements IdempotentException {}
+class ImmutableEntityException extends \Exception implements IdempotentException
+{
+}

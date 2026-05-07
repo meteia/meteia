@@ -2,20 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Database\EventHandlers\Files\FileUploaded;
+namespace Meteia\Database\EventSinks\Files\FileUploaded;
 
 use Meteia\Events\Event;
-use Meteia\Events\EventHandler;
+use Meteia\Events\EventSink;
+use Meteia\ValueObjects\Identity\MessageScope;
 use Psr\Log\LoggerInterface;
 
-final readonly class InsertIntoDatabase implements EventHandler
+final readonly class InsertIntoDatabase implements EventSink
 {
     public function __construct(
         private LoggerInterface $log,
     ) {}
 
     #[\Override]
-    public function handle(Event $event): void
+    public function drain(Event $event, MessageScope $scope): void
     {
         $this->log->info('File inserted into database', ['event' => $event::class]);
     }

@@ -7,4 +7,6 @@ namespace Meteia\Domain\Contracts;
 use ArrayAccess;
 use Countable;
 
-interface ArrayValueObject extends \IteratorAggregate, Countable, ArrayAccess {}
+interface ArrayValueObject extends \IteratorAggregate, Countable, ArrayAccess
+{
+}
