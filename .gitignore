@@ -1,4 +1,5 @@
 *.cache
+.zed/settings.json
 .graphqlconfig
 .task
 /.idea/

@@ -7,12 +7,13 @@ with lib; {
   config = mkMerge [
     {
       devShell = {
-        contents = with pkgs; [];
+        contents = [];
         environment = [];
       };
 
       programs.lefthook.enable = true;
       programs.taskfile.enable = true;
+      programs.zed.enable = true;
       programs.php = {
         pkg = pkgs.php85;
         linters = ["mago"];
