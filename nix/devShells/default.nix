@@ -15,6 +15,7 @@ with lib; {
       programs.taskfile.enable = true;
       programs.php = {
         pkg = pkgs.php85;
+        linters = ["mago"];
         extraConfig = ''
           output_buffering = 4096
           post_max_size = 100M
