@@ -99,7 +99,7 @@ class ImmutableURI extends StringLiteral implements URI
     #[\Override]
     public function withPath($path)
     {
-        $parts = explode('/', (string) $path);
+        $parts = explode('/', $path);
         $parts = array_filter($parts, static fn($i) => $i !== '');
         $path = '/' . implode('/', $parts);
 
@@ -134,7 +134,7 @@ class ImmutableURI extends StringLiteral implements URI
     }
 
     #[\Override]
-    public function withUserInfo($user, $password = null)
+    public function withUserInfo($user, #[\SensitiveParameter] $password = null)
     {
         return new static($this->getZendUri()->setUserInfo(implode(':', [
             $user,

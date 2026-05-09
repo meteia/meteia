@@ -16,6 +16,7 @@ readonly class SetServerRequestInterface implements MiddlewareInterface
         private Container $container,
     ) {}
 
+    #[\Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $this->container->set(ServerRequestInterface::class, $request);

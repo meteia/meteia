@@ -21,7 +21,7 @@ class UploadUrl
      */
     public $authorizationToken;
 
-    public function __construct(string $bucketId, string $uploadUrl, string $authorizationToken)
+    public function __construct(string $bucketId, string $uploadUrl, #[\SensitiveParameter] string $authorizationToken)
     {
         $this->bucketId = $bucketId;
         $this->uploadUrl = $uploadUrl;

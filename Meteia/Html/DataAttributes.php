@@ -24,8 +24,7 @@ trait DataAttributes
             array_keys($attrs),
             $attrs,
         );
-        $attrs = implode(' ', $attrs);
 
-        return $attrs;
+        return implode(' ', $attrs);
     }
 }

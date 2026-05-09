@@ -19,16 +19,19 @@ class FilesystemPath extends StringLiteral implements Path
         parent::__construct($value);
     }
 
+    #[\Override]
     public function delete(): void
     {
         unlink((string) $this);
     }
 
+    #[\Override]
     public function exists(): bool
     {
         return file_exists((string) $this);
     }
 
+    #[\Override]
     public function extension(): string
     {
         $filename = pathinfo((string) $this, PATHINFO_BASENAME);
@@ -40,6 +43,7 @@ class FilesystemPath extends StringLiteral implements Path
         return substr($filename, $extensionIdx);
     }
 
+    #[\Override]
     public function find(string ...$regex): \Iterator
     {
         $basePath = $this->realpath();
@@ -49,6 +53,7 @@ class FilesystemPath extends StringLiteral implements Path
         return new \RegexIterator($iterator, $regex, \RegexIterator::MATCH);
     }
 
+    #[\Override]
     public function hash(string $algo, ?SecretKey $hmacKey = null): Hash
     {
         $hashCtx = $hmacKey ? hash_init($algo, HASH_HMAC, (string) $hmacKey) : hash_init($algo);
@@ -57,16 +62,19 @@ class FilesystemPath extends StringLiteral implements Path
         return new Hash(hash_final($hashCtx));
     }
 
+    #[\Override]
     public function isReadable(): bool
     {
         return is_readable((string) $this);
     }
 
+    #[\Override]
     public function isDirectory(): bool
     {
         return is_dir((string) $this);
     }
 
+    #[\Override]
     public function join(...$paths): self
     {
         return new self((string) $this, ...$paths);
@@ -75,6 +83,7 @@ class FilesystemPath extends StringLiteral implements Path
     /**
      * @return \Iterator<int, string>
      */
+    #[\Override]
     public function lines(int $start = 0, ?int $end = null): \Iterator
     {
         $file = new \SplFileObject((string) $this);
@@ -88,6 +97,7 @@ class FilesystemPath extends StringLiteral implements Path
         }
     }
 
+    #[\Override]
     public function open(): Resource
     {
         $resource = fopen((string) $this, 'r');
@@ -98,16 +108,19 @@ class FilesystemPath extends StringLiteral implements Path
         return new Resource($resource);
     }
 
+    #[\Override]
     public function read(): string
     {
         return file_get_contents((string) $this);
     }
 
+    #[\Override]
     public function readJson(): mixed
     {
         return json_decode($this->read(), false, 512, JSON_THROW_ON_ERROR);
     }
 
+    #[\Override]
     public function realpath(): static
     {
         return new static(realpath((string) $this));
@@ -118,6 +131,7 @@ class FilesystemPath extends StringLiteral implements Path
         return new self(trim(str_replace((string) $prefix, '', (string) $this), \DIRECTORY_SEPARATOR));
     }
 
+    #[\Override]
     public function write(string $content): void
     {
         $dirname = \dirname((string) $this);
@@ -132,6 +146,7 @@ class FilesystemPath extends StringLiteral implements Path
         rename($tmpName, (string) $this);
     }
 
+    #[\Override]
     public function writeJson(array $array): void
     {
         $this->write(json_encode($array, JSON_THROW_ON_ERROR));
@@ -165,16 +180,19 @@ class FilesystemPath extends StringLiteral implements Path
         return $newPath;
     }
 
+    #[\Override]
     public function basename(): string
     {
         return pathinfo((string) $this, PATHINFO_BASENAME);
     }
 
+    #[\Override]
     public function mimeType(): string
     {
         return mime_content_type((string) $this);
     }
 
+    #[\Override]
     public function extensionFromMimeType(): string
     {
         $mimeType = $this->mimeType();

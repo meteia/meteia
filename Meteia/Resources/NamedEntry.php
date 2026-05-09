@@ -11,6 +11,7 @@ final readonly class NamedEntry implements EntryTarget
         private bool $isReact = false,
     ) {}
 
+    #[\Override]
     public function path(): string
     {
         $extension = $this->isReact ? 'tsx' : 'ts';

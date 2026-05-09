@@ -169,11 +169,13 @@ class Address
         ];
 
         foreach (array_replace($baseArray, $data) as $key => $value) {
-            if (\array_key_exists($key, $baseArray)) {
-                $value = new StringLiteral($value);
-                $this->replacements['%' . $key . '%'] = $value->trim();
-                unset($value);
+            if (!\array_key_exists($key, $baseArray)) {
+                continue;
             }
+
+            $value = new StringLiteral($value);
+            $this->replacements['%' . $key . '%'] = $value->trim();
+            unset($value);
         }
 
         // Zip Separator

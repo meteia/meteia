@@ -6,12 +6,11 @@ namespace Meteia\Backblaze\Api;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 
 class AuthorizedAccount
 {
-    public function __construct(string $apiUrl, string $authorizationToken)
+    public function __construct(string $apiUrl, #[\SensitiveParameter] string $authorizationToken)
     {
         $this->client = new Client([
             'base_uri' => $apiUrl,

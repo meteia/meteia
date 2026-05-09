@@ -9,7 +9,7 @@ use Tuupola\Base62;
 
 abstract readonly class UniqueId implements Identifier
 {
-    protected const int EPOCH = 1577836800;
+    protected const int EPOCH = 1_577_836_800;
     protected const int LEN_ENCODED = 27;
     protected const int LEN_RANDOM = 16;
     protected const int LEN_TIMESTAMP = 4;
@@ -39,6 +39,7 @@ abstract readonly class UniqueId implements Identifier
         return $this->token;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->token;
@@ -52,7 +53,7 @@ abstract readonly class UniqueId implements Identifier
         return new static($data);
     }
 
-    public static function fromToken(string $token): static
+    public static function fromToken(#[\SensitiveParameter] string $token): static
     {
         // Discard any additional data on the token (e.g. a selector).
         [$prefix, $token] = explode('_', $token, 3);

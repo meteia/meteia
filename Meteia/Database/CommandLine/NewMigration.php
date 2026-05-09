@@ -18,9 +18,9 @@ final readonly class NewMigration implements Command
     public const ARG_TYPE = 'type';
 
     public function __construct(
-        private readonly InputInterface $input,
-        private readonly OutputInterface $output,
-        private readonly ApplicationPath $applicationPath,
+        private InputInterface $input,
+        private OutputInterface $output,
+        private ApplicationPath $applicationPath,
     ) {}
 
     #[\Override]

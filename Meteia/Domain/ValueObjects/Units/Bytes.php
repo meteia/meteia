@@ -19,23 +19,23 @@ class Bytes extends Enum
     public const KILOBYTE = 1024;
     public const KILOBYTES = 1024;
 
-    public const MB = 1048576;
-    public const MEGABYTE = 1048576;
-    public const MEGABYTES = 1048576;
+    public const MB = 1_048_576;
+    public const MEGABYTE = 1_048_576;
+    public const MEGABYTES = 1_048_576;
 
-    public const GB = 1073741824;
-    public const GIGABYTE = 1073741824;
-    public const GIGABYTES = 1073741824;
+    public const GB = 1_073_741_824;
+    public const GIGABYTE = 1_073_741_824;
+    public const GIGABYTES = 1_073_741_824;
 
-    public const TB = 1099511627776;
-    public const TERABYTE = 1099511627776;
-    public const TERABYTES = 1099511627776;
+    public const TB = 1_099_511_627_776;
+    public const TERABYTE = 1_099_511_627_776;
+    public const TERABYTES = 1_099_511_627_776;
 
-    public const PB = 1125899906842624;
-    public const PETABYTE = 1125899906842624;
-    public const PETABYTES = 1125899906842624;
+    public const PB = 1_125_899_906_842_624;
+    public const PETABYTE = 1_125_899_906_842_624;
+    public const PETABYTES = 1_125_899_906_842_624;
 
-    public const EB = 1152921504606846976;
-    public const EXABYTE = 1152921504606846976;
-    public const EXABYTES = 1152921504606846976;
+    public const EB = 1_152_921_504_606_846_976;
+    public const EXABYTE = 1_152_921_504_606_846_976;
+    public const EXABYTES = 1_152_921_504_606_846_976;
 }

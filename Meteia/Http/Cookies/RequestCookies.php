@@ -23,7 +23,7 @@ class RequestCookies
     {
         $cookies = $this->serverRequest->getCookieParams();
         if (!isset($cookies[$name])) {
-            throw new \RuntimeException("Cookie '$name' not found");
+            throw new \RuntimeException("Cookie '{$name}' not found");
         }
 
         return new SealedCookie($name, $cookies[$name]);

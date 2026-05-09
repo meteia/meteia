@@ -10,6 +10,7 @@ readonly class SealCookieResult
 {
     public function __construct(
         public SealedCookie $sealedCookie,
+        #[\SensitiveParameter]
         public SecretKey $secret,
     ) {}
 }

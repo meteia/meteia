@@ -15,9 +15,11 @@ final readonly class ClassesImplementing implements Classes
     public function getIterator(): \Traversable
     {
         foreach ($this->classes as $class) {
-            if (is_subclass_of($class, $this->implementing)) {
-                yield $class;
+            if (!is_subclass_of($class, $this->implementing)) {
+                continue;
             }
+
+            yield $class;
         }
     }
 }

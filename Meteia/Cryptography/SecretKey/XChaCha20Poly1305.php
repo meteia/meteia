@@ -17,6 +17,7 @@ class XChaCha20Poly1305
     public function decrypt(
         string $ciphertext,
         string $associatedData,
+        #[\SensitiveParameter]
         SecretKey $secret,
     ): XChaCha20Poly1305DecryptionResult {
         $ciphertext = $this->codec->decode($ciphertext);
@@ -42,6 +43,7 @@ class XChaCha20Poly1305
     public function encrypt(
         string $plaintext,
         string $associatedData,
+        #[\SensitiveParameter]
         ?SecretKey $secret = null,
     ): XChaCha20Poly1305EncryptionResult {
         if (!$secret) {

@@ -136,9 +136,11 @@ class Street
         ];
 
         foreach (array_replace($baseArray, $data) as $key => $value) {
-            if (\array_key_exists($key, $baseArray)) {
-                $this->replacements['%' . $key . '%'] = new StringLiteral($value);
+            if (!\array_key_exists($key, $baseArray)) {
+                continue;
             }
+
+            $this->replacements['%' . $key . '%'] = new StringLiteral($value);
         }
     }
 }

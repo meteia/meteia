@@ -12,7 +12,7 @@ class RGBSpec extends ObjectBehavior
     public function it_can_be_represented_as_a_number(): void
     {
         $this->beConstructedWith(255, 255, 255);
-        $this->asNumber()->shouldReturn(16777215);
+        $this->asNumber()->shouldReturn(16_777_215);
     }
 
     public function it_can_be_represented_as_hex(): void

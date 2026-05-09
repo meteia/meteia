@@ -90,6 +90,7 @@ class CatchAndReportErrors implements MiddlewareInterface
         ], [$throwable]);
     }
 
+    #[\Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {

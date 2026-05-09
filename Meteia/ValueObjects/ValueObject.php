@@ -37,9 +37,11 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
     {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
-            if ($key[0] !== '_') {
-                yield $key => $value;
+            if ($key[0] === '_') {
+                continue;
             }
+
+            yield $key => $value;
         }
     }
 

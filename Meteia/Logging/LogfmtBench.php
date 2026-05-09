@@ -22,7 +22,7 @@ class LogfmtBench
     {
         $this->logfmt->format('debug', 'a simple message string', [
             'someString' => '9EE28D4F-EF87-480D-961E-364E08A152B4',
-            'float' => 3.14159,
+            'float' => 3.141_59,
             'bool' => true,
             'int' => 1,
         ]);

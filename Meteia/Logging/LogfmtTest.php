@@ -57,7 +57,7 @@ test('key names can not be empty', function (): void {
 });
 
 test('floats are rounded', function (): void {
-    $out = $this->uut->format('info', 'world', ['num' => 3.14159265]);
+    $out = $this->uut->format('info', 'world', ['num' => 3.141_592_65]);
 
     $this->assertEquals('level=info msg=world num=3.1416', $out);
 });

@@ -40,8 +40,8 @@ class PreciseUSDSpec extends ObjectBehavior
 
     public function it_can_be_compared(): void
     {
-        $this->equalTo(new PreciseUSD(3.14159))->shouldEqual(true);
-        $this->equalTo(new PreciseUSD(3.141592))->shouldEqual(false);
+        $this->equalTo(new PreciseUSD(3.141_59))->shouldEqual(true);
+        $this->equalTo(new PreciseUSD(3.141_592))->shouldEqual(false);
     }
 
     public function it_supports_basic_operations(): void

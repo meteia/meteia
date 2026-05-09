@@ -29,7 +29,7 @@ final class AmbientMessageScopeSourceTest extends TestCase
         $pushed = $this->scope();
         $source = new AmbientMessageScopeSource($default);
 
-        $observed = $source->using($pushed, fn(): MessageScope => $source->current());
+        $observed = $source->using($pushed, static fn(): MessageScope => $source->current());
 
         static::assertSame($pushed, $observed);
     }
@@ -64,7 +64,7 @@ final class AmbientMessageScopeSourceTest extends TestCase
         $inner = $this->scope();
         $source = new AmbientMessageScopeSource($default);
 
-        $observed = $source->using($outer, fn(): MessageScope => $source->using($inner, fn(): MessageScope => $source->current()));
+        $observed = $source->using($outer, static fn(): MessageScope => $source->using($inner, static fn(): MessageScope => $source->current()));
 
         static::assertSame($inner, $observed);
         static::assertSame($default, $source->current());

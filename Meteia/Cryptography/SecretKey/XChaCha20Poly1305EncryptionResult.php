@@ -10,6 +10,7 @@ class XChaCha20Poly1305EncryptionResult
 {
     public function __construct(
         public readonly string $ciphertext,
+        #[\SensitiveParameter]
         public readonly SecretKey $secret,
     ) {}
 }

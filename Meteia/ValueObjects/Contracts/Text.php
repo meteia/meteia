@@ -8,5 +8,6 @@ use Meteia\Domain\Contracts\Comparable;
 
 interface Text extends \Stringable, \JsonSerializable, Comparable
 {
+    #[\Override]
     public function toNative(): string;
 }

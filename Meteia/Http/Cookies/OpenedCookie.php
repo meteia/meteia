@@ -15,8 +15,11 @@ readonly class OpenedCookie
         public string $associatedData = '',
     ) {}
 
-    public function seal(XChaCha20Poly1305 $XChaCha20Poly1305, ?SecretKey $secret = null): SealCookieResult
-    {
+    public function seal(
+        XChaCha20Poly1305 $XChaCha20Poly1305,
+        #[\SensitiveParameter]
+        ?SecretKey $secret = null,
+    ): SealCookieResult {
         $ad = implode('_', array_filter([$this->name, $this->associatedData]));
         $result = $XChaCha20Poly1305->encrypt($this->value, $ad, $secret);
 

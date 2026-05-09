@@ -22,7 +22,7 @@ class PreciseUSD implements PreciseMoney
 
     public function __toString()
     {
-        return (string) $this->amount;
+        return $this->amount;
     }
 
     #[\Override]

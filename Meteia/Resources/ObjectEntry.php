@@ -11,6 +11,7 @@ final readonly class ObjectEntry implements EntryTarget
         private bool $isReact = false,
     ) {}
 
+    #[\Override]
     public function path(): string
     {
         $name = str_replace('\\', '/', $this->target::class);

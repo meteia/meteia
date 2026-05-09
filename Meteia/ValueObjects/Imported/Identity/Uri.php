@@ -11,7 +11,7 @@ class Uri extends StringLiteral
 {
     public function __construct(string $uri)
     {
-        parent::__construct((string) $uri);
+        parent::__construct($uri);
     }
 
     public function withFragment($fragment): self

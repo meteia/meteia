@@ -44,7 +44,7 @@ final readonly class HtmlEncoder
         foreach ($attrs->values as $name => $value) {
             $serialized = match ($value) {
                 null, false, '' => null,
-                true => (string) $name,
+                true => $name,
                 default => sprintf('%s="%s"', $name === 'className' ? 'class' : $name, $this->escape((string) $value)),
             };
             if ($serialized !== null) {

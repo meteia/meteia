@@ -99,7 +99,7 @@ class PdoEventStream implements EventStream
             WHERE aggregate_root_id = :aggregateRootId
         ', ['aggregateRootId' => $streamId->bytes()]);
 
-        $max = $row?->max_seq;
+        $max = $row->max_seq;
         if ($max === null) {
             return StreamVersion::start();
         }

@@ -18,7 +18,7 @@ class UdpSystemLog extends AbstractLogger
 
     public function __construct(
         private string $hostname = '127.0.0.1',
-        private int $port = 10514,
+        private int $port = 10_514,
         $facility = 23,
     ) {
         // Assertion::between($facility, self::FACILITY_MIN, self::FACILITY_MAX);
