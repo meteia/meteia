@@ -230,9 +230,7 @@ final class CountingTarget implements EventSourced
     public int $sequence = -1;
 
     #[\Override]
-    public function commitInto(UnitOfWorkContext $unitOfWorkContext): void
-    {
-    }
+    public function commitInto(UnitOfWorkContext $unitOfWorkContext): void {}
 
     #[\Override]
     public function handleEventMessage(UniqueId $streamId, DomainEvent $event, int $eventSequence): void

@@ -24,15 +24,12 @@ final readonly class PdoGlobalEventStream implements GlobalEventStream
     #[\Override]
     public function readGlobally(GlobalSequence $after = new GlobalSequence(0)): ProjectableEvents
     {
-        $rows = $this->db->fetchObjects(
-            '
+        $rows = $this->db->fetchObjects('
             SELECT id, aggregate_root_id, aggregate_sequence, event, causation_id, correlation_id, created
             FROM domain_events
             WHERE id > :lowerBound
             ORDER BY id ASC
-        ',
-            ['lowerBound' => $after->asInt()],
-        );
+        ', ['lowerBound' => $after->asInt()]);
 
         $projectable = array_map(
             fn(\stdClass $row): ProjectableEvent => new ProjectableEvent(

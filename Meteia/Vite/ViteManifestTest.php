@@ -54,12 +54,7 @@ final class ViteManifestTest extends TestCase
     {
         $baseUri = new ResourceBaseUri('/');
 
-        return new Head(
-            new Title('Untitled'),
-            new Metadata(),
-            new Stylesheets($baseUri),
-            new Scripts($baseUri),
-        );
+        return new Head(new Title('Untitled'), new Metadata(), new Stylesheets($baseUri), new Scripts($baseUri));
     }
 
     private function source(): ManifestSource

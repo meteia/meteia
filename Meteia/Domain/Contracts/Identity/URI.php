@@ -6,6 +6,4 @@ namespace Meteia\Domain\Contracts\Identity;
 
 use Psr\Http\Message\UriInterface;
 
-interface URI extends UriInterface
-{
-}
+interface URI extends UriInterface {}

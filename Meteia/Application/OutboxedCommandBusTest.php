@@ -39,16 +39,12 @@ final class OutboxedCommandBusTest extends TestCase
 /**
  * @internal
  */
-final readonly class TransportableCommand implements Command, TransportCommand
-{
-}
+final readonly class TransportableCommand implements Command, TransportCommand {}
 
 /**
  * @internal
  */
-final readonly class ApplicationOnlyCommand implements Command
-{
-}
+final readonly class ApplicationOnlyCommand implements Command {}
 
 /**
  * @internal

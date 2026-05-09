@@ -6,6 +6,4 @@ namespace Meteia\Domain\Exceptions;
 
 use Meteia\Exceptions\Contracts\IdempotentException;
 
-class ImmutableValueObjectException extends \Exception implements IdempotentException
-{
-}
+class ImmutableValueObjectException extends \Exception implements IdempotentException {}

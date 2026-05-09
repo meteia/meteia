@@ -37,15 +37,8 @@ final readonly class BunnyCommandInbox implements CommandInbox
         $queueName = str_replace('\\', '.', $commandClassName);
         $this->log->info('Subscribing Command Sink', ['queue' => $queueName]);
 
-        $channel->queueDeclare(
-            queue: $queueName,
-            durable: true,
-        );
-        $channel->queueBind(
-            queue: $queueName,
-            exchange: $this->exchangeName,
-            routingKey: $queueName,
-        );
+        $channel->queueDeclare(queue: $queueName, durable: true);
+        $channel->queueBind(exchange: (string) $this->exchangeName, queue: $queueName, routingKey: $queueName);
 
         $channel->consume(function (Message $message, Channel $channel, Client $bunny) use (
             $commandClassName,

@@ -6,6 +6,4 @@ namespace Meteia\Database;
 
 use Aura\Sql\ExtendedPdoInterface;
 
-interface MigrationDatabase extends ExtendedPdoInterface
-{
-}
+interface MigrationDatabase extends ExtendedPdoInterface {}

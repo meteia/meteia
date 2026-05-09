@@ -28,12 +28,10 @@ final class PdoIssuedCommandsTest extends TestCase
         $correlation = CorrelationId::random();
         $issuedAt = new \DateTimeImmutable('2026-05-07 12:00:00');
 
-        $issued->append(new CommandMetadata(
-            $aggregateRootId,
-            $causation,
-            $correlation,
-            $issuedAt,
-        ), new SampleCommand());
+        $issued->append(
+            new CommandMetadata($aggregateRootId, $causation, $correlation, $issuedAt),
+            new SampleCommand(),
+        );
 
         $row = $db->fetchObject('SELECT * FROM issued_commands LIMIT 1');
         static::assertNotNull($row);
@@ -48,12 +46,15 @@ final class PdoIssuedCommandsTest extends TestCase
         $db = $this->bootstrappedDatabase();
         $issued = new PdoIssuedCommands($db, $this->serializer());
 
-        $issued->append(new CommandMetadata(
-            SampleAggregateRootId::random(),
-            CausationId::random(),
-            CorrelationId::random(),
-            new \DateTimeImmutable(),
-        ), new SampleCommand());
+        $issued->append(
+            new CommandMetadata(
+                SampleAggregateRootId::random(),
+                CausationId::random(),
+                CorrelationId::random(),
+                new \DateTimeImmutable(),
+            ),
+            new SampleCommand(),
+        );
 
         static::assertCount(0, $issued->pending());
     }
@@ -112,6 +113,4 @@ final readonly class SampleAggregateRootId extends AggregateRootId
 /**
  * @internal
  */
-final readonly class SampleCommand implements Command
-{
-}
+final readonly class SampleCommand implements Command {}

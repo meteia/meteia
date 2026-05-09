@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace Meteia\MessageStreams\Contracts;
 
-interface Message
-{
-}
+interface Message {}

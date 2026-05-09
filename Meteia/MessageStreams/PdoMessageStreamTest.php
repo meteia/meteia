@@ -90,6 +90,4 @@ final readonly class StubStreamId extends UniqueId
 /**
  * @internal
  */
-final readonly class SimpleMessage implements Message
-{
-}
+final readonly class SimpleMessage implements Message {}

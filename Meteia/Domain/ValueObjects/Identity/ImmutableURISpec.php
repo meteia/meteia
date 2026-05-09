@@ -29,9 +29,6 @@ class ImmutableURISpec extends ObjectBehavior
     public function it_appends_a_query_string(): void
     {
         $this->withQuery(['food' => 'potato'])->__toString()->shouldEqual('/?food=potato');
-        $this->withPath('/hmm')
-            ->withQuery(['food' => 'potato'])
-            ->__toString()
-            ->shouldEqual('/hmm?food=potato');
+        $this->withPath('/hmm')->withQuery(['food' => 'potato'])->__toString()->shouldEqual('/hmm?food=potato');
     }
 }

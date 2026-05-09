@@ -16,5 +16,8 @@ interface Kernel
      */
     public function container(array $definitions = []): Container;
 
-    public function requestHandler(Container $container, MiddlewareList $middleware = new MiddlewareList()): RequestHandlerInterface;
+    public function requestHandler(
+        Container $container,
+        MiddlewareList $middleware = new MiddlewareList(),
+    ): RequestHandlerInterface;
 }

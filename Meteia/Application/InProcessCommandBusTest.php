@@ -53,9 +53,7 @@ final class InProcessCommandBusTest extends TestCase
 /**
  * @internal
  */
-final readonly class ExampleApplicationCommand implements Command
-{
-}
+final readonly class ExampleApplicationCommand implements Command {}
 
 /**
  * @internal

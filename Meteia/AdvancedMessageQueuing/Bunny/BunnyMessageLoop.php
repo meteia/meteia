@@ -9,11 +9,11 @@ use Bunny\Client;
 use Bunny\Message;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\Loop;
 
 final readonly class BunnyMessageLoop
 {
     public function __construct(
-        private Client $client,
         private Channel $channel,
         private LoggerInterface $log,
     ) {}
@@ -42,6 +42,6 @@ final readonly class BunnyMessageLoop
             exit(0);
         }, $result->queue);
 
-        $this->client->run();
+        Loop::run();
     }
 }

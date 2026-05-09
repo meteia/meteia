@@ -9,7 +9,5 @@ use Meteia\EventSourcing\Contracts\ExpectedVersion;
 final readonly class AnyVersion implements ExpectedVersion
 {
     #[\Override]
-    public function assertCompatibleWith(StreamVersion $observed): void
-    {
-    }
+    public function assertCompatibleWith(StreamVersion $observed): void {}
 }

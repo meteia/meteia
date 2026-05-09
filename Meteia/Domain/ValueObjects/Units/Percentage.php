@@ -11,6 +11,4 @@ use Meteia\Domain\ValueObjects\Primitive\FloatLiteral;
  *
  * @description Expressed as a fraction of 100
  */
-class Percentage extends FloatLiteral
-{
-}
+class Percentage extends FloatLiteral {}

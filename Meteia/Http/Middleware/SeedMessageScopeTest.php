@@ -23,7 +23,9 @@ final class SeedMessageScopeTest extends TestCase
     public function testHonorsAValidCorrelationIdHeader(): void
     {
         $known = CorrelationId::random();
-        $request = new Psr17Factory()->createServerRequest('GET', '/')->withHeader('X-Correlation-ID', (string) $known);
+        $request = new Psr17Factory()
+            ->createServerRequest('GET', '/')
+            ->withHeader('X-Correlation-ID', (string) $known);
         $sink = $this->captureScope();
 
         $response = new SeedMessageScope($this->container(), ProcessId::random())->process($request, $sink);
@@ -35,7 +37,9 @@ final class SeedMessageScopeTest extends TestCase
 
     public function testMintsFreshCorrelationIdWhenHeaderIsMalformed(): void
     {
-        $request = new Psr17Factory()->createServerRequest('GET', '/')->withHeader('X-Correlation-ID', 'not a token');
+        $request = new Psr17Factory()
+            ->createServerRequest('GET', '/')
+            ->withHeader('X-Correlation-ID', 'not a token');
         $sink = $this->captureScope();
 
         $response = new SeedMessageScope($this->container(), ProcessId::random())->process($request, $sink);

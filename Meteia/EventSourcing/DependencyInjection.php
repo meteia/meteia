@@ -9,7 +9,6 @@ use Meteia\EventSourcing\PdoGlobalEventStream;
 
 return [
     EventStream::class => static fn(PdoEventStream $pdoEventStream): EventStream => $pdoEventStream,
-    GlobalEventStream::class => static fn(
-        PdoGlobalEventStream $pdoGlobalEventStream,
-    ): GlobalEventStream => $pdoGlobalEventStream,
+    GlobalEventStream::class =>
+        static fn(PdoGlobalEventStream $pdoGlobalEventStream): GlobalEventStream => $pdoGlobalEventStream,
 ];
