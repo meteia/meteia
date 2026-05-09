@@ -62,7 +62,7 @@
   "require-dev": {
     "phpunit/phpunit": "*",
     "roave/security-advisories": "dev-master",
-    "carthage-software/mago": "^1.25"
+    "carthage-software/mago": "^1.26"
   },
   "config": {
     "allow-plugins": {
