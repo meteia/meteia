@@ -30,10 +30,10 @@ final readonly class ConsoleKernel
 
         $app = new Application();
         foreach ($appCommands as $command) {
-            $app->add($command);
+            $app->addCommand($command);
         }
         foreach ($frameworkCommands as $command) {
-            $app->add($command);
+            $app->addCommand($command);
         }
 
         return $app->run();

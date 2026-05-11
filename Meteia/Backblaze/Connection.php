@@ -41,7 +41,6 @@ class Connection
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
         $server_output = curl_exec($session);
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
-        curl_close($session);
         if ($http_status !== 200) {
             throw new Exception('Unknown error');
         }
@@ -83,7 +82,6 @@ class Connection
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
         $server_output = curl_exec($session); // Let's do this!
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
-        curl_close($session); // Clean up
         $result = json_decode($server_output, false, 512, JSON_THROW_ON_ERROR);
         if ($http_status !== 200) {
             throw new Exception('Unknown error');
@@ -131,7 +129,6 @@ class Connection
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
         $server_output = curl_exec($session); // Let's do this!
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
-        curl_close($session);
         if ($http_status !== 200) {
             throw new Exception('Unknown error');
         }

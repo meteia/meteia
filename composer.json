@@ -59,8 +59,14 @@
     "vlucas/phpdotenv": "^5.6",
     "web-auth/webauthn-lib": "^5.1",
     "webonyx/graphql-php": "^15.8.1",
-    "zumba/json-serializer": "^3.2"
+    "zumba/json-serializer": "dev-php-85 as 3.2.4"
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/jasonrm/json-serializer"
+    }
+  ],
   "require-dev": {
     "phpunit/phpunit": "*",
     "roave/security-advisories": "dev-master",

@@ -20,7 +20,7 @@ trait CookieString
         $maxAge = $expiresAt ? $expiresAt->getTimestamp() - time() : null;
         $kvParts = array_filter([
             sprintf('%s=%s', $name, $value),
-            'Expires' => $expiresAt?->format(DATE_RFC7231),
+            'Expires' => $expiresAt?->format(DateTimeInterface::RFC7231),
             'Max-Age' => $maxAge,
             'Domain' => '.' . $url->getHost(),
             'Path' => $url->getPath(),
