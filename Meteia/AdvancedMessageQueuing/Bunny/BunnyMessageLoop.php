@@ -32,7 +32,7 @@ final readonly class BunnyMessageLoop
         $result = $this->channel->queueDeclare(exclusive: true);
         $this->log->info('Declared Queue', ['queue' => $result->queue]);
 
-        $this->channel->queueBind($result->queue, $shutdownExchangeName);
+        $this->channel->queueBind(exchange: $shutdownExchangeName, queue: $result->queue);
         $this->channel->consume(function (Message $message, Channel $channel, Client $bunny): void {
             $this->log->info('Shutdown Message Received');
             $channel->ack($message);
