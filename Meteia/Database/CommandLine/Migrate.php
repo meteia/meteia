@@ -75,7 +75,6 @@ readonly class Migrate implements Command
             __DIR__,
             '..',
             '..',
-            '..',
             'migrations',
             '*.sql',
         ]);

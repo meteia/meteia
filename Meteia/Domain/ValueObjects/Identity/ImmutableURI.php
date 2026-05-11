@@ -10,7 +10,7 @@ use Meteia\Domain\ValueObjects\Primitive\StringLiteral;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class ImmutableURI extends StringLiteral implements URI
+readonly class ImmutableURI extends StringLiteral implements URI
 {
     public function __construct(...$segments)
     {
