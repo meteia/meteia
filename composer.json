@@ -57,7 +57,8 @@
     "tuupola/base62": "^2.1.0",
     "vlucas/phpdotenv": "^5.6",
     "web-auth/webauthn-lib": "^5.1",
-    "webonyx/graphql-php": "^15.8.1"
+    "webonyx/graphql-php": "^15.8.1",
+    "zumba/json-serializer": "^3.2"
   },
   "require-dev": {
     "phpunit/phpunit": "*",
