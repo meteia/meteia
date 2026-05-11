@@ -6,22 +6,20 @@ namespace Meteia\Http\Responses;
 
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Stream;
-use Override;
 use Psr\Http\Message\StreamInterface;
 
 class BinaryResponse extends Response
 {
-    public function __construct(StreamInterface|string $data, $status = 200, array $headers = [])
+    /**
+     * @param array<non-empty-string, array<array-key, string>|string> $headers
+     */
+    public function __construct(StreamInterface|string $data, int $status = 200, array $headers = [])
     {
-        $body = match (true) {
-            $data instanceof StreamInterface => $data,
-            default => $this->getStream($data),
-        };
+        $body = $data instanceof StreamInterface ? $data : self::createStream($data);
         parent::__construct($body, $status, $headers);
     }
 
-    #[Override]
-    private function getStream($data): StreamInterface
+    private static function createStream(string $data): StreamInterface
     {
         $stream = new Stream('php://temp', 'wb+');
         $stream->write($data);

@@ -11,8 +11,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function Meteia\Polyfills\array_map_assoc;
-
 class ServerTimingHeader implements MiddlewareInterface
 {
     public function __construct(
@@ -21,9 +19,11 @@ class ServerTimingHeader implements MiddlewareInterface
 
     public function addHeader(ResponseInterface $response): ResponseInterface
     {
-        $value = implode(',', array_map_assoc(static fn($key, $value) => [
-            $key => $key . ';dur=' . round($value, 4),
-        ], $this->timings->all()));
+        $parts = [];
+        foreach ($this->timings->all() as $key => $duration) {
+            $parts[] = $key . ';dur=' . round($duration, 4);
+        }
+        $value = implode(',', $parts);
 
         return $response->withHeader('Server-Timing', $value);
     }

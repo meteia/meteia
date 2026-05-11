@@ -9,14 +9,16 @@ use Override;
 
 class JsonPostBody implements ServerRequestBody
 {
+    /** @var array<array-key, mixed> */
     private readonly array $data;
 
     public function __construct(RequestBody $requestBody)
     {
-        $this->data = json_decode($requestBody->content(), true, 512, JSON_THROW_ON_ERROR);
+        $decoded = json_decode($requestBody->content(), true, 512, JSON_THROW_ON_ERROR);
+        $this->data = is_array($decoded) ? $decoded : [];
     }
 
-    public function value(string $name, $default): mixed
+    public function value(string $name, mixed $default): mixed
     {
         return $this->data[$name] ?? $default;
     }
@@ -24,12 +26,19 @@ class JsonPostBody implements ServerRequestBody
     #[Override]
     public function int($key, int $default): int
     {
-        return (int) ($this->data[$key] ?? $default);
+        $value = $this->data[$key] ?? $default;
+        if (!is_scalar($value)) {
+            return $default;
+        }
+
+        return (int) $value;
     }
 
     #[Override]
     public function string($key, string $default): string
     {
-        return trim($this->data[$key] ?? $default);
+        $value = $this->data[$key] ?? $default;
+
+        return is_string($value) ? trim($value) : $default;
     }
 }

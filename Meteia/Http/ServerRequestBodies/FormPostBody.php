@@ -12,13 +12,18 @@ use ReflectionParameter;
 
 readonly class FormPostBody implements ServerRequestBody
 {
+    /** @var array<array-key, mixed> */
     private array $data;
 
     public function __construct(ServerRequestInterface $request)
     {
-        $this->data = $request->getParsedBody();
+        $parsed = $request->getParsedBody();
+        $this->data = is_array($parsed) ? $parsed : [];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     public function all(): array
     {
         return $this->data;
@@ -27,13 +32,20 @@ readonly class FormPostBody implements ServerRequestBody
     #[Override]
     public function int($key, int $default): int
     {
-        return (int) ($this->data[$key] ?? $default);
+        $value = $this->data[$key] ?? $default;
+        if (!is_scalar($value)) {
+            return $default;
+        }
+
+        return (int) $value;
     }
 
     #[Override]
     public function string($key, string $default): string
     {
-        return trim($this->data[$key] ?? $default);
+        $value = $this->data[$key] ?? $default;
+
+        return is_string($value) ? trim($value) : $default;
     }
 
     public function bool($key, bool $default): bool
@@ -52,14 +64,22 @@ readonly class FormPostBody implements ServerRequestBody
         return $default;
     }
 
+    /**
+     * @template T of object
+     * @param class-string<T> $class
+     * @return T
+     */
     public function deserialize(string $class): object
     {
         $reflection = new ReflectionClass($class);
         $instanceArgs = array_map(
-            fn(ReflectionParameter $parameter) => $this->data[StringCase::snake($parameter->getName())],
+            fn(ReflectionParameter $parameter) => $this->data[StringCase::snake($parameter->getName())] ?? null,
             $reflection->getConstructor()?->getParameters() ?? [],
         );
 
-        return $reflection->newInstanceArgs($instanceArgs);
+        $instance = $reflection->newInstanceArgs($instanceArgs);
+        \assert($instance instanceof $class);
+
+        return $instance;
     }
 }

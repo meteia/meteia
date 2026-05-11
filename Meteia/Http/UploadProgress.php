@@ -58,7 +58,7 @@ class UploadProgress
 
     private function shouldSendUpdate(): bool
     {
-        $now = hrtime(true);
+        $now = (int) hrtime(true);
         if (($now - $this->lastUpdateSent) > $this->intervalNanos) {
             $this->lastUpdateSent = $now;
 

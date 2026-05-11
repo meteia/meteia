@@ -9,14 +9,14 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class TypedRequestPath
 {
+    /** @var array<int, string> */
     private array $path;
 
     public function __construct(
         private readonly BooleanValues $booleanValues,
         ServerRequestInterface $sri,
     ) {
-        $this->path = explode('/', $sri->getUri()->getPath());
-        $this->path = array_filter($this->path);
+        $this->path = array_values(array_filter(explode('/', $sri->getUri()->getPath())));
     }
 
     public function string(int $idx, string $default): string

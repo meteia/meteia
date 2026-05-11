@@ -14,7 +14,9 @@ readonly class SealedCookie extends PlaintextCookie
 
     public function open(XChaCha20Poly1305 $XChaCha20Poly1305, #[SensitiveParameter] SecretKey $secret): OpenedCookie
     {
-        [$ciphertext, $associatedData] = explode('_', $this->value, 2);
+        $parts = explode('_', $this->value, 2);
+        $ciphertext = $parts[0];
+        $associatedData = $parts[1] ?? '';
         $ad = implode('_', array_filter([$this->name, $associatedData]));
 
         $result = $XChaCha20Poly1305->decrypt($ciphertext, $ad, $secret);

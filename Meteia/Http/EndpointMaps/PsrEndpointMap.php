@@ -48,7 +48,7 @@ class PsrEndpointMap implements EndpointMap
         }
 
         $path = '/' . implode('/', $parts);
-        $path = preg_replace('~(?<=\\w)([A-Z])~u', '-$1', $path);
+        $path = preg_replace('~(?<=\\w)([A-Z])~u', '-$1', $path) ?? $path;
 
         return mb_strtolower($path);
     }

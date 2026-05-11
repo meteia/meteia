@@ -32,6 +32,11 @@ class Timings
         return $result;
     }
 
+    /**
+     * @template T
+     * @param callable(): T $c
+     * @return T
+     */
     public function measure(string $category, callable $c): mixed
     {
         $category = $this->filteredCategory($category);

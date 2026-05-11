@@ -44,13 +44,14 @@ final class RequestHandler implements RequestHandlerInterface, MiddlewareInterfa
     #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        /** @var MiddlewareInterface $middleware */
         $middleware = array_shift($this->middleware);
         if ($middleware === null) {
             throw new Exception('Request was not handled by any middleware');
         }
         if (\is_string($middleware)) {
-            $middleware = $this->container->get($middleware);
+            $resolved = $this->container->get($middleware);
+            \assert($resolved instanceof MiddlewareInterface);
+            $middleware = $resolved;
         }
 
         return $middleware->process($request, $this);

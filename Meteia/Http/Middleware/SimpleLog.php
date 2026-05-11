@@ -24,7 +24,7 @@ class SimpleLog implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $logFile = $this->logPath->join('http.log');
-        $line = PHP_EOL . sprintf('--> %s %s', $request->getMethod(), $request->getUri()) . PHP_EOL;
+        $line = PHP_EOL . sprintf('--> %s %s', $request->getMethod(), (string) $request->getUri()) . PHP_EOL;
         $line .= 'Headers  : ' . json_encode($request->getHeaders()) . PHP_EOL;
         $line .= 'Form Data  : ' . json_encode($_POST) . PHP_EOL;
         if (\strlen($this->requestBody->content())) {

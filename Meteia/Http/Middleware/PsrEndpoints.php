@@ -38,7 +38,10 @@ class PsrEndpoints implements MiddlewareInterface
         $path = $request->getUri()->getPath();
         if ($path === '/') {
             // FIXME: This feels hackish
-            return $this->container->get(HomepageEndpoint::class);
+            $homepage = $this->container->get(HomepageEndpoint::class);
+            \assert($homepage instanceof Endpoint, 'HomepageEndpoint binding must produce an Endpoint');
+
+            return $homepage;
         }
 
         // FIXME: This is code path is very slow

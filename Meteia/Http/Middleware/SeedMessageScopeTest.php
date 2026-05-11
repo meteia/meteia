@@ -16,6 +16,20 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+final class SeedMessageScopeTestCaptureScope implements RequestHandlerInterface
+{
+    public ?MessageScope $observed = null;
+
+    #[Override]
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $scope = $request->getAttribute(MessageScope::class);
+        $this->observed = $scope instanceof MessageScope ? $scope : null;
+
+        return new Response(204);
+    }
+}
+
 /**
  * @internal
  */
@@ -83,20 +97,9 @@ final class SeedMessageScopeTest extends TestCase
         static::assertInstanceOf(MessageScope::class, $container->get(MessageScope::class));
     }
 
-    private function captureScope(): RequestHandlerInterface
+    private function captureScope(): SeedMessageScopeTestCaptureScope
     {
-        return new class implements RequestHandlerInterface {
-            public ?MessageScope $observed = null;
-
-            #[Override]
-            public function handle(ServerRequestInterface $request): ResponseInterface
-            {
-                $scope = $request->getAttribute(MessageScope::class);
-                $this->observed = $scope instanceof MessageScope ? $scope : null;
-
-                return new Response(204);
-            }
-        };
+        return new SeedMessageScopeTestCaptureScope();
     }
 
     private function container(): Container
@@ -126,6 +129,8 @@ final class SeedMessageScopeTest extends TestCase
             #[Override]
             public function call($callable, array $parameters = []): mixed
             {
+                \assert(\is_callable($callable));
+
                 return $callable(...$parameters);
             }
         };

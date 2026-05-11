@@ -16,14 +16,15 @@ class RequestCookies
     public function plaintext(string $name, string $default): PlaintextCookie
     {
         $cookies = $this->serverRequest->getCookieParams();
+        $value = $cookies[$name] ?? $default;
 
-        return new PlaintextCookie($name, $cookies[$name] ?? $default);
+        return new PlaintextCookie($name, is_string($value) ? $value : $default);
     }
 
     public function sealed(string $name): SealedCookie
     {
         $cookies = $this->serverRequest->getCookieParams();
-        if (!isset($cookies[$name])) {
+        if (!isset($cookies[$name]) || !is_string($cookies[$name])) {
             throw new RuntimeException("Cookie '{$name}' not found");
         }
 

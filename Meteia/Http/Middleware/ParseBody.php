@@ -28,7 +28,9 @@ class ParseBody implements MiddlewareInterface
             $contents = $body->getContents();
             try {
                 $json = json_decode($contents, true, 256, JSON_THROW_ON_ERROR);
-                $request = $request->withParsedBody($json);
+                if (is_array($json) || is_object($json) || $json === null) {
+                    $request = $request->withParsedBody($json);
+                }
             } catch (JsonException) {
                 // Ignore JSON parse errors
             }
