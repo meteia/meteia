@@ -4,28 +4,35 @@ declare(strict_types=1);
 
 namespace Meteia\Performance;
 
-use function Meteia\Polyfills\array_map_assoc;
-
 class Timings
 {
-    private $childDurations = 0;
+    private float $childDurations = 0.0;
 
-    private $timeDepth = 0;
+    private int $timeDepth = 0;
 
-    private $timings = [];
+    /** @var array<string, float> */
+    private array $timings = [];
 
-    public function add($category, float $ms): void
+    public function add(string $category, float $ms): void
     {
         $category = $this->filteredCategory($category);
-        $this->timings[$category] = ($this->timings[$category] ?? 0) + $ms;
+        $this->timings[$category] = ($this->timings[$category] ?? 0.0) + $ms;
     }
 
+    /**
+     * @return array<string, float>
+     */
     public function all(): array
     {
-        return array_map_assoc(static fn($k, $v) => [$k => round($v, 4)], $this->timings);
+        $result = [];
+        foreach ($this->timings as $k => $v) {
+            $result[$k] = round($v, 4);
+        }
+
+        return $result;
     }
 
-    public function measure(string $category, callable $c)
+    public function measure(string $category, callable $c): mixed
     {
         $category = $this->filteredCategory($category);
         ++$this->timeDepth;
@@ -36,13 +43,13 @@ class Timings
         } finally {
             $endTime = hrtime(true);
             --$this->timeDepth;
-            $duration = max(0, (($endTime - $startTime) / 1_000_000) - $this->childDurations);
+            $duration = max(0.0, (($endTime - $startTime) / 1_000_000) - $this->childDurations);
             $this->childDurations += $duration;
             if ($this->timeDepth === 0) {
-                $this->childDurations = 0;
+                $this->childDurations = 0.0;
             }
 
-            $this->timings[$category] = ($this->timings[$category] ?? 0) + $duration;
+            $this->timings[$category] = ($this->timings[$category] ?? 0.0) + $duration;
         }
 
         return $result;

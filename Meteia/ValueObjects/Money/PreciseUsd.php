@@ -4,94 +4,114 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Money;
 
-use BCMathExtended\BC;
 use Meteia\ValueObjects\Contracts\Money\PreciseMoney;
-use Meteia\ValueObjects\Primitive\FloatLiteral;
 use Override;
+use Stringable;
 
-class PreciseUsd implements PreciseMoney
+class PreciseUsd implements PreciseMoney, Stringable
 {
     public const PRECISION = 6;
 
-    /** @var string */
-    protected $amount;
+    /** @var numeric-string */
+    protected string $amount;
 
-    public function __construct($amount)
+    public function __construct(string|float|int|Stringable $amount)
     {
-        $this->amount = (string) $amount;
+        $value = (string) $amount;
+        \assert(is_numeric($value));
+        $this->amount = $value;
     }
 
-    public function __toString()
+    #[Override]
+    public function __toString(): string
     {
         return $this->amount;
     }
 
     #[Override]
-    public function round($precision = 2)
+    public function round(int $precision = 2): RoundedUsd
     {
-        return new RoundedUsd(BC::round($this->amount, $precision));
+        return new RoundedUsd(self::bcround($this->amount, $precision));
     }
 
-    public function equalTo($amount)
+    public function equalTo(string|float|int|Stringable $amount): bool
     {
-        return bccomp($this->amount, (string) $amount, static::PRECISION) === 0;
+        return bccomp($this->amount, self::numericString($amount), static::PRECISION) === 0;
     }
 
-    public function lessThan($amount)
+    public function lessThan(string|float|int|Stringable $amount): bool
     {
-        return bccomp($this->amount, (string) $amount, static::PRECISION) === -1;
+        return bccomp($this->amount, self::numericString($amount), static::PRECISION) === -1;
     }
 
-    public function greaterThan($amount)
+    public function greaterThan(string|float|int|Stringable $amount): bool
     {
-        return bccomp($this->amount, (string) $amount, static::PRECISION) === 1;
+        return bccomp($this->amount, self::numericString($amount), static::PRECISION) === 1;
     }
 
-    public function lessThanOrEq($amount)
+    public function lessThanOrEq(string|float|int|Stringable $amount): bool
     {
-        return bccomp($this->amount, (string) $amount, static::PRECISION) <= 0;
+        return bccomp($this->amount, self::numericString($amount), static::PRECISION) <= 0;
     }
 
-    public function greaterThanOrEq($amount)
+    public function greaterThanOrEq(string|float|int|Stringable $amount): bool
     {
-        return bccomp($this->amount, (string) $amount, static::PRECISION) >= 0;
+        return bccomp($this->amount, self::numericString($amount), static::PRECISION) >= 0;
     }
 
-    public function add($b)
+    public function add(string|float|int|Stringable $b): self
     {
-        return new self(bcadd($this->amount, (string) $b, self::PRECISION));
+        return new self(bcadd($this->amount, self::numericString($b), self::PRECISION));
     }
 
-    public function subtract($b)
+    public function subtract(string|float|int|Stringable $b): self
     {
-        return new self(bcsub($this->amount, (string) $b, self::PRECISION));
+        return new self(bcsub($this->amount, self::numericString($b), self::PRECISION));
     }
 
-    public function multiply($value)
+    public function multiply(string|float|int|Stringable $value): self
     {
-        return new self(bcmul($this->amount, (string) $value, self::PRECISION));
+        return new self(bcmul($this->amount, self::numericString($value), self::PRECISION));
     }
 
-    public function divide($value)
+    public function divide(string|float|int|Stringable $value): self
     {
-        return new self(bcdiv($this->amount, (string) $value, self::PRECISION));
+        return new self(bcdiv($this->amount, self::numericString($value), self::PRECISION));
     }
 
-    public function abs()
+    public function abs(): self
     {
-        return new self(BC::abs($this->amount));
+        $abs = ltrim($this->amount, '-');
+
+        return new self($abs);
     }
 
     public function asCents(): int
     {
-        return bcmul(BC::round($this->amount, 2), 100, self::PRECISION);
+        return (int) bcmul(self::bcround($this->amount, 2), '100', self::PRECISION);
     }
 
     /**
-     * @deprecated Use PreciseUsd and RoundedUsd whenever possible
+     * @return numeric-string
      */
-    public function asMoney(): Money
+    private static function numericString(string|float|int|Stringable $amount): string
     {
-        return new Money(new FloatLiteral($this->amount), new Currency('USD'));
+        $value = (string) $amount;
+        \assert(is_numeric($value));
+
+        return $value;
+    }
+
+    /**
+     * @param numeric-string $value
+     *
+     * @return numeric-string
+     */
+    private static function bcround(string $value, int $precision): string
+    {
+        $rounded = number_format((float) $value, $precision, '.', '');
+        \assert(is_numeric($rounded));
+
+        return $rounded;
     }
 }

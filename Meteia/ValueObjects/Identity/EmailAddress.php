@@ -8,35 +8,30 @@ use Meteia\ValueObjects\ValueObject;
 
 class EmailAddress extends ValueObject
 {
-    /** @var string */
-    protected $address;
+    protected string $address;
 
-    /** @var string */
-    protected $displayName;
+    protected string $displayName;
 
-    public function __construct($address, $displayName)
+    public function __construct(string $address, string $displayName)
     {
         $this->address = $address;
         $this->displayName = $displayName;
     }
 
-    /**
-     * @return string
-     */
-    public function getAddress()
+    public function getAddress(): string
     {
         return $this->address;
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return $this->displayName;
     }
 
-    public function toArray()
+    /**
+     * @return array<string, string>
+     */
+    public function toArray(): array
     {
         return [$this->address => $this->displayName];
     }

@@ -12,11 +12,11 @@ class FrameFilters
     private array $filters;
 
     /**
-     * @param FrameFilter[] $filters
+     * @param array<int, FrameFilter> $filters
      */
     public function __construct(array $filters = [])
     {
-        $this->filters = array_map(static fn(FrameFilter $filter) => $filter, $filters);
+        $this->filters = array_values(array_map(static fn(FrameFilter $filter) => $filter, $filters));
     }
 
     public function filtered(array $frames): array

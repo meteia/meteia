@@ -19,6 +19,9 @@ final readonly class ViteFileManifestSource implements ManifestSource
     #[Override]
     public function entries(): array
     {
-        return $this->cache->entriesAt($this->path);
+        /** @var array<string, array{file?: string, imports?: list<string>, css?: list<string>}> $entries */
+        $entries = $this->cache->entriesAt($this->path);
+
+        return $entries;
     }
 }

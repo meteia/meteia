@@ -9,18 +9,18 @@ use Meteia\Domain\Contracts\Identity\EmailAddresses;
 use Meteia\ValueObjects\ImmutableArrayValueObject;
 use Override;
 
-class ImmutableEmailAddresses extends ImmutableArrayValueObject implements EmailAddresses
+readonly class ImmutableEmailAddresses extends ImmutableArrayValueObject implements EmailAddresses
 {
     public const TYPE = EmailAddress::class;
 
     #[Override]
-    public function toArray()
+    public function toArray(): array
     {
         $result = [];
 
-        /** @var EmailAddress $email */
         foreach ($this->values as $email) {
-            $result = array_merge($result, $email->toArray());
+            \assert($email instanceof EmailAddress);
+            $result = array_merge($result, [$email->getAddress() => $email->getDisplayName()]);
         }
 
         return $result;

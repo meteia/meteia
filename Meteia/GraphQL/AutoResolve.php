@@ -21,12 +21,15 @@ class AutoResolve
         private readonly Container $container,
     ) {}
 
-    public function resolve($source, array $args, RequestContext $requestContext, ResolveInfo $resolveInfo)
+    /**
+     * @param array<string, mixed> $args
+     */
+    public function resolve(mixed $source, array $args, RequestContext $requestContext, ResolveInfo $resolveInfo): mixed
     {
         $returnType = $resolveInfo->returnType;
         $expectsList = $returnType instanceof ListOfType;
         while ($returnType instanceof WrappingType && !$expectsList) {
-            $returnType = $returnType->getWrappedType(false);
+            $returnType = $returnType->getWrappedType();
             $expectsList = $returnType instanceof ListOfType;
         }
 
@@ -44,11 +47,14 @@ class AutoResolve
         }
 
         if ($resolver instanceof Resolver && ($returnType instanceof StringType || $resolver instanceof ResolvesAttr)) {
-            return $resolver->data($source->{$resolveInfo->fieldName}, $args, $requestContext);
+            $value = \is_object($source) ? $source->{$resolveInfo->fieldName} ?? null : null;
+
+            return $resolver->data($value, $args, $requestContext);
         }
         if ($resolver instanceof Resolver) {
             if (
-                isset($source->{$resolveInfo->fieldName})
+                \is_object($source)
+                && isset($source->{$resolveInfo->fieldName})
                 && \is_array($source->{$resolveInfo->fieldName})
                 && $expectsList
             ) {
@@ -66,6 +72,7 @@ class AutoResolve
             return $source;
         }
 
+        /** @var array<string, mixed> $args */
         return Executor::defaultFieldResolver($source, $args, $requestContext, $resolveInfo);
     }
 }

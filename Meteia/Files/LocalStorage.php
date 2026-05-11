@@ -26,6 +26,12 @@ class LocalStorage implements Storage
     }
 
     #[Override]
+    public function internalUri(string $dest): Uri
+    {
+        return $this->canonicalUri($dest);
+    }
+
+    #[Override]
     public function exists(string $dest): bool
     {
         return $this->onDiskDest($dest)->exists();

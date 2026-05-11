@@ -68,6 +68,11 @@ final readonly class SqlBoundColumns
         return \sprintf('%s = %s', $column, $column);
     }
 
+    /**
+     * @param callable(string, string): string $mapping
+     *
+     * @return list<string>
+     */
     private function mapped(callable $mapping): array
     {
         $mapped = [];

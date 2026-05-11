@@ -25,6 +25,7 @@ final readonly class Attrs
             return new self(['class' => $raw[0]]);
         }
 
+        /** @var array<string, bool|string|\Stringable|int|float|null> $raw */
         return new self($raw);
     }
 

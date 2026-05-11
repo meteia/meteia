@@ -26,8 +26,13 @@ readonly class PdoCredentialSourceRepository implements CredentialSourceReposito
         $rows = $this->db->select((string) $this->table, [
             'public_key_credential_id' => $publicKeyCredentialId,
         ]);
+        if ($rows === []) {
+            return null;
+        }
+        $row = reset($rows);
+        \assert(\is_object($row));
 
-        return $rows === [] ? null : $this->hydrate(reset($rows));
+        return $this->hydrate($row);
     }
 
     #[Override]
@@ -59,6 +64,10 @@ readonly class PdoCredentialSourceRepository implements CredentialSourceReposito
 
     private function hydrate(object $row): CredentialRecord
     {
-        return $this->serializer->deserialize($row->data, CredentialRecord::class, 'json');
+        \assert(\is_string($row->data));
+        $record = $this->serializer->deserialize($row->data, CredentialRecord::class, 'json');
+        \assert($record instanceof CredentialRecord);
+
+        return $record;
     }
 }

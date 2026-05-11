@@ -21,16 +21,26 @@ readonly class PdoUserEntityRepository implements UserEntityRepository
     public function findOneByUsername(string $username): ?PublicKeyCredentialUserEntity
     {
         $rows = $this->db->select((string) $this->table, ['username' => $username]);
+        if ($rows === []) {
+            return null;
+        }
+        $row = reset($rows);
+        \assert(\is_object($row));
 
-        return $rows === [] ? null : $this->hydrate(reset($rows));
+        return $this->hydrate($row);
     }
 
     #[Override]
     public function findOneByUserHandle(string $userHandle): ?PublicKeyCredentialUserEntity
     {
         $rows = $this->db->select((string) $this->table, ['user_handle' => $userHandle]);
+        if ($rows === []) {
+            return null;
+        }
+        $row = reset($rows);
+        \assert(\is_object($row));
 
-        return $rows === [] ? null : $this->hydrate(reset($rows));
+        return $this->hydrate($row);
     }
 
     #[Override]
@@ -50,6 +60,8 @@ readonly class PdoUserEntityRepository implements UserEntityRepository
 
     private function hydrate(object $row): PublicKeyCredentialUserEntity
     {
+        \assert(\is_string($row->username) && \is_string($row->user_handle) && \is_string($row->display_name));
+
         return PublicKeyCredentialUserEntity::create($row->username, $row->user_handle, $row->display_name);
     }
 }

@@ -8,6 +8,9 @@ use IteratorAggregate;
 use Override;
 use Traversable;
 
+/**
+ * @implements IteratorAggregate<class-string<Event>, array<array-key, class-string<EventSink>>>
+ */
 readonly class EventToEventSinksMap implements IteratorAggregate
 {
     public function __construct(

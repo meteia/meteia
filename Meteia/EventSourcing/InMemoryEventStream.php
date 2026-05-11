@@ -72,6 +72,7 @@ final class InMemoryEventStream implements EventStream, GlobalEventStream
     public function replay(StreamId $streamId, EventSourced $target): EventSourced
     {
         foreach ($this->read($streamId) as $recorded) {
+            \assert($recorded instanceof RecordedEvent);
             $recorded->applyTo($target);
         }
 

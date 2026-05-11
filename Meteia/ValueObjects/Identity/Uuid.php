@@ -7,13 +7,15 @@ namespace Meteia\ValueObjects\Identity;
 use Meteia\ValueObjects\Errors\ValueObjectInvalid;
 use Meteia\ValueObjects\PrimitiveValueObject;
 use Override;
+use Stringable;
+use Symfony\Component\Uid\Uuid as SymfonyUuid;
 
-class Uuid extends PrimitiveValueObject
+class Uuid extends PrimitiveValueObject implements Stringable
 {
-    public function __construct($value = null)
+    public function __construct(string|Stringable|null $value = null)
     {
         if ($value === null) {
-            $value = \Ramsey\Uuid\Uuid::uuid4()->toString();
+            $value = SymfonyUuid::v4()->toRfc4122();
         } else {
             $value = (string) $value;
 
@@ -46,13 +48,13 @@ class Uuid extends PrimitiveValueObject
     }
 
     #[Override]
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->value;
+        return (string) $this->value;
     }
 
-    public function equalTo(self $other)
+    public function equalTo(self $other): bool
     {
-        return hash_equals(strtolower($this), strtolower($other));
+        return hash_equals(strtolower((string) $this), strtolower((string) $other));
     }
 }

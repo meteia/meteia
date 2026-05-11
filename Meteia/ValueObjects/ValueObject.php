@@ -10,30 +10,40 @@ use Meteia\ValueObjects\Errors\ValueObjectImmutable;
 use Override;
 use Traversable;
 
+/**
+ * @implements IteratorAggregate<string, mixed>
+ */
 abstract class ValueObject implements JsonSerializable, IteratorAggregate
 {
-    public function __get($key)
+    public function __get(string $key): mixed
     {
         if (isset($this->{$key})) {
             return $this->{$key};
         }
+
+        return null;
     }
 
-    public function __set($key, $value): void
+    public function __set(string $key, mixed $value): void
     {
         throw new ValueObjectImmutable(static::class . ' is immutable');
     }
 
-    public function __isset($key)
+    public function __isset(string $key): bool
     {
         return isset($this->{$key});
     }
 
-    public function __call($name, $arguments)
+    /**
+     * @param array<int, mixed> $arguments
+     */
+    public function __call(string $name, array $arguments): mixed
     {
         if (strncmp($name, 'with', 4) === 0) {
-            return $this->with(lcfirst(substr($name, 4)), ...$arguments);
+            return $this->with(lcfirst(substr($name, 4)), $arguments[0] ?? null);
         }
+
+        return null;
     }
 
     #[Override]
@@ -41,7 +51,7 @@ abstract class ValueObject implements JsonSerializable, IteratorAggregate
     {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
-            if ($key[0] === '_') {
+            if (str_starts_with((string) $key, '_')) {
                 continue;
             }
 
@@ -60,7 +70,7 @@ abstract class ValueObject implements JsonSerializable, IteratorAggregate
         return $data;
     }
 
-    private function with($key, $value): self
+    private function with(string $key, mixed $value): self
     {
         $copy = clone $this;
         $copy->{$key} = $value;

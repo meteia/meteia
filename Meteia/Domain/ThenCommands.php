@@ -6,26 +6,25 @@ namespace Meteia\Domain;
 
 use Meteia\Commands\Command;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
-use Meteia\ValueObjects\ImmutableCommands;
 
 trait ThenCommands
 {
-    /** @var Command[] */
-    private $__pendingCommands = [];
+    /** @var list<Command> */
+    private array $__pendingCommands = [];
 
-    public function then(Command $event)
+    public function then(Command $event): self
     {
         return $this->appendCommand($event);
     }
 
-    public function commitCommandsIn(UnitOfWorkContext $unitOfWorkContext)
+    public function commitCommandsIn(UnitOfWorkContext $unitOfWorkContext): self
     {
-        $unitOfWorkContext->commitCommands(new ImmutableCommands($this->__pendingCommands));
+        $unitOfWorkContext->wantsTo(new PendingCommands($this->__pendingCommands));
 
         return $this->withoutPendingCommands();
     }
 
-    private function appendCommand(Command $event)
+    private function appendCommand(Command $event): self
     {
         $copy = clone $this;
         $copy->__pendingCommands[] = $event;
@@ -33,7 +32,7 @@ trait ThenCommands
         return $copy;
     }
 
-    private function withoutPendingCommands()
+    private function withoutPendingCommands(): self
     {
         $copy = clone $this;
         $copy->__pendingCommands = [];

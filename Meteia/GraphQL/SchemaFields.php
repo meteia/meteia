@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\GraphQL;
 
 use Generator;
+use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type;
 use Meteia\Classy\Classes;
 use Meteia\Classy\ClassesImplementing;
@@ -22,7 +23,7 @@ final readonly class SchemaFields
     {
         $classes = new ClassesImplementing($this->fieldClasses, $interface);
         foreach ($classes as $queryFieldClassName) {
-            /** @var QueryField $field */
+            /** @var QueryField&NullableType&Type $field */
             $field = $this->container->get($queryFieldClassName);
 
             yield $this->fieldName($queryFieldClassName) => [

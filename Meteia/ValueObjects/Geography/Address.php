@@ -13,87 +13,90 @@ use Meteia\ValueObjects\Primitive\ComplexStringLiteral as StringLiteral;
  */
 class Address
 {
-    protected $replacements = [];
+    /** @var array<string, StringLiteral|string> */
+    protected array $replacements = [];
 
-    public function __construct($addressInformation)
+    /**
+     * @param array<string, mixed> $addressInformation
+     */
+    public function __construct(array $addressInformation)
     {
         $this->buildBasicElements($addressInformation);
         $this->buildComplexElements();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getAddress();
     }
 
-    public function getRecipient()
+    public function getRecipient(): string
     {
         return $this->format('%recipient%');
     }
 
-    public function getStreetLine()
+    public function getStreetLine(): string
     {
         return $this->format('%street%');
     }
 
-    public function getLine2()
-    {
-        return $this->function('%line2%');
-    }
-
-    public function getOccupancyLine()
+    public function getLine2(): string
     {
         return $this->format('%line2%');
     }
 
-    public function getCity()
+    public function getOccupancyLine(): string
+    {
+        return $this->format('%line2%');
+    }
+
+    public function getCity(): string
     {
         return $this->format('%city%');
     }
 
-    public function getCountry()
+    public function getCountry(): string
     {
         return $this->format('%country%');
     }
 
-    public function getState()
+    public function getState(): string
     {
         return $this->format('%state%');
     }
 
-    public function getZip()
+    public function getZip(): string
     {
         return $this->format('%zip%');
     }
 
-    public function getZipPlusFour()
+    public function getZipPlusFour(): string
     {
         return $this->format('%zip%%zip4separator%%zip4%');
     }
 
-    public function getAddress()
+    public function getAddress(): string
     {
         return $this->format(AddressFormat::ONE_LINE_ADDRESS);
     }
 
-    public function format($format)
+    public function format(string $format): string
     {
-        $format = new StringLiteral($format);
+        $formatLiteral = new StringLiteral($format);
 
-        $parts = $format->replace(array_keys($this->replacements), array_values($this->replacements))->split(' ');
+        $replacements = array_map(static fn(StringLiteral|string $v): string => (string) $v, $this->replacements);
+
+        $parts = $formatLiteral->replace(array_keys($replacements), array_values($replacements))->split(' ');
 
         $join = '';
         foreach ($parts as $part) {
-            $part = $part->trim();
-            $part = '' . $part;
-            if ($part !== ' ' && $part !== '') {
-                $join .= $part . ' ';
+            $trimmed = (string) $part->trim();
+            if ($trimmed !== ' ' && $trimmed !== '') {
+                $join .= $trimmed . ' ';
             }
         }
 
-        $join = new StringLiteral($join);
-
-        return $join->trim();
+        return (string) new StringLiteral($join)->trim();
     }
 
     private function buildComplexElements(): void
@@ -112,14 +115,23 @@ class Address
         $this->replacements['%areaElementLineBreak%'] = $this->buildLineBreakElement('areaElement');
     }
 
-    private function buildLineBreakElement($baseElement)
+    private function buildLineBreakElement(string $baseElement): string
     {
-        return $this->replacements['%' . $baseElement . '%']->trim()->isEmpty()
-            ? new StringLiteral('')
-            : $this->replacements['%' . $baseElement . '%'] . $this->replacements['%lineBreak%'];
+        $key = '%' . $baseElement . '%';
+        $existing = $this->replacements[$key] ?? '';
+        $existingLiteral = $existing instanceof StringLiteral ? $existing : new StringLiteral($existing);
+        if ($existingLiteral->trim()->isEmpty()) {
+            return '';
+        }
+        $lineBreak = $this->replacements['%lineBreak%'] ?? '';
+
+        return (string) $existingLiteral . (string) $lineBreak;
     }
 
-    private function buildBasicElements($data)
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function buildBasicElements(array $data): void
     {
         $baseArray = [
             'recipient' => '',
@@ -145,18 +157,20 @@ class Address
                 continue;
             }
 
-            $value = new StringLiteral($value);
-            $this->replacements['%' . $key . '%'] = $value->trim();
-            unset($value);
+            $literal = new StringLiteral((string) $value);
+            $this->replacements['%' . $key . '%'] = $literal->trim();
         }
 
         $this->buildZipSeparator($data);
         $this->buildStateSeparator($data);
     }
 
-    private function buildZipSeparator($data): void
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function buildZipSeparator(array $data): void
     {
-        if (isset($data['zip4separator'])) {
+        if (isset($data['zip4separator']) && \is_string($data['zip4separator'])) {
             $this->replacements['%zip4separator%'] = $data['zip4separator'];
         } elseif (isset($data['zip4']) && $data['zip4'] !== '') {
             $this->replacements['%zip4separator%'] = new StringLiteral('-');
@@ -165,13 +179,17 @@ class Address
         }
     }
 
-    private function buildStateSeparator($data): void
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function buildStateSeparator(array $data): void
     {
-        if (isset($data['stateSeparator'])) {
+        if (isset($data['stateSeparator']) && \is_string($data['stateSeparator'])) {
             $this->replacements['%stateSeparator%'] = $data['stateSeparator'];
         } else {
             $this->replacements['%stateSeparator%'] = '';
-            $state = isset($data['state']) ? new StringLiteral($data['state']) : new StringLiteral('');
+            $stateValue = isset($data['state']) ? (string) $data['state'] : '';
+            $state = new StringLiteral($stateValue);
             if ($state->trim()->length() === 2) {
                 $this->replacements['%stateSeparator%'] = ',';
             }

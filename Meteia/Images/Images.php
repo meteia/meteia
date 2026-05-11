@@ -28,6 +28,7 @@ readonly class Images
             $row = [];
             for ($x = 0; $x < $width; ++$x) {
                 $index = imagecolorat($img, $x, $y);
+                \assert($index !== false);
                 $colors = imagecolorsforindex($img, $index);
 
                 $row[] = [$colors['red'], $colors['green'], $colors['blue']];
@@ -56,7 +57,10 @@ readonly class Images
         $sourceHeight = imagesy($src);
 
         $dst = imagecreatetruecolor($canvasWidth, $canvasHeight);
-        imagefill($dst, 0, 0, imagecolorallocatealpha($dst, 0, 0, 0, 127));
+        \assert($dst !== false);
+        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+        \assert($transparent !== false);
+        imagefill($dst, 0, 0, $transparent);
         imagealphablending($dst, true);
         imagesavealpha($dst, true);
         imagecopyresampled($dst, $src, 0, 0, 0, 0, $canvasWidth, $canvasHeight, $sourceWidth, $sourceHeight);
@@ -95,6 +99,9 @@ readonly class Images
         return new ImageFile(new FilesystemPath($tempPath));
     }
 
+    /**
+     * @return array{0: int, 1: int}
+     */
     private function constrainedDimensions(int $width, int $height, int $targetWidth, int $targetHeight): array
     {
         if ($targetWidth === -1 && $targetHeight === -1) {

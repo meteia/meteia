@@ -36,8 +36,12 @@ class UniqueIdNormalizer implements NormalizerInterface, DenormalizerInterface
     #[Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): UniqueId
     {
-        // @var UniqueId $type
-        return $type::fromToken($data);
+        \assert(is_subclass_of($type, UniqueId::class));
+        \assert(\is_string($data));
+        $result = $type::fromToken($data);
+        \assert($result instanceof UniqueId);
+
+        return $result;
     }
 
     #[Override]

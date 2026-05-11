@@ -44,13 +44,13 @@ final readonly class ViteManifest implements Resources
 
             return;
         }
-        foreach ($entry['imports'] ?? [] as $import) {
+        $imports = $entry['imports'] ?? [];
+        \assert(\is_array($imports));
+        foreach ($imports as $import) {
+            \assert(\is_string($import));
             yield from $this->moduleScripts($import);
         }
-        yield new Script(self::PREFIX . $entry['file'], type: 'module');
-        foreach ($entry['css'] ?? [] as $css) {
-            yield new Link('stylesheet', self::PREFIX . $css);
-        }
+        yield new Script(self::PREFIX . (string) $entry['file'], type: 'module');
     }
 
     #[Override]
@@ -64,12 +64,17 @@ final readonly class ViteManifest implements Resources
 
             return;
         }
-        foreach ($entry['imports'] ?? [] as $import) {
+        $imports = $entry['imports'] ?? [];
+        \assert(\is_array($imports));
+        foreach ($imports as $import) {
+            \assert(\is_string($import));
             yield from $this->styleLinks($import);
         }
-        yield new Link('stylesheet', self::PREFIX . $entry['file']);
-        foreach ($entry['css'] ?? [] as $css) {
-            yield new Link('stylesheet', self::PREFIX . $css);
+        yield new Link('stylesheet', self::PREFIX . (string) $entry['file']);
+        $css = $entry['css'] ?? [];
+        \assert(\is_array($css));
+        foreach ($css as $cssPath) {
+            yield new Link('stylesheet', self::PREFIX . (string) $cssPath);
         }
     }
 

@@ -15,9 +15,16 @@ class FileFragment
         private readonly int $line,
     ) {}
 
+    /**
+     * @return list<object{href: string, number: int, activeLine: bool, source: string}>
+     */
     public function lines(): array
     {
-        $lines = explode("\n", file_get_contents($this->file));
+        $contents = file_get_contents($this->file);
+        if ($contents === false) {
+            return [];
+        }
+        $lines = explode("\n", $contents);
 
         $offset = (int) max(0, $this->line - ceil(11 / 2));
 

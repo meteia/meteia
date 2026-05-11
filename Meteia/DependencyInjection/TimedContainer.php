@@ -29,7 +29,10 @@ readonly class TimedContainer implements Container
     #[Override]
     public function has(string $id): bool
     {
-        return $this->timings->measure('di-has-' . $id, fn() => $this->container->has($id));
+        $result = $this->timings->measure('di-has-' . $id, fn() => $this->container->has($id));
+        \assert(\is_bool($result));
+
+        return $result;
     }
 
     #[Override]

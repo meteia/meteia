@@ -11,15 +11,18 @@ trait DataAttributes
         $attrs = get_object_vars($this);
         $attrs = array_filter($attrs, static fn($key) => \in_array($key, $names, true), ARRAY_FILTER_USE_KEY);
         $attrs = array_map(
-            static function ($k, $v) {
-                $k = preg_replace('~(?<=\\w)([A-Z])~u', '-$1', $k);
+            static function ($k, $v): string {
+                $k = preg_replace('~(?<=\\w)([A-Z])~u', '-$1', (string) $k);
+                \assert(\is_string($k));
                 $k = mb_strtolower($k);
 
                 if (\is_bool($v) && $v) {
                     return 'data-' . $k;
                 }
 
-                return sprintf('data-%s="%s"', $k, $v);
+                \assert(\is_scalar($v) || $v === null || $v instanceof \Stringable);
+
+                return sprintf('data-%s="%s"', $k, (string) $v);
             },
             array_keys($attrs),
             $attrs,

@@ -65,10 +65,15 @@ class UniqueIdType extends ScalarType implements Resolver
     #[Override]
     public function data($root, array $args, RequestContext $requestContext): mixed
     {
-        if (isset($root->id) && $root->id instanceof $this->uniqueIdClass) {
+        if (\is_object($root) && isset($root->id) && $root->id instanceof $this->uniqueIdClass) {
             return $root->id;
         }
 
-        return new $this->uniqueIdClass($root->id ?? $args['id'] ?? $root);
+        $class = $this->uniqueIdClass;
+        \assert(is_subclass_of($class, UniqueId::class));
+        $value = \is_object($root) ? $root->id ?? $args['id'] ?? $root : $args['id'] ?? $root;
+        \assert(\is_string($value));
+
+        return new $class($value);
     }
 }

@@ -20,9 +20,14 @@ readonly class EnvironmentConfiguration implements Configuration
     {
         $this->env = match (isset($_ENV['APP_ENV_FILES'])) {
             true => array_merge($_ENV, ...array_map(
-                static fn(string $file) => Dotenv::parse(file_get_contents($file)),
+                static function (string $file): array {
+                    $contents = file_get_contents($file);
+                    \assert($contents !== false);
+
+                    return Dotenv::parse($contents);
+                },
                 array_filter(
-                    explode(',', $_ENV['APP_ENV_FILES']),
+                    explode(',', (string) $_ENV['APP_ENV_FILES']),
                     static fn(string $file) => file_exists($file) && is_readable($file),
                 ),
             )),
@@ -37,7 +42,7 @@ readonly class EnvironmentConfiguration implements Configuration
         if ($value === null) {
             return $default;
         }
-        $value = strtolower($value);
+        $value = strtolower((string) $value);
         if (\in_array($value, self::BOOLEAN_VALUES_TRUE, true)) {
             return true;
         }
@@ -56,7 +61,7 @@ readonly class EnvironmentConfiguration implements Configuration
             return $default;
         }
         if (!is_numeric($value)) {
-            throw new UnexpectedType('Expected float, got ' . $value);
+            throw new UnexpectedType('Expected float, got ' . (string) $value);
         }
 
         return (float) $value;
@@ -71,7 +76,7 @@ readonly class EnvironmentConfiguration implements Configuration
         }
 
         if (!is_numeric($value) || bccomp((string) (int) $value, (string) (float) $value, 6) !== 0) {
-            throw new UnexpectedType('Expected int, got ' . $value);
+            throw new UnexpectedType('Expected int, got ' . (string) $value);
         }
 
         return (int) $value;
@@ -85,7 +90,7 @@ readonly class EnvironmentConfiguration implements Configuration
             return (string) $default;
         }
 
-        return $value;
+        return (string) $value;
     }
 
     public function all(): array

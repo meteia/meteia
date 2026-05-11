@@ -36,7 +36,7 @@ final class PdoIssuedCommandsTest extends TestCase
         );
 
         $row = $db->fetchObject('SELECT * FROM issued_commands LIMIT 1');
-        static::assertNotNull($row);
+        static::assertNotFalse($row);
         static::assertSame($causation->bytes(), $row->causation_id);
         static::assertSame($correlation->bytes(), $row->correlation_id);
         static::assertSame($aggregateRootId->bytes(), $row->aggregate_root_id);
@@ -75,7 +75,10 @@ final class PdoIssuedCommandsTest extends TestCase
             #[Override]
             public function unserialize(string $value): mixed
             {
-                return unserialize(base64_decode($value, true), ['allowed_classes' => true]);
+                $decoded = base64_decode($value, true);
+                \assert($decoded !== false);
+
+                return unserialize($decoded, ['allowed_classes' => true]);
             }
         };
     }

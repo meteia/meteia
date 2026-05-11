@@ -43,14 +43,15 @@ if (!function_exists('jdd')) {
     function jdd(): never
     {
         $stackTrace = debug_backtrace();
-        $stackTrace = array_slice(
-            array_filter(
-                $stackTrace,
-                static fn($frame) => isset($frame['file'], $frame['line']) && !str_contains($frame['file'], '/vendor/'),
+        /** @var list<array{file: string, line: int}> $stackTrace */
+        $stackTrace = array_values(array_filter(
+            $stackTrace,
+            static fn($frame) => (
+                isset($frame['file'], $frame['line']) && !str_contains((string) $frame['file'], '/vendor/')
             ),
-            0,
-        );
-        $commonPrefix = common_prefix_length(array_column($stackTrace, 'file'));
+        ));
+        $fileNames = array_column($stackTrace, 'file');
+        $commonPrefix = common_prefix_length($fileNames);
         $stackTrace = array_map(
             static fn($frame) => substr($frame['file'], $commonPrefix) . ':' . $frame['line'],
             $stackTrace,
@@ -77,16 +78,14 @@ if (!function_exists('hdd')) {
     {
         $id = bin2hex(random_bytes(2));
         $stackTrace = debug_backtrace();
-        $stackTrace = array_slice(
-            array_filter(
-                $stackTrace,
-                static fn($frame) => (
-                    isset($frame['file'], $frame['line'])
-                    && preg_match('#/(vendor|DependencyInjection)/#', $frame['file']) === 0
-                ),
+        /** @var list<array{file: string, line: int}> $stackTrace */
+        $stackTrace = array_values(array_filter(
+            $stackTrace,
+            static fn($frame) => (
+                isset($frame['file'], $frame['line'])
+                && preg_match('#/(vendor|DependencyInjection)/#', (string) $frame['file']) === 0
             ),
-            0,
-        );
+        ));
         $fileNames = array_column($stackTrace, 'file');
         $prefixLength = common_prefix_length($fileNames);
         $stackTrace = array_map(

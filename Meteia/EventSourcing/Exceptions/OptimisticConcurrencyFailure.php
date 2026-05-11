@@ -11,6 +11,10 @@ final class OptimisticConcurrencyFailure extends RuntimeException
 {
     public function __construct(StreamVersion $expected, StreamVersion $observed)
     {
-        parent::__construct(\sprintf('Expected stream version %s but observed %s.', $expected, $observed));
+        parent::__construct(\sprintf(
+            'Expected stream version %s but observed %s.',
+            (string) $expected,
+            (string) $observed,
+        ));
     }
 }

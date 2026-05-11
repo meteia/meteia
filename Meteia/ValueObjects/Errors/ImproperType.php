@@ -8,6 +8,9 @@ use Exception;
 
 class ImproperType extends Exception
 {
+    /**
+     * @param array<array-key, string> $allowed_types
+     */
     public function __construct(string $type, array $allowed_types)
     {
         $message = sprintf(

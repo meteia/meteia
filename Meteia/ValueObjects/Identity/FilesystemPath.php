@@ -118,7 +118,12 @@ class FilesystemPath extends StringLiteral implements Path
     #[Override]
     public function read(): string
     {
-        return file_get_contents((string) $this);
+        $contents = file_get_contents((string) $this);
+        if ($contents === false) {
+            throw new Exception('Unable to read file: ' . $this);
+        }
+
+        return $contents;
     }
 
     #[Override]
@@ -146,6 +151,9 @@ class FilesystemPath extends StringLiteral implements Path
             mkdir($dirname, 0o777, true);
         }
         $tmpName = tempnam($dirname, 'fsp-write');
+        if ($tmpName === false) {
+            throw new Exception('Failed to create temporary file.');
+        }
         $success = file_put_contents($tmpName, $content);
         if (!$success) {
             throw new Exception('Failed to write file.');
@@ -170,6 +178,7 @@ class FilesystemPath extends StringLiteral implements Path
         $destination = $destination->join($this->basename());
         rename((string) $this, (string) $destination);
 
+        /** @var static */
         return $destination;
     }
 
@@ -184,6 +193,7 @@ class FilesystemPath extends StringLiteral implements Path
             throw new Exception('Failed to rename file.');
         }
 
+        /** @var static */
         return $newPath;
     }
 
@@ -196,7 +206,12 @@ class FilesystemPath extends StringLiteral implements Path
     #[Override]
     public function mimeType(): string
     {
-        return mime_content_type((string) $this);
+        $mimeType = mime_content_type((string) $this);
+        if ($mimeType === false) {
+            throw new Exception('Unable to detect mime type for: ' . $this);
+        }
+
+        return $mimeType;
     }
 
     #[Override]
@@ -210,7 +225,6 @@ class FilesystemPath extends StringLiteral implements Path
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
             'image/gif' => 'gif',
-            'image/webp' => 'webp',
             'image/svg+xml' => 'svg',
             'audio/mpeg' => 'mp3',
             'audio/ogg' => 'ogg',
@@ -218,7 +232,7 @@ class FilesystemPath extends StringLiteral implements Path
             'video/mp4' => 'mp4',
             'video/ogg' => 'ogg',
             'video/webm' => 'webm',
-            default => explode('+', explode('/', $mimeType, 2)[1], 2)[0],
+            default => explode('+', explode('/', $mimeType, 2)[1] ?? '', 2)[0],
         };
     }
 }

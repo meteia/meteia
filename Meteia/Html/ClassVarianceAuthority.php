@@ -10,9 +10,9 @@ class ClassVarianceAuthority implements ClassName
 {
     /**
      * @param string $class Base class names
-     * @param array $variants Variant definitions
-     * @param array $compoundVariants Compound variant definitions
-     * @param array $defaultVariants Default variant values
+     * @param array<string, array<string, array<int, string>|string>> $variants Variant definitions
+     * @param list<array<string, mixed>> $compoundVariants Compound variant definitions
+     * @param array<string, mixed> $defaultVariants Default variant values
      */
     public function __construct(
         private readonly string $class = '',
@@ -24,22 +24,33 @@ class ClassVarianceAuthority implements ClassName
     #[Override]
     public function use(array $props): ClassList
     {
+        /** @var array<string, mixed> $props */
         $props = array_merge($this->defaultVariants, $props);
 
         $list = ClassList::of($this->class);
 
         foreach ($this->variants as $variantName => $variantOptions) {
-            if (!isset($props[$variantName], $variantOptions[$props[$variantName]])) {
+            if (!isset($props[$variantName])) {
                 continue;
             }
-            $list = $list->merge(self::asList($variantOptions[$props[$variantName]]));
+            $selector = $props[$variantName];
+            \assert(\is_string($selector) || \is_int($selector));
+            if (!isset($variantOptions[$selector])) {
+                continue;
+            }
+            $option = $variantOptions[$selector];
+            \assert(\is_string($option) || \is_array($option));
+            $list = $list->merge(self::asList($option));
         }
 
         foreach ($this->compoundVariants as $compound) {
             if (!self::matches($compound, $props)) {
                 continue;
             }
-            $list = $list->merge(self::asList($compound['class'] ?? $compound['className'] ?? ''));
+            $cls = $compound['class'] ?? $compound['className'] ?? '';
+            \assert(\is_string($cls) || \is_array($cls));
+            /** @var array<int, string>|string $cls */
+            $list = $list->merge(self::asList($cls));
         }
 
         return $list;

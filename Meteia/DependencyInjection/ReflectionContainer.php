@@ -25,9 +25,14 @@ class ReflectionContainer implements Container
     #[Override]
     public function call($callable, array $parameters = []): mixed
     {
-        if (\is_array($callable) && \is_object($callable[0])) {
-            return $this->resolveCallable($callable, $parameters);
+        if (\is_array($callable) && isset($callable[0]) && \is_object($callable[0])) {
+            /** @var callable $arrayCallable */
+            $arrayCallable = $callable;
+
+            return $this->resolveCallable($arrayCallable, $parameters);
         }
+
+        \assert(\is_callable($callable));
 
         return $callable(...$this->resolveFunctionParameters($callable, $parameters));
     }
@@ -48,17 +53,19 @@ class ReflectionContainer implements Container
             return $this->save($id, $this->resolveCallable($target));
         }
 
-        if (class_exists($target)) {
+        if (\is_string($target) && class_exists($target)) {
             return $this->save($id, $this->resolveClass($target));
         }
 
-        throw new Exception("{$id} was not resolvable, and {$target} was not a class?");
+        throw new Exception("{$id} was not resolvable");
     }
 
     #[Override]
     public function has(string $id): bool
     {
-        return $this->get($id) !== null;
+        $value = $this->get($id);
+
+        return $value !== null;
     }
 
     #[Override]
@@ -77,31 +84,48 @@ class ReflectionContainer implements Container
             return;
         }
 
-        throw new Exception("Uncertain what to do with this... {$id}, {$value}");
+        throw new Exception("Uncertain what to do with this... {$id}");
     }
 
+    /**
+     * @return array{cache: array<array-key, mixed>, definitions: array<array-key, mixed>}
+     */
     public function internals(): array
     {
         return ['cache' => $this->cache, 'definitions' => $this->definitions];
     }
 
-    private function resolveCallable(callable $callable, array $parameters = []): mixed
+    /**
+     * @param array<array-key, mixed> $parameters
+     */
+    private function resolveCallable(mixed $callable, array $parameters = []): mixed
     {
+        $rm = null;
         if (\is_array($callable)) {
+            \assert((\is_object($callable[0]) || \is_string($callable[0])) && \is_string($callable[1]));
             $rm = new ReflectionMethod($callable[0], $callable[1]);
-        } else {
+        } elseif (\is_object($callable) && !$callable instanceof \Closure) {
             $rm = new ReflectionMethod($callable, '__invoke');
         }
-        $resolved = $this->resolveMethodParameters($rm, $parameters);
 
-        $resolved = $callable(...$resolved);
+        \assert(\is_callable($callable));
+        if ($rm === null) {
+            $resolvedParams = $this->resolveFunctionParameters($callable, $parameters);
+        } else {
+            $resolvedParams = $this->resolveMethodParameters($rm, $parameters);
+        }
+
+        $resolved = $callable(...$resolvedParams);
         if (\is_string($resolved) && class_exists($resolved)) {
-            $resolved = $this->get($resolved);
+            return $this->get($resolved);
         }
 
         return $resolved;
     }
 
+    /**
+     * @param class-string $className
+     */
     private function resolveClass(string $className): mixed
     {
         $r = new ReflectionClass($className);
@@ -111,27 +135,50 @@ class ReflectionContainer implements Container
 
         $rc = $r->getConstructor();
         if (!$rc) {
-            return new $className();
+            $instance = $r->newInstance();
+            $this->cache[$className] = $instance;
+
+            return $instance;
         }
         $resolved = $this->resolveMethodParameters($rc);
-        $instance = new $className(...$resolved);
+        $instance = $r->newInstanceArgs($resolved);
         $this->cache[$className] = $instance;
 
         return $instance;
     }
 
+    /**
+     * @param array<array-key, mixed> $parameters
+     *
+     * @return list<mixed>
+     */
     private function resolveFunctionParameters(callable $callable, array $parameters = []): array
     {
+        \assert($callable instanceof \Closure || \is_string($callable));
         $rm = new ReflectionFunction($callable);
 
-        return array_map(fn($param) => $this->resolveParameter($param, $parameters), $rm->getParameters());
+        return array_values(array_map(fn($param) => $this->resolveParameter(
+            $param,
+            $parameters,
+        ), $rm->getParameters()));
     }
 
+    /**
+     * @param array<array-key, mixed> $parameters
+     *
+     * @return list<mixed>
+     */
     private function resolveMethodParameters(ReflectionMethod $method, array $parameters = []): array
     {
-        return array_map(fn($param) => $this->resolveParameter($param, $parameters), $method->getParameters());
+        return array_values(array_map(fn($param) => $this->resolveParameter(
+            $param,
+            $parameters,
+        ), $method->getParameters()));
     }
 
+    /**
+     * @param array<array-key, mixed> $parameters
+     */
     private function resolveParameter(ReflectionParameter $rp, array $parameters = []): mixed
     {
         if (isset($parameters[$rp->getName()])) {
@@ -146,12 +193,15 @@ class ReflectionContainer implements Container
         if ($rp->isDefaultValueAvailable()) {
             return $rp->getDefaultValue();
         }
-        if ($expectedType->allowsNull() || $expectedType->isBuiltin()) {
-            return null;
-        }
-
         if ($expectedType instanceof ReflectionNamedType) {
+            if ($expectedType->allowsNull() || $expectedType->isBuiltin()) {
+                return null;
+            }
+
             return $this->get($expectedType->getName());
+        }
+        if ($expectedType->allowsNull()) {
+            return null;
         }
 
         throw new Exception('Unsupported Type');

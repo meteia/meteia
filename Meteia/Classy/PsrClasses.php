@@ -11,6 +11,9 @@ use Stringable;
 
 final readonly class PsrClasses implements Classes
 {
+    /**
+     * @param list<string> $regex
+     */
     public function __construct(
         private FilesystemPath $baseDirectory,
         private string|Stringable $namespacePrefix,

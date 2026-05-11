@@ -41,10 +41,10 @@ readonly class BeginAuthentication implements Endpoint
         if ($username !== null) {
             $userEntity = $this->users->findOneByUsername($username);
             if ($userEntity !== null) {
-                $allowCredentials = array_map(
+                $allowCredentials = array_values(array_map(
                     static fn($record) => $record->getPublicKeyCredentialDescriptor(),
                     $this->credentials->findAllForUserEntity($userEntity),
-                );
+                ));
             }
         }
 

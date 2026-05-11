@@ -6,12 +6,14 @@ namespace Meteia\ValueObjects\Primitive;
 
 use Meteia\ValueObjects\Errors\ValueObjectInvalid;
 use Meteia\ValueObjects\PrimitiveValueObject;
+use Override;
+use Stringable;
 
-abstract class FloatLiteral extends PrimitiveValueObject
+abstract class FloatLiteral extends PrimitiveValueObject implements Stringable
 {
     public const PRECISION = 12;
 
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $filteredValue = filter_var($value, FILTER_VALIDATE_FLOAT);
 
@@ -22,28 +24,46 @@ abstract class FloatLiteral extends PrimitiveValueObject
         parent::__construct($filteredValue);
     }
 
-    public function __toString()
+    #[Override]
+    public function __toString(): string
     {
         return (string) $this->toNative();
     }
 
-    public function add($amount)
+    #[Override]
+    public function toNative(): float
     {
-        return new static(bcadd($this, $amount, static::PRECISION));
+        return (float) parent::toNative();
     }
 
-    public function subtract($amount)
+    public function add(string|float|int|\Stringable $amount): static
     {
-        return new static(bcsub($this, $amount, static::PRECISION));
+        return new static(bcadd(self::numericString($this), self::numericString($amount), static::PRECISION));
     }
 
-    public function multiply($by)
+    public function subtract(string|float|int|\Stringable $amount): static
     {
-        return new static(bcmul($this, $by, static::PRECISION));
+        return new static(bcsub(self::numericString($this), self::numericString($amount), static::PRECISION));
     }
 
-    public function divide($by)
+    public function multiply(string|float|int|\Stringable $by): static
     {
-        return new static(bcdiv($this, $by, static::PRECISION));
+        return new static(bcmul(self::numericString($this), self::numericString($by), static::PRECISION));
+    }
+
+    public function divide(string|float|int|\Stringable $by): static
+    {
+        return new static(bcdiv(self::numericString($this), self::numericString($by), static::PRECISION));
+    }
+
+    /**
+     * @return numeric-string
+     */
+    private static function numericString(string|float|int|\Stringable $value): string
+    {
+        $string = (string) $value;
+        \assert(is_numeric($string));
+
+        return $string;
     }
 }

@@ -21,9 +21,12 @@ readonly class ImageFile implements Image
     #[Override]
     public function dimensions(): array
     {
-        [$sourceWidth, $sourceHeight] = getimagesize((string) $this->path);
+        $size = getimagesize((string) $this->path);
+        if ($size === false) {
+            throw new Exception('Failed to read image dimensions.');
+        }
 
-        return [$sourceWidth, $sourceHeight];
+        return [$size[0], $size[1]];
     }
 
     #[Override]

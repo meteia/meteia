@@ -17,53 +17,48 @@ use Override;
  */
 class NullType extends Type implements OutputType, LeafType
 {
+    public string $name;
+
+    /**
+     * @param array{name?: string} $config
+     */
     public function __construct(array $config = [])
     {
-        $this->name = $config['name'] ?? $this->tryInferName();
+        $this->name = $config['name'] ?? 'Null';
         Utils::assertValidName($this->name);
     }
 
-    /**
-     * @param Node $valueNode
-     */
-    public function isValidLiteral($valueNode)
+    public function isValidLiteral(Node $valueNode): bool
     {
         return $valueNode instanceof NullValueNode;
     }
 
-    /**
-     * @param string $value
-     *
-     * @return bool
-     */
-    public function isValidValue($value)
+    public function isValidValue(mixed $value): bool
     {
         return $value === null;
     }
 
-    /**
-     * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input.
-     */
     #[Override]
-    public function parseLiteral(Node $valueNode, ?array $variables = null)
-    {
-        return null;
-    }
-
-    /**
-     * Parses an externally provided value (query variable) to use as an input.
-     *
-     * @param mixed $value
-     */
-    #[Override]
-    public function parseValue($value)
+    public function parseLiteral(Node $valueNode, ?array $variables = null): mixed
     {
         return null;
     }
 
     #[Override]
-    public function serialize($value)
+    public function parseValue(mixed $value): mixed
+    {
+        return null;
+    }
+
+    #[Override]
+    public function serialize(mixed $value): mixed
     {
         return $value;
+    }
+
+    #[Override]
+    public function toString(): string
+    {
+        return $this->name;
     }
 }

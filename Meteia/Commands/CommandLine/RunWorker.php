@@ -56,6 +56,7 @@ readonly class RunWorker implements CLICommand, CommandSink
     public function execute(): void
     {
         foreach ($this->commands as $command) {
+            \assert(\is_string($command));
             $this->log->info('Registering command sink', ['command' => $command]);
             $this->commandInbox->subscribe($command, $this);
         }

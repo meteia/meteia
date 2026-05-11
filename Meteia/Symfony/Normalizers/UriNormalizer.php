@@ -37,6 +37,8 @@ class UriNormalizer implements NormalizerInterface, DenormalizerInterface
     #[Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): UriInterface
     {
+        \assert(\is_string($data));
+
         return new Uri($data);
     }
 

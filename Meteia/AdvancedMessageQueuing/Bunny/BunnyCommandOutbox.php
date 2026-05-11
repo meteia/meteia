@@ -35,7 +35,7 @@ final readonly class BunnyCommandOutbox implements CommandOutbox
         $this->channel->publish(
             $payload,
             $context->headersWithMessageId((string) CommandId::random()),
-            $this->exchangeName,
+            (string) $this->exchangeName,
             $queueName,
         );
         $this->log->info('Published Command', [

@@ -26,8 +26,10 @@ class Resource
     public function contents(): string
     {
         rewind($this->resource);
+        $contents = stream_get_contents($this->resource);
+        \assert($contents !== false);
 
-        return stream_get_contents($this->resource);
+        return $contents;
     }
 
     public function hash(string $algo, ?SecretKey $hmacKey = null): Hash
@@ -52,6 +54,7 @@ class Resource
         }
         rewind($this->resource);
         $content = stream_get_contents($this->resource);
+        \assert($content !== false);
 
         return \strlen($content);
     }
@@ -63,8 +66,9 @@ class Resource
             mkdir($dirname, 0o777, true);
         }
         $dest = fopen((string) $destination, 'w');
+        \assert($dest !== false);
         rewind($this->resource);
-        stream_copy_to_stream($this->resource, $dest);
+        stream_copy_to_stream($this->resource, $dest, -1);
         fclose($dest);
     }
 }

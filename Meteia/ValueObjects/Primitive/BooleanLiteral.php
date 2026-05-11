@@ -21,13 +21,13 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
     }
 
     #[Override]
-    public function compareTo(Comparable $other)
+    public function compareTo(Comparable $other): int
     {
-        return $this->toNative() <=> $other->toNative();
+        return (bool) $this->toNative() <=> (bool) $other->toNative();
     }
 
     #[Override]
-    public function jsonSerialize()
+    public function jsonSerialize(): bool
     {
         return $this->isTrue();
     }

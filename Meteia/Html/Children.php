@@ -29,7 +29,7 @@ final readonly class Children implements Node, IteratorAggregate
     }
 
     /**
-     * @param callable(): (string|\Stringable|Component|iterable<string|\Stringable|Component>) $produce
+     * @param callable(): (string|\Stringable|Component|iterable<array-key, string|\Stringable|Component>) $produce
      */
     #[NoDiscard]
     public function when(bool $condition, callable $produce): self
@@ -38,13 +38,13 @@ final readonly class Children implements Node, IteratorAggregate
             return $this;
         }
         $produced = $produce();
-        $more = is_iterable($produced) && !$produced instanceof Stringable ? [...$produced] : [$produced];
+        $more = is_iterable($produced) && !$produced instanceof Stringable ? array_values([...$produced]) : [$produced];
 
         return clone($this, ['nodes' => [...$this->nodes, ...$more]]);
     }
 
     /**
-     * @param iterable<mixed> $items
+     * @param iterable<array-key, mixed> $items
      * @param callable(mixed, int|string): (string|\Stringable|Component) $render
      */
     #[NoDiscard]

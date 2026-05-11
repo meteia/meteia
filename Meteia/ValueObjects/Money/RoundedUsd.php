@@ -13,7 +13,10 @@ class RoundedUsd extends StringLiteral implements RoundedMoney
     public function formatted(): string
     {
         $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
+        $value = (float) $this->toNative();
+        $formatted = $formatter->format($value);
+        \assert($formatted !== false);
 
-        return $formatter->format($this->value);
+        return $formatted;
     }
 }

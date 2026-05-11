@@ -15,7 +15,7 @@ class Frames
     ) {}
 
     /**
-     * @return Frame[]
+     * @return list<Frame>
      */
     public function from(Throwable $throwable): array
     {
@@ -27,7 +27,10 @@ class Frames
         ]);
         $frames = $this->filters->filtered($frames);
 
-        return array_map(fn($frame) => $this->frame($frame['file'], $frame['line']), $frames);
+        return array_values(array_map(fn($frame) => $this->frame(
+            (string) ($frame['file'] ?? ''),
+            (int) ($frame['line'] ?? 0),
+        ), $frames));
     }
 
     private function frame(string $file, int $line): Frame
@@ -40,6 +43,8 @@ class Frames
 
     private function rootCause(Throwable $throwable): Throwable
     {
-        return $throwable->getPrevious() ? $this->rootCause($throwable->getPrevious()) : $throwable;
+        $previous = $throwable->getPrevious();
+
+        return $previous !== null ? $this->rootCause($previous) : $throwable;
     }
 }

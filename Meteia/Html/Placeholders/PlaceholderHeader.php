@@ -15,7 +15,7 @@ class PlaceholderHeader extends MutableString implements Header
     #[Override]
     public function title($title): Header
     {
-        $this->set('<h1>' . $title . '</h1>');
+        $this->set('<h1>' . (string) $title . '</h1>');
 
         return $this;
     }

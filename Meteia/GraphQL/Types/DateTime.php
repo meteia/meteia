@@ -27,9 +27,12 @@ class DateTime extends ScalarType implements Resolver
     #[Override]
     public function data($root, array $args, RequestContext $requestContext): string
     {
+        \assert(\is_string($root));
         $date = new \DateTime($root, new DateTimeZone('UTC'));
+        $format = $args['format'] ?? \DateTime::ATOM;
+        \assert(\is_string($format));
 
-        return $date->format($args['format']);
+        return $date->format($format);
     }
 
     #[Override]
@@ -45,6 +48,7 @@ class DateTime extends ScalarType implements Resolver
     #[Override]
     public function parseValue($value)
     {
+        \assert(\is_string($value));
         $date = new \DateTime($value, new DateTimeZone('UTC'));
 
         return $date->format(\DateTime::ATOM);

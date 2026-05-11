@@ -6,26 +6,26 @@ namespace Meteia\Domain;
 
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
-use Meteia\ValueObjects\ImmutableEvents;
+use Meteia\EventSourcing\PendingEvents;
 
 trait ThenEvents
 {
-    /** @var DomainEvent[] */
-    private $__pendingEvents = [];
+    /** @var list<DomainEvent> */
+    private array $__pendingEvents = [];
 
-    public function causes(DomainEvent $event)
+    public function causes(DomainEvent $event): self
     {
         return $this->appendEvent($event);
     }
 
-    public function commitEventsIn(UnitOfWorkContext $unitOfWorkContext)
+    public function commitEventsIn(UnitOfWorkContext $unitOfWorkContext): self
     {
-        $unitOfWorkContext->commitEvents(new ImmutableEvents($this->__pendingEvents));
+        $unitOfWorkContext->caused(new PendingEvents($this->__pendingEvents));
 
         return $this->withoutPendingEvents();
     }
 
-    private function appendEvent(DomainEvent $event)
+    private function appendEvent(DomainEvent $event): self
     {
         $copy = clone $this;
         $copy->__pendingEvents[] = $event;
@@ -33,7 +33,7 @@ trait ThenEvents
         return $copy;
     }
 
-    private function withoutPendingEvents()
+    private function withoutPendingEvents(): self
     {
         $copy = clone $this;
         $copy->__pendingEvents = [];

@@ -50,13 +50,14 @@ final readonly class BunnyEventInbox implements EventInbox
             $queueName,
             $sink,
         ): void {
-            $eventId = EventId::fromToken($message->headers['message-id']);
-            $correlationId = CorrelationId::fromToken($message->headers['correlation-id']);
-            $processId = ProcessId::fromToken($message->headers['process-id']);
+            $eventId = EventId::fromToken((string) $message->headers['message-id']);
+            $correlationId = CorrelationId::fromToken((string) $message->headers['correlation-id']);
+            $processId = ProcessId::fromToken((string) $message->headers['process-id']);
             $scope = new MessageScope($correlationId, CausationId::fromHex($eventId->hex()), $processId);
 
             try {
                 $event = $this->serializer->deserialize($message->content, $eventClassName, 'json');
+                \assert($event instanceof \Meteia\Events\Event);
                 $this->scopeSource->using($scope, function () use ($sink, $event, $scope, $queueName, $eventId): void {
                     $this->log->info('Received Event', [
                         'queueName' => $queueName,

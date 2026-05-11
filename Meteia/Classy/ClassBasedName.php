@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Classy;
 
+use Override;
 use Stringable;
 
 final readonly class ClassBasedName implements Stringable
@@ -20,6 +21,7 @@ final readonly class ClassBasedName implements Stringable
         private string $class,
     ) {}
 
+    #[Override]
     public function __toString(): string
     {
         $segments = explode('\\', $this->class);

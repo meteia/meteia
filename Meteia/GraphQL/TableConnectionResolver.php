@@ -16,6 +16,9 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
 {
     use ConnectionResolver;
 
+    /**
+     * @param list<string> $cursorOver
+     */
     public function __construct(
         private readonly DatabaseTables $db,
         private readonly string $table,
@@ -31,13 +34,13 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
 
         $where = [];
         $bindings = [
-            'limit' => $args[ConnectionField::ARG_FIRST] + 1,
+            'limit' => (int) $args[ConnectionField::ARG_FIRST] + 1,
         ];
 
-        if ($cursor) {
+        if ($cursor !== false) {
             $compare = $cursorDirection === 'forward' ? '>' : '<';
 
-            $cursorValues = $this->decodeCursor($cursor);
+            $cursorValues = $this->decodeCursor((string) $cursor);
             \assert(\count($cursorValues) === \count($this->cursorOver));
             $placeholders = str_repeat('?,', \count($cursorValues) - 1) . '?';
             $where[] = sprintf('(%s) %s (%s)', $cursorColumns, $compare, $placeholders);
@@ -69,20 +72,27 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
             $rows = array_reverse($rows);
         }
         if (\count($rows)) {
-            // FIXME: This seems pretty expensive just to fix column names... would it better in the query?
-            // Maybe we could ask for mappings (maybe even static?) similar to how we do resolveWhereBindings
-            // TODO: This probably should be a trait, or some place more reusable
+            $firstRow = $rows[0] ?? [];
+            \assert(\is_array($firstRow));
             $columnNameMap = array_map_assoc(static fn($i, $column) => [
-                $column => lcfirst(implode('', array_map(ucfirst(...), explode('_', $column)))),
-            ], array_keys($rows[0]));
-            $rows = array_map(
-                static fn($row) => (object) array_map_assoc(static fn($column, $row) => [
-                    $columnNameMap[$column] => $row,
-                ], $row),
-                $rows,
-            );
+                (string) $column => lcfirst(implode('', array_map(ucfirst(...), explode('_', (string) $column)))),
+            ], array_keys($firstRow));
+            $rows = array_map(static function ($row) use ($columnNameMap) {
+                \assert(\is_array($row));
+
+                return (object) array_map_assoc(static function ($column, $value) use ($columnNameMap): array {
+                    $key = $columnNameMap[(string) $column] ?? (string) $column;
+                    \assert(\is_string($key));
+
+                    return [$key => $value];
+                }, $row);
+            }, $rows);
         }
 
-        return $this->processedRows($rows, $args, $this->cursorOver);
+        /** @var array<int, object> $rowsForReturn */
+        $rowsForReturn = array_values($rows);
+
+        /** @var array<string, mixed> $args */
+        return $this->processedRows($rowsForReturn, $args, array_values($this->cursorOver));
     }
 }

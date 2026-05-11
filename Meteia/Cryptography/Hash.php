@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Cryptography;
 
 use Meteia\ValueObjects\Primitive\StringLiteral;
+use RuntimeException;
 use Tuupola\Base62;
 
 class Hash extends StringLiteral
@@ -46,11 +47,16 @@ class Hash extends StringLiteral
 
     public function binary(): string
     {
-        return hex2bin($this->value);
+        $binary = hex2bin($this->toNative());
+        if ($binary === false) {
+            throw new RuntimeException('Invalid hex string');
+        }
+
+        return $binary;
     }
 
     public function hex(): string
     {
-        return $this->value;
+        return $this->toNative();
     }
 }

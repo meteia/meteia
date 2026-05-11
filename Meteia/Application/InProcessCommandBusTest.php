@@ -58,6 +58,8 @@ final readonly class ExampleApplicationCommand implements Command {}
 
 /**
  * @internal
+ *
+ * @implements CommandEndpoint<ExampleApplicationCommand>
  */
 final class RecordingEndpoint implements CommandEndpoint
 {

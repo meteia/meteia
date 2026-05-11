@@ -53,12 +53,12 @@ class Money extends ValueObject
         return $this->currency;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormatted()
+    public function getFormatted(): string
     {
-        return $this->formatter->format($this->getValue()->toNative());
+        $formatted = $this->formatter->format($this->getValue()->toNative());
+        \assert($formatted !== false);
+
+        return $formatted;
     }
 
     public function asPreciseUsd()

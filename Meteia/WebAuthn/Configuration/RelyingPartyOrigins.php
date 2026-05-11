@@ -16,9 +16,10 @@ readonly class RelyingPartyOrigins
 
     public static function fromCsv(string $csv): self
     {
+        /** @var list<string> $parts */
         $parts = explode(',', $csv)
             |> (static fn(array $a): array => array_map('trim', $a))
-            |> (static fn(array $a): array => array_filter($a, static fn(string $v): bool => $v !== ''));
+            |> (static fn(array $a): array => array_values(array_filter($a, static fn(string $v): bool => $v !== '')));
 
         return new self(...$parts);
     }

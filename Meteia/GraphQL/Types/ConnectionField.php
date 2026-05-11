@@ -32,11 +32,19 @@ abstract class ConnectionField extends ObjectType
         ]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function defaultArguments(): array
     {
-        $args = array_map_assoc(static fn($key, $value) => [$key => $value['defaultValue'] ?? null], $this->argsWith());
+        $args = array_map_assoc(static fn($key, $value) => [
+            (string) $key => \is_array($value) ? $value['defaultValue'] ?? null : null,
+        ], $this->argsWith());
 
-        return array_filter($args);
+        /** @var array<string, mixed> $filtered */
+        $filtered = array_filter($args);
+
+        return $filtered;
     }
 
     public function argsWith(array $args = []): array

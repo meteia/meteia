@@ -47,13 +47,14 @@ final readonly class BunnyCommandInbox implements CommandInbox
             $queueName,
             $sink,
         ): void {
-            $commandId = CommandId::fromToken($message->headers['message-id']);
-            $correlationId = CorrelationId::fromToken($message->headers['correlation-id']);
-            $processId = ProcessId::fromToken($message->headers['process-id']);
+            $commandId = CommandId::fromToken((string) $message->headers['message-id']);
+            $correlationId = CorrelationId::fromToken((string) $message->headers['correlation-id']);
+            $processId = ProcessId::fromToken((string) $message->headers['process-id']);
             $scope = new MessageScope($correlationId, CausationId::fromHex($commandId->hex()), $processId);
 
             try {
                 $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
+                \assert($command instanceof \Meteia\Commands\Command);
                 $this->scopeSource->using($scope, function () use (
                     $sink,
                     $command,

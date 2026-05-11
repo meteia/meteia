@@ -16,6 +16,9 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
 {
     public const TYPE = 'ArrayTypeNotDefined';
 
+    /**
+     * @param array<array-key, object> $values
+     */
     public function __construct(
         protected array $values = [],
     ) {
@@ -23,17 +26,25 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
     }
 
     #[Override]
-    public function __toString()
+    public function __toString(): string
     {
-        return implode(', ', $this->values);
+        return implode(', ', array_map(static fn(object $v): string => $v instanceof \Stringable
+            ? (string) $v
+            : $v::class, $this->values));
     }
 
-    public function compareTo(Comparable $other)
+    public function compareTo(Comparable $other): int
     {
-        return \count(array_diff($this->toNative(), $other->toNative()));
+        $otherNative = $other->toNative();
+        \assert(\is_array($otherNative));
+
+        return \count(array_diff($this->toNative(), $otherNative));
     }
 
-    public function toNative()
+    /**
+     * @return array<array-key, object>
+     */
+    public function toNative(): array
     {
         return $this->values;
     }
@@ -46,7 +57,7 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         }
     }
 
-    public function push($value)
+    public function push(object $value): static
     {
         $copy = $this->values;
         $copy[] = $value;
@@ -54,12 +65,15 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         return new static($copy);
     }
 
-    public function merge(self $other)
+    public function merge(self $other): static
     {
         return new static(array_merge($this->values, $other->values));
     }
 
-    public function toArray()
+    /**
+     * @return array<array-key, mixed>
+     */
+    public function toArray(): array
     {
         return $this->values;
     }
@@ -100,7 +114,10 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         return $this->toNative();
     }
 
-    protected function guardType($values): void
+    /**
+     * @param array<array-key, object> $values
+     */
+    protected function guardType(array $values): void
     {
         foreach ($values as $value) {
             if (!is_a($value, static::TYPE)) {

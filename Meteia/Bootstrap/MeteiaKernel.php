@@ -36,6 +36,7 @@ final readonly class MeteiaKernel implements Kernel
 
         $requestHandler = $this->requestHandler($container, $middleware);
         $serverRequest = $container->get(ServerRequestInterface::class);
+        \assert($serverRequest instanceof ServerRequestInterface);
         $response = $requestHandler->handle($serverRequest);
 
         $this->sink->send($response);

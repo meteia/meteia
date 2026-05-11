@@ -8,16 +8,17 @@ use JsonSerializable;
 use Meteia\Domain\Contracts\Comparable;
 use Meteia\ValueObjects\PrimitiveValueObject;
 use Override;
+use Stringable;
 
-class Boolean extends PrimitiveValueObject implements Comparable, JsonSerializable
+class Boolean extends PrimitiveValueObject implements Comparable, JsonSerializable, Stringable
 {
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         parent::__construct(filter_var($value, FILTER_VALIDATE_BOOLEAN));
     }
 
     #[Override]
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->isTrue()) {
             return 'TRUE';
@@ -27,39 +28,37 @@ class Boolean extends PrimitiveValueObject implements Comparable, JsonSerializab
     }
 
     #[Override]
-    public function compareTo(Comparable $other)
+    public function compareTo(Comparable $other): int
     {
-        if ($this->toNative() === $other->toNative()) {
+        $self = $this->isTrue();
+        $otherBool = (bool) $other->toNative();
+        if ($self === $otherBool) {
             return 0;
         }
-        if ($this->toNative() < $other->toNative()) {
+        if ($self === false) {
             return -1;
         }
 
         return 1;
     }
 
-    public function isTrue()
+    public function isTrue(): bool
     {
         return (bool) $this->value;
     }
 
-    public function isFalse()
+    public function isFalse(): bool
     {
-        return $this->isTrue() ? false : true;
+        return !$this->isTrue();
     }
 
-    public function Not()
+    public function Not(): self
     {
-        if ($this->isTrue()) {
-            return new self(false);
-        }
-
-        return new self(true);
+        return new self(!$this->isTrue());
     }
 
     #[Override]
-    public function jsonSerialize()
+    public function jsonSerialize(): bool
     {
         return $this->isTrue();
     }

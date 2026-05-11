@@ -8,7 +8,8 @@ use Meteia\ValueObjects\Primitive\ComplexStringLiteral as StringLiteral;
 
 class CountryCodeName
 {
-    private static $names = [
+    /** @var array<string, string> */
+    private static array $names = [
         'AF' => 'Afghanistan',
         'AX' => 'Åland Islands',
         'AL' => 'Albania',
@@ -255,28 +256,16 @@ class CountryCodeName
         'ZW' => 'Zimbabwe',
     ];
 
-    /**
-     * Returns country name.
-     *
-     * @param CountryCode $code
-     *
-     * @return StringLiteral
-     */
-    public static function getName($code)
+    public static function getName(string $code): StringLiteral
     {
-        $name = self::$names[$code];
+        $name = self::$names[$code] ?? '';
 
         return new StringLiteral($name);
     }
 
-    /**
-     * @param mixed $name
-     *
-     * @return StringLiteral
-     */
-    public static function getTwoLetterCode($name)
+    public static function getTwoLetterCode(string|\Stringable $name): StringLiteral
     {
-        $name = '' . $name;
+        $name = (string) $name;
         foreach (self::$names as $code => $countryName) {
             if ($name === $countryName) {
                 return new StringLiteral($code);

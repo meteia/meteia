@@ -26,8 +26,9 @@ class FileCache
         $retryUntil = time() + 5;
         while (time() <= $retryUntil) {
             if ($metadataPath->exists() && $dataPath->exists()) {
-                $metadata = $metadataPath->readJson();
-                $expiresAt = Chronos::createFromFormat(DateTimeInterface::RFC3339, $metadata->expires);
+                $metadata = (array) $metadataPath->readJson();
+                \assert(\is_string($metadata['expires']));
+                $expiresAt = Chronos::createFromFormat(DateTimeInterface::RFC3339, $metadata['expires']);
                 if ($expiresAt->isPast()) {
                     $dataPath->delete();
                     $metadataPath->delete();

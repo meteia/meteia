@@ -21,6 +21,6 @@ final readonly class ComposerAutoload
             throw new MissingPrimaryNamespace($this->composerJson);
         }
 
-        return new ApplicationNamespace(trim($namespace, '\\'));
+        return new ApplicationNamespace(trim((string) $namespace, '\\'));
     }
 }

@@ -28,8 +28,12 @@ class CatchAndReportErrors implements MiddlewareInterface
         private MeteiaKernel $kernel,
     ) {
         $container = $kernel->container();
-        $this->logger = $container->get(LoggerInterface::class);
-        $this->errorClassification = $container->get(ErrorClassification::class);
+        $logger = $container->get(LoggerInterface::class);
+        $errorClassification = $container->get(ErrorClassification::class);
+        \assert($logger instanceof LoggerInterface);
+        \assert($errorClassification instanceof ErrorClassification);
+        $this->logger = $logger;
+        $this->errorClassification = $errorClassification;
 
         $this->registerFatalErrorHandlers();
     }
@@ -85,11 +89,15 @@ class CatchAndReportErrors implements MiddlewareInterface
             Throwable::class => $throwable,
         ]);
         $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
+        \assert($errorEndpoint instanceof ErrorEndpoint);
 
-        return $freshContainer->call([
+        $response = $freshContainer->call([
             $errorEndpoint,
             'response',
         ], [$throwable]);
+        \assert($response instanceof ResponseInterface);
+
+        return $response;
     }
 
     #[Override]

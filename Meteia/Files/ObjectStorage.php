@@ -45,10 +45,10 @@ class ObjectStorage implements Storage
     #[Override]
     public function internalUri(string $dest): Uri
     {
-        return new Uri($this->endpoint->withPath(implode('/', [
+        return $this->endpoint->withPath(implode('/', [
             $this->bucketName,
             $dest,
-        ])));
+        ]));
     }
 
     #[Override]
@@ -158,7 +158,7 @@ class ObjectStorage implements Storage
 
         return (
             implode("\n", array_map(
-                static fn($key, $value) => sprintf('%s:%s', strtolower($key), trim((string) $value)),
+                static fn($key, $value) => sprintf('%s:%s', strtolower((string) $key), trim((string) $value)),
                 array_keys($headers),
                 $headers,
             )) . "\n"

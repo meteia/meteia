@@ -6,38 +6,31 @@ namespace Meteia\ValueObjects\Identity;
 
 use Meteia\Domain\Contracts\Identity\EmailAddress;
 use Meteia\ValueObjects\ValueObject;
+use Override;
 
 class ImmutableEmailAddress extends ValueObject implements EmailAddress
 {
-    /** @var string */
-    protected $address;
+    public function __construct(
+        protected string $address,
+        protected string $displayName,
+    ) {}
 
-    /** @var string */
-    protected $displayName;
-
-    public function __construct($address, $displayName)
-    {
-        $this->address = $address;
-        $this->displayName = $displayName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAddress()
+    #[Override]
+    public function getAddress(): string
     {
         return $this->address;
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    #[Override]
+    public function getDisplayName(): string
     {
         return $this->displayName;
     }
 
-    public function toArray()
+    /**
+     * @return array<string, string>
+     */
+    public function toArray(): array
     {
         return [$this->address => $this->displayName];
     }

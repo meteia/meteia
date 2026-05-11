@@ -37,6 +37,8 @@ class HashNormalizer implements NormalizerInterface, DenormalizerInterface
     #[Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Hash
     {
+        \assert(\is_string($data));
+
         return new Hash($data);
     }
 

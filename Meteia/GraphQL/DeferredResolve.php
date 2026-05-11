@@ -8,14 +8,14 @@ use Exception;
 
 trait DeferredResolve
 {
-    /** @var array */
-    private $fetched = [];
+    /** @var array<string, mixed> */
+    private array $fetched = [];
 
-    /** @var string[] */
-    private $deferred = [];
+    /** @var list<string> */
+    private array $deferred = [];
 
-    /** @var string[] */
-    private $mergedArgs = [];
+    /** @var array<string, mixed> */
+    private array $mergedArgs = [];
 
     public function clearDeferred(): void
     {
@@ -23,7 +23,10 @@ trait DeferredResolve
         $this->mergedArgs = [];
     }
 
-    public function defer($id, $args = []): void
+    /**
+     * @param array<string, mixed> $args
+     */
+    public function defer(string|\Stringable $id, array $args = []): void
     {
         $id = (string) $id;
         if (isset($this->fetched[$id])) {
@@ -34,7 +37,7 @@ trait DeferredResolve
         $this->deferred[] = $id;
     }
 
-    public function fetch($id)
+    public function fetch(string|\Stringable $id): mixed
     {
         $id = (string) $id;
         if (isset($this->fetched[$id])) {
@@ -46,29 +49,36 @@ trait DeferredResolve
         return $this->fetched[$id] ?? null;
     }
 
-    protected function store($id, $type): void
+    protected function store(string $id, mixed $type): void
     {
         $this->fetched[$id] = $type;
     }
 
-    protected function deferredIds()
+    /**
+     * @return list<string>
+     */
+    protected function deferredIds(): array
     {
         return array_values(array_unique($this->deferred));
     }
 
-    protected function deferredArgument($string)
+    /**
+     * @return list<mixed>|null
+     */
+    protected function deferredArgument(string $string): ?array
     {
         if (!isset($this->mergedArgs[$string])) {
             return null;
         }
 
-        return (
-            \is_array($this->mergedArgs[$string])
-                ? array_unique($this->mergedArgs[$string])
-                : [$this->mergedArgs[$string]]
-        );
+        $value = $this->mergedArgs[$string];
+
+        return \is_array($value) ? array_values(array_unique($value)) : [$value];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function load(): array
     {
         throw new Exception('load() must be implemented by the using class');

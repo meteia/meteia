@@ -24,12 +24,15 @@ readonly class Cache
         $metadataPath = new FilesystemPath($dataPath . '.meta');
         while (true) {
             if ($metadataPath->exists() && $dataPath->exists()) {
-                $metadata = $metadataPath->readJson();
-                $expiresAt = Chronos::createFromFormat(DateTimeInterface::RFC3339, $metadata->expires);
+                $metadata = (array) $metadataPath->readJson();
+                \assert(\is_string($metadata['expires']));
+                $expiresAt = Chronos::createFromFormat(DateTimeInterface::RFC3339, $metadata['expires']);
                 if ($expiresAt->isFuture()) {
                     $data = $dataPath->read();
+                    $decompressed = gzuncompress($data);
+                    \assert($decompressed !== false);
 
-                    return unserialize(gzuncompress($data));
+                    return unserialize($decompressed);
                 }
             }
 
@@ -38,7 +41,9 @@ readonly class Cache
             }
 
             $data = $default();
-            $dataPath->write(gzcompress(serialize($data)));
+            $compressed = gzcompress(serialize($data));
+            \assert($compressed !== false);
+            $dataPath->write($compressed);
             $metadataPath->writeJson([
                 'key' => $key,
                 'expires' => $expires->format(DateTimeInterface::RFC3339),

@@ -29,6 +29,10 @@ final class InProcessManifestCache implements ManifestCache
             return [];
         }
 
-        return json_decode($manifest->read(), true, 512, JSON_THROW_ON_ERROR);
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($manifest->read(), true, 512, JSON_THROW_ON_ERROR);
+        \assert(\is_array($decoded));
+
+        return $decoded;
     }
 }

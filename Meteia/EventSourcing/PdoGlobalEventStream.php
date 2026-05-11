@@ -47,15 +47,25 @@ final readonly class PdoGlobalEventStream implements GlobalEventStream
 
     private function hydrate(stdClass $row): RecordedEvent
     {
-        $streamId = new StreamId($row->aggregate_root_id);
+        $aggregateRootIdRaw = $row->aggregate_root_id;
+        $eventRaw = $row->event;
+        $causationIdRaw = $row->causation_id;
+        $correlationIdRaw = $row->correlation_id;
+        \assert(
+            \is_string($aggregateRootIdRaw)
+            && \is_string($eventRaw)
+            && \is_string($causationIdRaw)
+            && \is_string($correlationIdRaw),
+        );
+        $streamId = new StreamId($aggregateRootIdRaw);
         /** @var DomainEvent $event */
-        $event = $this->messageSerializer->unserialize($row->event);
+        $event = $this->messageSerializer->unserialize($eventRaw);
         $pending = new PendingEvent($streamId, new StreamVersion((int) $row->aggregate_sequence), $event);
 
         return new RecordedEvent(
             $pending,
-            new CausationId($row->causation_id),
-            new CorrelationId($row->correlation_id),
+            new CausationId($causationIdRaw),
+            new CorrelationId($correlationIdRaw),
             new DateTimeImmutable((string) $row->created),
         );
     }

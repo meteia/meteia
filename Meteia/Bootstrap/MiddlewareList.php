@@ -10,7 +10,7 @@ use Psr\Http\Server\MiddlewareInterface;
 
 final readonly class MiddlewareList
 {
-    /** @var array<int, MiddlewareInterface|class-string> */
+    /** @var list<MiddlewareInterface|string> */
     private array $items;
 
     /**
@@ -18,7 +18,7 @@ final readonly class MiddlewareList
      */
     public function __construct(MiddlewareInterface|string ...$items)
     {
-        $this->items = $items;
+        $this->items = array_values($items);
     }
 
     /**

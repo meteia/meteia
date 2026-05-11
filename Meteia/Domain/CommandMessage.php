@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Meteia\Commands\Command;
 use Meteia\Commands\CommandOutbox;
 use Meteia\Domain\Contracts\AggregateRoot;
+use Meteia\Domain\Contracts\CommandMessageTarget;
 use Meteia\Domain\Contracts\IssuedCommands;
 use Meteia\ValueObjects\AggregateRootId;
 use Meteia\ValueObjects\Identity\CausationId;
@@ -57,7 +58,7 @@ final readonly class CommandMessage
         $issuedCommands->append($this->metadata(), $this->command());
     }
 
-    public function applyTo(AggregateRoot $target): void
+    public function applyTo(AggregateRoot&CommandMessageTarget $target): void
     {
         $target->handleCommandMessage($this->command(), $this->metadata());
     }

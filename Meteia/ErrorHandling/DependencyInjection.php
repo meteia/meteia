@@ -19,11 +19,14 @@ return [
     ErrorEndpoint::class => static function (Container $container, Configuration $configuration): ErrorEndpoint {
         $errorPage = $configuration->string('ERROR_HANDLING_ENDPOINT', 'public');
 
-        return match (strtolower($errorPage)) {
+        $endpoint = match (strtolower($errorPage)) {
             'console' => $container->get(ConsoleErrorEndpoint::class),
             'developer' => $container->get(DeveloperErrorEndpoint::class),
             default => $container->get(PublicErrorEndpoint::class),
         };
+        \assert($endpoint instanceof ErrorEndpoint);
+
+        return $endpoint;
     },
     EditorUri::class => static fn(Configuration $configuration): EditorUri => new EditorUri($configuration->string(
         'EDITOR_URI',

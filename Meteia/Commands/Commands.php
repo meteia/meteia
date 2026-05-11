@@ -14,6 +14,9 @@ use Meteia\ValueObjects\Identity\FilesystemPath;
 use Override;
 use Traversable;
 
+/**
+ * @implements IteratorAggregate<array-key, class-string<Command>>
+ */
 final readonly class Commands implements IteratorAggregate
 {
     public function __construct(

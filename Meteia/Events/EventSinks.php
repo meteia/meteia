@@ -14,6 +14,9 @@ use Meteia\ValueObjects\Identity\FilesystemPath;
 use Override;
 use Traversable;
 
+/**
+ * @implements IteratorAggregate<array-key, class-string<EventSink>>
+ */
 final readonly class EventSinks implements IteratorAggregate
 {
     public function __construct(

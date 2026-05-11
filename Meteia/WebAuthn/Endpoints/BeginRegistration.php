@@ -36,10 +36,10 @@ readonly class BeginRegistration implements Endpoint
         $userEntity = $this->resolveRequestingUser->fromRequest($request);
         $challenge = random_bytes(32);
 
-        $excludeCredentials = array_map(
+        $excludeCredentials = array_values(array_map(
             static fn($record) => $record->getPublicKeyCredentialDescriptor(),
             $this->credentials->findAllForUserEntity($userEntity),
-        );
+        ));
 
         $options = $this->webAuthnServer->creationOptions($userEntity, $challenge, $excludeCredentials);
 

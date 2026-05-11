@@ -33,6 +33,7 @@ final class PdoMessageStreamTest extends TestCase
         $messages = $stream->read($streamId);
         static::assertCount(1, $messages);
         $first = $messages[0];
+        \assert($first instanceof \Meteia\MessageStreams\RecordedMessage);
         static::assertSame((string) $causation, (string) $first->causedBy());
         static::assertSame((string) $correlation, (string) $first->correlatedTo());
     }
@@ -51,7 +52,10 @@ final class PdoMessageStreamTest extends TestCase
             #[Override]
             public function unserialize(string $value): mixed
             {
-                return unserialize(base64_decode($value, true), ['allowed_classes' => true]);
+                $decoded = base64_decode($value, true);
+                \assert($decoded !== false);
+
+                return unserialize($decoded, ['allowed_classes' => true]);
             }
         };
     }

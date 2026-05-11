@@ -16,6 +16,11 @@ trait ConnectionResolver
     private bool $debug = false;
     private static ?Base62 $codec = null;
 
+    /**
+     * @param array<int, object> $rows
+     * @param array<string, mixed> $args
+     * @param list<string> $cursorColumns
+     */
     protected function processedRows(array $rows, array $args, array $cursorColumns): object
     {
         if (!$args || !\count($args)) {
@@ -25,68 +30,76 @@ trait ConnectionResolver
         }
         $hasNextPage = $this->hasNextPage(\count($rows), $args);
         if (isset($args[ConnectionField::ARG_FIRST])) {
-            $rows = \array_slice($rows, 0, $args[ConnectionField::ARG_FIRST]);
+            $rows = \array_slice($rows, 0, (int) $args[ConnectionField::ARG_FIRST]);
         }
 
         $hasPreviousPage = $this->hasPreviousPage(\count($rows), $args);
         if (isset($args[ConnectionField::ARG_LAST])) {
-            if (\count($rows) > $args[ConnectionField::ARG_LAST]) {
-                // Remove the extra row we used to determine pagination
+            if (\count($rows) > (int) $args[ConnectionField::ARG_LAST]) {
                 array_pop($rows);
             }
-            $rows = \array_slice($rows, 0, $args[ConnectionField::ARG_LAST]);
+            $rows = \array_slice($rows, 0, (int) $args[ConnectionField::ARG_LAST]);
             $rows = array_reverse($rows);
         }
 
-        /** @var array $edges */
         $edges = array_map(fn($row) => $this->asEdge($row, $cursorColumns), $rows);
         $firstEdge = $edges[0] ?? null;
         $lastEdge = end($edges);
 
+        $encoded = json_encode($args);
+        \assert($encoded !== false);
+
         return (object) [
-            'id' => base64_encode(hash('sha1', json_encode($args), true)),
+            'id' => base64_encode(hash('sha1', $encoded, true)),
             'edges' => $edges,
             'pageInfo' => [
                 'startCursor' => $firstEdge->cursor ?? null,
-                'endCursor' => $lastEdge->cursor ?? null,
+                'endCursor' => $lastEdge instanceof \stdClass ? $lastEdge->cursor ?? null : null,
                 'hasNextPage' => $hasNextPage,
                 'hasPreviousPage' => $hasPreviousPage,
             ],
         ];
     }
 
-    protected function hasNextPage($count, $args)
+    /**
+     * @param array<string, mixed> $args
+     */
+    protected function hasNextPage(int $count, array $args): bool
     {
         if (isset($args[ConnectionField::ARG_FIRST])) {
-            if ($count > $args[ConnectionField::ARG_FIRST]) {
+            if ($count > (int) $args[ConnectionField::ARG_FIRST]) {
                 return true;
             }
         }
 
         if (isset($args[ConnectionField::ARG_BEFORE])) {
-            // FIXME: Not strictly true, but true enough
             return true;
         }
 
         return false;
     }
 
-    protected function hasPreviousPage($count, $args)
+    /**
+     * @param array<string, mixed> $args
+     */
+    protected function hasPreviousPage(int $count, array $args): bool
     {
         if (isset($args[ConnectionField::ARG_LAST])) {
-            if ($count > $args[ConnectionField::ARG_LAST]) {
+            if ($count > (int) $args[ConnectionField::ARG_LAST]) {
                 return true;
             }
         }
 
         if (isset($args[ConnectionField::ARG_AFTER])) {
-            // FIXME: Not strictly true, but true enough
             return true;
         }
 
         return false;
     }
 
+    /**
+     * @return list<string>
+     */
     protected function decodeCursor(string $cursor): array
     {
         if (static::$codec === null) {
@@ -97,6 +110,9 @@ trait ConnectionResolver
         return explode('|', static::$codec->decode($cursor));
     }
 
+    /**
+     * @param list<string> $cursorColumns
+     */
     private function asEdge(object $row, array $cursorColumns): object
     {
         $cursorValues = [];
@@ -104,7 +120,9 @@ trait ConnectionResolver
             if (!isset($row->{$cursorColumn})) {
                 throw new ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
             }
-            $cursorValues[] = $row->{$cursorColumn};
+            $value = $row->{$cursorColumn};
+            \assert(\is_scalar($value) || $value === null || $value instanceof \Stringable);
+            $cursorValues[] = (string) $value;
         }
 
         return (object) [
@@ -113,6 +131,9 @@ trait ConnectionResolver
         ];
     }
 
+    /**
+     * @param list<string> $cursorData
+     */
     private function encodeCursor(array $cursorData): string
     {
         if (static::$codec === null) {

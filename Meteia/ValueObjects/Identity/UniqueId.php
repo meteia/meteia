@@ -59,17 +59,23 @@ abstract readonly class UniqueId implements Identifier
     public static function fromToken(#[SensitiveParameter] string $token): static
     {
         // Discard any additional data on the token (e.g. a selector).
-        [$prefix, $token] = explode('_', $token, 3);
+        $parts = explode('_', $token, 3);
+        \assert(\count($parts) >= 2, 'Expected token with prefix ' . static::prefix());
+        $prefix = $parts[0];
+        $tokenBody = $parts[1] ?? '';
         \assert($prefix === static::prefix(), 'Expected token with prefix ' . static::prefix());
-        $token = ltrim($token, '0');
-        $data = new Base62()->decode($token);
+        $tokenBody = ltrim($tokenBody, '0');
+        $data = new Base62()->decode($tokenBody);
 
         return new static($data);
     }
 
     public static function fromHex(string $hex): static
     {
-        return new static(hex2bin($hex));
+        $bin = hex2bin($hex);
+        \assert($bin !== false);
+
+        return new static($bin);
     }
 
     public function equalTo(self $other): bool

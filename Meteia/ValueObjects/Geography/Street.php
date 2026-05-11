@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\ValueObjects\Geography;
 
 use Meteia\ValueObjects\Primitive\ComplexStringLiteral as StringLiteral;
+use Stringable;
 
 /**
  * Class Street.
@@ -13,18 +14,17 @@ use Meteia\ValueObjects\Primitive\ComplexStringLiteral as StringLiteral;
  */
 class Street
 {
-    protected $replacements = [];
+    /** @var array<string, StringLiteral> */
+    protected array $replacements = [];
 
     /**
-     * Returns a new Street object.
-     *
-     * @param mixed  $streetNumber This can be either the street number, the street name (if street name not provided)
-     *                             or an array of basic street values. @see StreetFormat for list of basic values.
-     * @param string $streetName   [optional] the street name
+     * @param array<string, mixed>|string $streetNumber This can be either the street number, the street name (if
+     *                                                  street name not provided) or an array of basic street values.
      */
-    public function __construct($streetNumber, $streetName = null)
+    public function __construct(array|string $streetNumber, ?string $streetName = null)
     {
         if ($streetName !== null) {
+            \assert(\is_string($streetNumber));
             $this->buildBasicElements([
                 'addressNumberValue' => $streetNumber,
                 'streetNameValue' => $streetName,
@@ -39,70 +39,40 @@ class Street
         $this->buildComplexElements();
     }
 
-    /**
-     * Returns a string representation of the StringLiteral in the format defined in the constructor.
-     *
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getCompleteStreet()->string();
     }
 
-    /**
-     * Complex Element: Complete Address Number.
-     *
-     * @return StringLiteral
-     */
-    public function getNumber()
+    public function getNumber(): StringLiteral
     {
         return $this->format(StreetFormat::ADDRESS_NUMBER);
     }
 
-    /**
-     * Official name of a street as assigned by a local governing authority, or an alternate (alias) name that is used
-     *      and recognized.
-     *
-     * @return StringLiteral
-     */
-    public function getStreetName()
+    public function getStreetName(): StringLiteral
     {
         return $this->format(StreetFormat::FULL_STREET_NAME);
     }
 
-    /**
-     * Gets the full street name including numbers.
-     *
-     * @return StringLiteral
-     */
-    public function getCompleteStreet()
+    public function getCompleteStreet(): StringLiteral
     {
         return $this->format(StreetFormat::COMPLETE_STREET_NAME);
     }
 
-    /**
-     * Formats a string based on some inputs.
-     * You can use any of the constance or make your own.
-     *
-     * @param string|StringLiteral $format
-     *
-     * @return StringLiteral
-     */
-    public function format($format)
+    public function format(string|Stringable $format): StringLiteral
     {
-        $format = new StringLiteral($format);
-        $formats = $format->replace(array_keys($this->replacements), array_values($this->replacements))->split(' ');
+        $literal = new StringLiteral((string) $format);
+        $replacements = array_map(static fn(StringLiteral $v): string => $v->string(), $this->replacements);
+        $formats = $literal->replace(array_keys($replacements), array_values($replacements))->split(' ');
         $join = '';
         foreach ($formats as $part) {
-            $part = '' . $part;
-            if ($part !== ' ') {
-                $join .= $part . ' ';
+            $partStr = $part->string();
+            if ($partStr !== ' ') {
+                $join .= $partStr . ' ';
             }
         }
 
-        $join = new StringLiteral($join);
-
-        return $join->trim();
+        return new StringLiteral($join)->trim();
     }
 
     private function buildComplexElements(): void
@@ -114,13 +84,9 @@ class Street
     }
 
     /**
-     * Ensures that the minimal data is collected and that all values exsist.
-     *
-     * @param mixed $data
-     *
-     * @return array
+     * @param array<string, mixed> $data
      */
-    private function buildBasicElements($data)
+    private function buildBasicElements(array $data): void
     {
         $baseArray = [
             'addressNumberPrefix' => '',
@@ -140,7 +106,7 @@ class Street
                 continue;
             }
 
-            $this->replacements['%' . $key . '%'] = new StringLiteral($value);
+            $this->replacements['%' . $key . '%'] = new StringLiteral((string) $value);
         }
     }
 }

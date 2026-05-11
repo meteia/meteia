@@ -72,7 +72,7 @@ trait EventSourcing
             }
             $args[$parameter->getPosition()] = $event->{$parameter->name};
         }
-        \call_user_func_array([$this, $method], $args);
+        $this->{$method}(...$args);
     }
 
     public function handleCommandMessage(Command $command): void
@@ -102,20 +102,27 @@ trait EventSourcing
             }
             $args[$parameter->getPosition()] = $command->{$parameter->name};
         }
-        \call_user_func_array([$this, $method], $args);
+        $this->{$method}(...$args);
     }
 
     public function aggregateRootId(): AggregateRootId
     {
         $re = new ReflectionClass($this);
-        $firstParam = $re->getConstructor()->getParameters()[0];
+        $ctor = $re->getConstructor();
+        \assert($ctor !== null);
+        $firstParam = $ctor->getParameters()[0] ?? null;
+        \assert($firstParam !== null);
         $type = (string) $firstParam->getType();
         if (!is_subclass_of($type, AggregateRootId::class)) {
             throw new Exception('First param must be an AggregateRootId');
         }
         $name = $firstParam->getName();
+        $value = $this->{$name} ?? null;
+        if (!$value instanceof AggregateRootId) {
+            throw new Exception("{$name} must be an AggregateRootId property on " . $this::class);
+        }
 
-        return $this->{$name} ?? throw new Exception("{$name} must be a property on " . $this::class);
+        return $value;
     }
 
     private function streamId(): StreamId

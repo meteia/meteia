@@ -31,10 +31,11 @@ class Upload implements Command
     public function execute(): void
     {
         $files = $this->input->getArgument(self::ARG_FILES);
+        \assert(\is_array($files));
         foreach ($files as $file) {
-            $file = new FilesystemPath($file);
+            $file = new FilesystemPath((string) $file);
             $storedFile = $this->contentAddressableStorage->store($file->open(), $file->extension());
-            echo sprintf('%s => %s', $file, $storedFile) . PHP_EOL;
+            echo sprintf('%s => %s', $file, (string) $storedFile) . PHP_EOL;
         }
     }
 

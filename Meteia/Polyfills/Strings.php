@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Polyfills;
 
-function in_regexs(string $string, array $regexs)
+/**
+ * @param list<string> $regexs
+ */
+function in_regexs(string $string, array $regexs): bool
 {
     foreach ($regexs as $regex) {
         if (preg_match($regex, $string) === 1) {
@@ -17,6 +20,8 @@ function in_regexs(string $string, array $regexs)
 
 /**
  * @see https://stackoverflow.com/a/35838357/31341
+ *
+ * @param list<string> $strings
  */
 function common_prefix_length(array $strings): int
 {
@@ -25,13 +30,10 @@ function common_prefix_length(array $strings): int
     }
     sort($strings);
 
-    $s1 = array_shift($strings);
-    $s2 = array_pop($strings);
+    $s1 = (string) array_shift($strings);
+    $s2 = (string) array_pop($strings);
     $len = min(\strlen($s1), \strlen($s2));
 
-    // While we still have string to compare,
-    // if the indexed character is the same in both strings,
-    // increment the index.
     $i = 0;
     while ($i < $len && $s1[$i] === $s2[$i]) {
         ++$i;
@@ -40,11 +42,16 @@ function common_prefix_length(array $strings): int
     return $i;
 }
 
+/**
+ * @param list<string> $strings
+ *
+ * @return list<string>
+ */
 function remove_common_prefix(array $strings): array
 {
     $prefixLength = common_prefix_length($strings);
 
-    return array_map(static fn(string $string) => substr($string, $prefixLength), $strings);
+    return array_values(array_map(static fn(string $string) => substr($string, $prefixLength), $strings));
 }
 
 function without_prefix(string $string, string $prefix): string

@@ -15,15 +15,23 @@ trait PhpTemplate
 
         include $this->_getTemplatePath(static::class);
 
-        return ob_get_clean();
+        $output = ob_get_clean();
+        \assert($output !== false);
+
+        return $output;
     }
 
+    /**
+     * @param class-string $viewClassName
+     */
     private function _getTemplatePath(string $viewClassName): string
     {
         $templateClass = new ReflectionClass($viewClassName);
 
         while ($templateClass) {
-            $templatePath = str_replace('.php', '.tpl', $templateClass->getFileName());
+            $fileName = $templateClass->getFileName();
+            \assert($fileName !== false);
+            $templatePath = str_replace('.php', '.tpl', $fileName);
             if (is_readable($templatePath)) {
                 return $templatePath;
             }

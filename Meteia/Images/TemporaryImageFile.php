@@ -11,6 +11,7 @@ readonly class TemporaryImageFile extends ImageFile
     public function __construct(string $imageData)
     {
         $tempPath = tempnam(sys_get_temp_dir(), 'img');
+        \assert($tempPath !== false);
         file_put_contents($tempPath, $imageData);
         parent::__construct(new FilesystemPath($tempPath));
     }

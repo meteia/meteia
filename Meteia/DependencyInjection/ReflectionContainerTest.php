@@ -28,20 +28,28 @@ final class ReflectionContainerTest extends TestCase
     public function testSet(): void
     {
         $container = new ReflectionContainer(Definitions::get());
-        self::assertSame('', $container->get(InnerDependency::class)->option);
+        $first = $container->get(InnerDependency::class);
+        \assert($first instanceof InnerDependency);
+        self::assertSame('', $first->option);
 
         $input = new InnerDependency(new DateTime(), 'testing');
         $container->set(InnerDependency::class, $input);
-        self::assertSame('testing', $container->get(InnerDependency::class)->option);
+        $after = $container->get(InnerDependency::class);
+        \assert($after instanceof InnerDependency);
+        self::assertSame('testing', $after->option);
     }
 
     public function testSetCallable(): void
     {
         $container = new ReflectionContainer(Definitions::get());
-        self::assertSame('', $container->get(InnerDependency::class)->option);
+        $first = $container->get(InnerDependency::class);
+        \assert($first instanceof InnerDependency);
+        self::assertSame('', $first->option);
 
         $container->set(InnerDependency::class, static fn() => new InnerDependency(new DateTime(), 'testing'));
-        self::assertSame('testing', $container->get(InnerDependency::class)->option);
+        $after = $container->get(InnerDependency::class);
+        \assert($after instanceof InnerDependency);
+        self::assertSame('testing', $after->option);
     }
 
     public function testClassWithoutConstructor(): void

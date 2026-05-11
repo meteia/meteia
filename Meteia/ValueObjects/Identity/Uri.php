@@ -17,6 +17,7 @@ class Uri implements UriContract, Comparable
         private string $uri,
     ) {}
 
+    #[Override]
     public function __toString(): string
     {
         return $this->uri;
@@ -31,7 +32,7 @@ class Uri implements UriContract, Comparable
     #[Override]
     public function compareTo(Comparable $other): int
     {
-        return strcasecmp($this->uri, $other->toNative());
+        return strcasecmp($this->uri, (string) $other->toNative());
     }
 
     #[Override]

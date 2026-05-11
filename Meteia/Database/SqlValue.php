@@ -35,6 +35,8 @@ final readonly class SqlValue
 
     private function boundArray(): array
     {
+        \assert(\is_array($this->value));
+
         return array_map(static fn(mixed $value): mixed => new self($value)->bound(), $this->value);
     }
 

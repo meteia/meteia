@@ -22,6 +22,9 @@ use Throwable;
 
 use function Meteia\Http\Functions\send;
 
+/**
+ * @implements IteratorAggregate<array-key, SymfonyCommand>
+ */
 final readonly class Commands implements IteratorAggregate
 {
     public function __construct(
@@ -40,6 +43,7 @@ final readonly class Commands implements IteratorAggregate
         );
         $commandClassnames = new ClassesImplementing($classes, Command::class);
         foreach ($commandClassnames as $commandClassname) {
+            \assert(\is_string($commandClassname) && is_subclass_of($commandClassname, Command::class));
             $commandName = $this->commandName($commandClassname);
             $command = new SymfonyCommand($commandName);
             $command->setDefinition($commandClassname::inputDefinition());
@@ -49,6 +53,7 @@ final readonly class Commands implements IteratorAggregate
                     $this->container->set(InputInterface::class, $input);
                     $this->container->set(OutputInterface::class, $output);
                     $command = $this->container->get($commandClassname);
+                    \assert(\is_object($command));
                     if (!method_exists($command, 'execute')) {
                         throw new Exception('Command is missing required execute() method');
                     }

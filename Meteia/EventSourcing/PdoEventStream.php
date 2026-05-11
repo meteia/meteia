@@ -104,6 +104,9 @@ class PdoEventStream implements EventStream
             WHERE aggregate_root_id = :aggregateRootId
         ', ['aggregateRootId' => $streamId->bytes()]);
 
+        if ($row === false) {
+            return StreamVersion::start();
+        }
         $max = $row->max_seq;
         if ($max === null) {
             return StreamVersion::start();
@@ -119,14 +122,18 @@ class PdoEventStream implements EventStream
 
     private function hydrate(StreamId $streamId, stdClass $row): RecordedEvent
     {
+        $eventRaw = $row->event;
+        $causationIdRaw = $row->causation_id;
+        $correlationIdRaw = $row->correlation_id;
+        \assert(\is_string($eventRaw) && \is_string($causationIdRaw) && \is_string($correlationIdRaw));
         /** @var DomainEvent $event */
-        $event = $this->messageSerializer->unserialize($row->event);
+        $event = $this->messageSerializer->unserialize($eventRaw);
         $pending = new PendingEvent($streamId, new StreamVersion((int) $row->aggregate_sequence), $event);
 
         return new RecordedEvent(
             $pending,
-            new CausationId($row->causation_id),
-            new CorrelationId($row->correlation_id),
+            new CausationId($causationIdRaw),
+            new CorrelationId($correlationIdRaw),
             new DateTimeImmutable((string) $row->created),
         );
     }
@@ -135,7 +142,11 @@ class PdoEventStream implements EventStream
     {
         if (!isset($this->aggregateHashes[$target::class])) {
             $rc = new ReflectionClass($target);
-            $hash = substr(hash_file('sha256', $rc->getFileName(), true), 0, 16);
+            $fileName = $rc->getFileName();
+            \assert($fileName !== false);
+            $fileHash = hash_file('sha256', $fileName, true);
+            \assert($fileHash !== false);
+            $hash = substr($fileHash, 0, 16);
             $this->aggregateHashes[$target::class] = $hash;
         }
 
@@ -151,8 +162,12 @@ class PdoEventStream implements EventStream
         ]);
 
         $fromVersion = new FromFirst();
-        if ($snapshotRow) {
-            $target = $this->messageSerializer->unserialize($snapshotRow->snapshot);
+        if ($snapshotRow !== false) {
+            $snapshotData = $snapshotRow->snapshot;
+            \assert(\is_string($snapshotData));
+            $hydrated = $this->messageSerializer->unserialize($snapshotData);
+            \assert($hydrated instanceof EventSourced);
+            $target = $hydrated;
             $fromVersion = new FromAfter(new StreamVersion((int) $snapshotRow->aggregate_sequence));
         }
 
@@ -162,13 +177,14 @@ class PdoEventStream implements EventStream
         $count = 0;
         $lastSequence = -1;
         foreach ($events as $recorded) {
+            \assert($recorded instanceof RecordedEvent);
             $recorded->applyTo($target);
             $lastSequence = $recorded->version()->asInt();
             ++$count;
         }
         $replayDelta = (microtime(true) - $replayStart) * 1000;
         $this->timings->add($target::class . '.replay', $replayDelta);
-        $this->timings->add($target::class . '.replayCount', $count);
+        $this->timings->add($target::class . '.replayCount', (float) $count);
 
         if ($replayDelta > 15 && $count > 25 && $lastSequence >= 0) {
             $this->createSnapshot($streamId, $lastSequence, $target);

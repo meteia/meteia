@@ -14,7 +14,7 @@ use Stringable;
 class Body implements Component
 {
     /**
-     * @param array<string, string|\Stringable|number|boolean> $attributes
+     * @param array<string, Stringable|null|scalar> $attributes
      */
     public function __construct(
         public Header $header,

@@ -5,7 +5,7 @@ php-version = "8.5.0"
 [source]
 paths = ["Meteia/"]
 includes = ["vendor"]
-excludes = []
+excludes = ["**/*Spec.php"]
 
 [formatter]
 print-width = 120

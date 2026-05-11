@@ -8,33 +8,22 @@ use Meteia\ValueObjects\Primitive\ComplexStringLiteral as StringLiteral;
 
 class Country
 {
-    /**
-     * @var CountryCode|string
-     */
-    protected $code;
+    public function __construct(
+        protected string $code,
+    ) {}
 
-    public function __construct($code)
-    {
-        $this->code = $code;
-    }
-
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getName()->string();
     }
 
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return StringLiteral
-     */
-    public function getName()
+    public function getName(): StringLiteral
     {
-        $code = $this->getCode();
-
-        return CountryCodeName::getName($code);
+        return CountryCodeName::getName($this->getCode());
     }
 }

@@ -6,25 +6,18 @@ namespace Meteia\ValueObjects\Color;
 
 class ColorRgb
 {
-    public $red;
+    public function __construct(
+        public int $red,
+        public int $green,
+        public int $blue,
+    ) {}
 
-    public $green;
-
-    public $blue;
-
-    public function __construct(int $red, int $green, int $blue)
-    {
-        $this->red = $red;
-        $this->green = $green;
-        $this->blue = $blue;
-    }
-
-    public function __toString()
+    public function __toString(): string
     {
         return '#' . $this->asHex();
     }
 
-    public function asHex()
+    public function asHex(): string
     {
         return (
             str_pad(dechex($this->red), 2, '0')
@@ -33,7 +26,7 @@ class ColorRgb
         );
     }
 
-    public function asInteger()
+    public function asInteger(): int|float
     {
         return hexdec($this->asHex());
     }

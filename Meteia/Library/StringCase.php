@@ -55,7 +55,11 @@ abstract class StringCase
             ':: NFC;',
         ]);
         $transliterator = Transliterator::createFromRules($rules, Transliterator::FORWARD);
+        if ($transliterator === null) {
+            throw new RuntimeException('Failed to create transliterator');
+        }
         $normalized = $transliterator->transliterate($string);
+        \assert(\is_string($normalized));
 
         $replacements = [
             '/\W/' => ' ',
@@ -69,8 +73,8 @@ abstract class StringCase
         foreach ($replacements as $pattern => $replacement) {
             $replaced = preg_replace($pattern, $replacement, $urlized);
 
-            if ($replaced === null) {
-                throw new RuntimeException(sprintf('preg_replace returned null for value "%s"', $urlized));
+            if (!\is_string($replaced)) {
+                throw new RuntimeException(sprintf('preg_replace returned non-string for value "%s"', $urlized));
             }
 
             $urlized = $replaced;

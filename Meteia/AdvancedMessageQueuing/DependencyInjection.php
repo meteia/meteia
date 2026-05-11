@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bunny\Channel;
+use Bunny\ChannelInterface;
 use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
@@ -10,7 +11,6 @@ use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Configuration\Configuration;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
-use React\EventLoop\LoopInterface;
 
 $connectionOptions = static fn(Configuration $config): array => [
     'host' => $config->string('RABBITMQ_HOST', '127.0.0.1'),
@@ -25,11 +25,7 @@ $connectionOptions = static fn(Configuration $config): array => [
 
 return [
     Client::class => static fn(Configuration $config): Client => new Client($connectionOptions($config)),
-    Bunny\Async\Client::class => static fn(
-        LoopInterface $loop,
-        Configuration $config,
-    ): Bunny\Async\Client => new Bunny\Async\Client($loop, $connectionOptions($config)),
-    Channel::class => static function (Client $client): Channel {
+    Channel::class => static function (Client $client): ChannelInterface {
         $client->connect();
 
         return $client->channel();

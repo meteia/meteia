@@ -58,7 +58,8 @@ readonly class ChallengeCookie
             throw new InvalidWebAuthnChallenge('Challenge cookie malformed');
         }
 
-        [$expiresAt, $encodedChallenge] = $parts;
+        $expiresAt = $parts[0];
+        $encodedChallenge = $parts[1] ?? '';
         if (time() > (int) $expiresAt) {
             throw new InvalidWebAuthnChallenge('Challenge expired');
         }

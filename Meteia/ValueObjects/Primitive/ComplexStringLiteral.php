@@ -4,86 +4,60 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Primitive;
 
+use Stringable;
+
 /**
  * WIP
  * Class StringLiteral.
  */
 class ComplexStringLiteral
 {
+    private string $value;
+
     /**
      * Returns a StringLiteral object given a PHP native string or StringLiteral as parameter(s).
      */
-    public function __construct(...$strings)
+    public function __construct(string|Stringable ...$strings)
     {
         $string = '';
         foreach ($strings as $piece) {
-            $string .= $piece;
+            $string .= (string) $piece;
         }
 
         $this->value = $string;
     }
 
-    /**
-     * Returns the string value itself.
-     *
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->string();
     }
 
-    /**
-     * Tells whether the StringLiteral is empty.
-     *
-     * @return bool
-     */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return $this->length() === 0;
     }
 
-    /**
-     * Get string length.
-     *
-     * @return int The length of the string on success, and 0 if the <i>string</i> is empty
-     */
-    public function length()
+    public function length(): int
     {
         return \strlen($this->value);
     }
 
     /**
      * Find the position of the first occurrence of a substring in a string.
-     *
-     * @param string|StringLiteral $needle The string to search in
-     * @param int                  $offset If specified, search will start this number of characters counted from
-     *                                     the beginning of the string. The offset cannot be negative.
-     *
-     * @return bool|int
      */
-    public function indexOf($needle, $offset = 0)
+    public function indexOf(string|Stringable $needle, int $offset = 0): false|int
     {
-        $needle = $this->getStringValue($needle);
-        $value = $this->getValue();
-
-        return strpos($value, $needle, $offset);
+        return strpos($this->value, (string) $needle, $offset);
     }
 
     /**
      * Split a string by string.
      *
-     * @param string|StringLiteral $delimiter the boundary string
-     * @param null                 $limit     if limit is set and positive, the returned array will contain a maximum
-     *                                        of limit elements with the last element containing the rest of string
-     *
-     * @return StringLiteral[]
+     * @return list<self>
      */
-    public function split($delimiter, $limit = 100)
+    public function split(string|Stringable $delimiter, int $limit = 100): array
     {
-        $delimiter = $this->getStringValue($delimiter);
-        $value = $this->getValue();
-        $strings = explode($delimiter, $value, $limit);
+        $strings = explode((string) $delimiter, $this->value, $limit);
         $stringLiterals = [];
         foreach ($strings as $string) {
             $stringLiterals[] = new self($string);
@@ -94,75 +68,40 @@ class ComplexStringLiteral
 
     /**
      * Return the sub string from $start to a $length.
-     *
-     * @param int $start  If start is non-negative, the returned string will start at the start'th position in
-     *                    string, counting from zero. For instance, in the string 'abcdef', the character at
-     *                    position 0 is 'a', the character at position 2 is 'c', and so forth.
-     * @param int $length If length is given and is positive, the string returned will contain at most length
-     *                    characters beginning from start (depending on the length of string). [OPTIONAL]
-     *
-     * @return StringLiteral this is a different StringLiteral that is returned
      */
-    public function slice($start, $length = 100)
+    public function slice(int $start, int $length = 100): self
     {
-        $value = $this->getValue();
-
-        return new self(mb_substr($value, $start, $length));
+        return new self(mb_substr($this->value, $start, $length));
     }
 
     /**
      * Replace all occurrences of the search string with the replacement string.
      *
-     * @param mixed $search  The value being searched for, otherwise known as the needle. An array may be used to
-     *                       designate multiple needles.
-     * @param mixed $replace The replacement value that replaces found search values. An array may be used to
-     *                       designate multiple replacements.
-     * @param int   $count   [optional] If passed, this will hold the number of matched and replaced needles
-     *
-     * @return StringLiteral this function returns a new ComplexStringLiteral with the replaced values
+     * @param array<array-key, string>|string $search
+     * @param array<array-key, string>|string $replace
      */
-    public function replace($search, $replace, &$count = null)
+    public function replace(array|string $search, array|string $replace): self
     {
-        return new self(str_replace($search, $replace, $this->value, $count));
+        $replaced = str_replace($search, $replace, $this->value);
+
+        return new self($replaced);
     }
 
     /**
      * Strip whitespace (or other characters) from the beginning and end of a string.
-     *
-     * @param string $charList [optional] Optionally, the stripped characters can also be specified using the
-     *                         charList parameter
-     *
-     * @return StringLiteral string The trimmed string
      */
-    public function trim($charList = " \t\n\r\0\x0B")
+    public function trim(string $charList = " \t\n\r\0\x0B"): self
     {
         return new self(trim($this->value, $charList));
     }
 
-    /**
-     * Returns the value of the string.
-     *
-     * @return string
-     */
-    public function string()
+    public function string(): string
     {
         return $this->value;
     }
 
-    protected function getValue()
+    protected function getValue(): string
     {
-        return '' . $this->value;
-    }
-
-    /**
-     * Converts an object to a string.
-     *
-     * @param mixed $objectInQuestion
-     *
-     * @return string
-     */
-    private function getStringValue($objectInQuestion)
-    {
-        return '' . $objectInQuestion;
+        return $this->value;
     }
 }
