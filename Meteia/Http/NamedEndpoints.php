@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Meteia\Http;
 
+use Meteia\Classy\ClassBasedName;
+
 use function Meteia\Polyfills\array_map_assoc;
 
 class NamedEndpoints
 {
-    use ClassBasedName;
-
     /**
      * @var array<string, NamedEndpoint>
      */
@@ -19,7 +19,7 @@ class NamedEndpoints
     {
         $endpoints = array_filter($endpoints, class_implements(...));
         $this->endpoints = array_map_assoc(fn(int $idx, string $endpoint) => [
-            $this->classBasedName($endpoint) => $endpoint,
+            (string) new ClassBasedName($endpoint) => $endpoint,
         ], $endpoints);
     }
 

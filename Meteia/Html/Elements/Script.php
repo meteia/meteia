@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Meteia\Html\Elements;
 
 use Meteia\Html\Component;
+use Meteia\Html\HeadResource;
 use Meteia\Html\Node;
 use Override;
 
-final readonly class Script implements Component
+final readonly class Script implements Component, HeadResource
 {
     public function __construct(
         public string $src,
@@ -30,5 +31,11 @@ final readonly class Script implements Component
             'integrity' => $this->integrity,
             'crossorigin' => $this->crossorigin,
         ]);
+    }
+
+    #[Override]
+    public function addTo(Head $head): void
+    {
+        $head->scripts->add($this);
     }
 }

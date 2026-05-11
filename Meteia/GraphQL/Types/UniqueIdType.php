@@ -6,7 +6,7 @@ namespace Meteia\GraphQL\Types;
 
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
-use Meteia\GraphQL\ClassBasedName;
+use Meteia\Classy\ClassBasedName;
 use Meteia\GraphQL\ClientAwareErrors\InvalidScalarValue;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
@@ -16,8 +16,6 @@ use Throwable;
 
 class UniqueIdType extends ScalarType implements Resolver
 {
-    use ClassBasedName;
-
     public function __construct(
         private readonly string $uniqueIdClass,
     ) {
@@ -26,7 +24,7 @@ class UniqueIdType extends ScalarType implements Resolver
             $uniqueIdClass . ' does not implement ' . UniqueId::class,
         );
         parent::__construct([
-            'name' => $this->classBasedName($uniqueIdClass),
+            'name' => (string) new ClassBasedName($uniqueIdClass),
         ]);
     }
 

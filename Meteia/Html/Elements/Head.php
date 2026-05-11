@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Html\Elements;
 
 use Meteia\Html\Component;
+use Meteia\Html\HeadResource;
 use Meteia\Html\Metadata;
 use Meteia\Html\Node;
 use Meteia\Html\Scripts;
@@ -19,6 +20,16 @@ final class Head implements Component
         public readonly Stylesheets $stylesheets,
         public readonly Scripts $scripts,
     ) {}
+
+    /**
+     * @param iterable<HeadResource> $resources
+     */
+    public function include(iterable $resources): void
+    {
+        foreach ($resources as $resource) {
+            $resource->addTo($this);
+        }
+    }
 
     /**
      * @param iterable<Script> $scripts

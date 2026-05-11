@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Meteia\GraphQL;
 
 use GraphQL\Type\Definition\ObjectType;
+use Meteia\Classy\ClassBasedName;
 use Meteia\GraphQL\Contracts\MutationField;
 
 class Mutation extends ObjectType
 {
-    use ClassBasedName;
-
     public function __construct(SchemaFields $schemaFields)
     {
         parent::__construct([
-            'name' => $this->classBasedName(),
+            'name' => (string) new ClassBasedName(static::class),
             'fields' => iterator_to_array($schemaFields->implementing(MutationField::class)),
         ]);
     }

@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Meteia\Html\Elements;
 
 use Meteia\Html\Component;
+use Meteia\Html\HeadResource;
 use Meteia\Html\Node;
 use Override;
 use Stringable;
 
-final readonly class Link implements Component
+final readonly class Link implements Component, HeadResource
 {
     public function __construct(
         public string $rel,
@@ -31,5 +32,11 @@ final readonly class Link implements Component
             'sizes' => $this->sizes,
             'type' => $this->type,
         ]);
+    }
+
+    #[Override]
+    public function addTo(Head $head): void
+    {
+        $head->stylesheets->add($this);
     }
 }

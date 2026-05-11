@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace Meteia\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
-use Meteia\GraphQL\ClassBasedName;
+use Meteia\Classy\ClassBasedName;
 
 class PageInfo extends ObjectType
 {
-    use ClassBasedName;
-
     public function __construct()
     {
         parent::__construct([
-            'name' => $this->classBasedName(),
+            'name' => (string) new ClassBasedName(static::class),
             'fields' => [
                 'startCursor' => [
                     'type' => self::string(),
