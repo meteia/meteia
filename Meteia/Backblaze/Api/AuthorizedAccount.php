@@ -11,6 +11,8 @@ use SensitiveParameter;
 
 class AuthorizedAccount
 {
+    private readonly Client $client;
+
     public function __construct(string $apiUrl, #[SensitiveParameter] string $authorizationToken)
     {
         $this->client = new Client([

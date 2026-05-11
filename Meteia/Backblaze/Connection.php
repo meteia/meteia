@@ -5,89 +5,43 @@ declare(strict_types=1);
 namespace Meteia\Backblaze;
 
 use Exception;
-use InvalidArgumentException;
 use Meteia\Backblaze\Configuration\ApplicationKey;
 use Meteia\Backblaze\Configuration\HmacKey;
 use Meteia\Backblaze\Configuration\KeyId;
+use stdClass;
 
 class Connection
 {
-    /**
-     * @var object
-     */
-    private $authorization;
+    private stdClass $authorization;
 
-    /**
-     * @var HmacKey
-     */
-    private $hmacKey;
-
-    public function __construct(KeyId $keyId, ApplicationKey $applicationKey)
-    {
-        $this->hmacKey = $hmacKey;
-
+    public function __construct(
+        KeyId $keyId,
+        ApplicationKey $applicationKey,
+        private readonly HmacKey $hmacKey,
+    ) {
         $credentials = base64_encode($keyId . ':' . $applicationKey);
         $url = 'https://api.backblazeb2.com/b2api/v2/b2_authorize_account';
 
         $session = curl_init($url);
+        \assert($session !== false);
 
-        // Add headers
-        $headers = [];
-        $headers[] = 'Accept: application/json';
-        $headers[] = 'Authorization: Basic ' . $credentials;
-        curl_setopt($session, CURLOPT_HTTPHEADER, $headers); // Add headers
-
-        curl_setopt($session, CURLOPT_HTTPGET, true); // HTTP GET
-        curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
-        $server_output = curl_exec($session);
-        $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
-        if ($http_status !== 200) {
-            throw new Exception('Unknown error');
-        }
-
-        $this->authorization = json_decode($server_output, false, 512, JSON_THROW_ON_ERROR);
-    }
-
-    public function uploadResource($resource): string
-    {
-        if (!\is_resource($resource)) {
-            throw new InvalidArgumentException('Not a Resource');
-        }
-        rewind($resource);
-
-        $hashCtx = hash_init('sha256', HASH_HMAC, $this->hmacKey);
-        hash_update_stream($hashCtx, $resource);
-        $fileHash = hash_final($hashCtx);
-
-        rewind($resource);
-        $read_file = fread($resource, filesize($filePath));
-
-        $content_type = mime_content_type($filePath);
-        $sha1_of_file_data = sha1_file($filePath);
-
-        $session = curl_init($uploadUrl->uploadUrl);
-
-        // Add read file as post field
-        curl_setopt($session, CURLOPT_POSTFIELDS, $read_file);
-
-        // Add headers
-        $headers = [];
-        $headers[] = 'Authorization: ' . $uploadUrl->authorizationToken;
-        $headers[] = 'X-Bz-File-Name: ' . $fileName;
-        $headers[] = 'Content-Type: ' . $content_type;
-        $headers[] = 'X-Bz-Content-Sha1: ' . $sha1_of_file_data;
+        $headers = [
+            'Accept: application/json',
+            'Authorization: Basic ' . $credentials,
+        ];
         curl_setopt($session, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($session, CURLOPT_HTTPGET, true);
+        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 
-        curl_setopt($session, CURLOPT_POST, true); // HTTP POST
-        curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
-        $server_output = curl_exec($session); // Let's do this!
-        $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
-        $result = json_decode($server_output, false, 512, JSON_THROW_ON_ERROR);
-        if ($http_status !== 200) {
+        $serverOutput = curl_exec($session);
+        $httpStatus = curl_getinfo($session, CURLINFO_HTTP_CODE);
+        if ($httpStatus !== 200 || !\is_string($serverOutput)) {
             throw new Exception('Unknown error');
         }
 
-        return implode('/', ['https://static.mylzh.net', 'b2', $fileName]);
+        $authorization = json_decode($serverOutput, false, 512, JSON_THROW_ON_ERROR);
+        \assert($authorization instanceof stdClass);
+        $this->authorization = $authorization;
     }
 
     public function upload(string $filePath, string $fileExtension): string
@@ -95,12 +49,13 @@ class Connection
         if (!isset($this->authorization->allowed->bucketId)) {
             throw new Exception('Application Keys that are not limited to a bucket are not supported');
         }
-        $uploadUrl = $this->uploadUrl($this->authorization->allowed->bucketId);
-
-        // fopen($filePath);
+        $bucketId = $this->authorization->allowed->bucketId;
+        \assert(\is_string($bucketId));
+        $uploadUrl = $this->uploadUrl($bucketId);
 
         $fileExtension = $this->normalizeExtension($fileExtension);
-        $fileHash = hash_hmac_file('sha256', $filePath, $this->hmacKey);
+        $fileHash = hash_hmac_file('sha256', $filePath, $this->hmacKey->bytes());
+        \assert($fileHash !== false);
         $fileName =
             implode('/', [
                 substr($fileHash, 0, 2),
@@ -109,31 +64,75 @@ class Connection
             ])
             . '.'
             . $fileExtension;
+
+        $fileSize = filesize($filePath);
+        \assert($fileSize !== false);
+        $resource = fopen($filePath, 'rb');
+        \assert($resource !== false);
+        $fileData = fread($resource, $fileSize);
+        fclose($resource);
+        \assert($fileData !== false);
+
+        $contentType = mime_content_type($filePath);
+        \assert($contentType !== false);
+        $contentSha1 = sha1_file($filePath);
+        \assert($contentSha1 !== false);
+
+        $session = curl_init($uploadUrl->uploadUrl);
+        \assert($session !== false);
+        curl_setopt($session, CURLOPT_POSTFIELDS, $fileData);
+
+        $headers = [
+            'Authorization: ' . $uploadUrl->authorizationToken,
+            'X-Bz-File-Name: ' . $fileName,
+            'Content-Type: ' . $contentType,
+            'X-Bz-Content-Sha1: ' . $contentSha1,
+        ];
+        curl_setopt($session, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($session, CURLOPT_POST, true);
+        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+
+        $serverOutput = curl_exec($session);
+        $httpStatus = curl_getinfo($session, CURLINFO_HTTP_CODE);
+        if ($httpStatus !== 200 || !\is_string($serverOutput)) {
+            throw new Exception('Unknown error');
+        }
+        json_decode($serverOutput, false, 512, JSON_THROW_ON_ERROR);
+
+        return implode('/', ['https://static.mylzh.net', 'b2', $fileName]);
     }
 
     private function uploadUrl(string $bucketId): UploadUrl
     {
-        $session = curl_init($this->authorization->apiUrl . '/b2api/v2/b2_get_upload_url');
+        $apiUrl = $this->authorization->apiUrl;
+        $authorizationToken = $this->authorization->authorizationToken;
+        \assert(\is_string($apiUrl));
+        \assert(\is_string($authorizationToken));
 
-        // Add post fields
+        $session = curl_init($apiUrl . '/b2api/v2/b2_get_upload_url');
+        \assert($session !== false);
+
         $data = ['bucketId' => $bucketId];
-        $post_fields = json_encode($data);
-        curl_setopt($session, CURLOPT_POSTFIELDS, $post_fields);
+        curl_setopt($session, CURLOPT_POSTFIELDS, json_encode($data, JSON_THROW_ON_ERROR));
 
-        // Add headers
-        $headers = [];
-        $headers[] = 'Authorization: ' . $this->authorization->authorizationToken;
+        $headers = [
+            'Authorization: ' . $authorizationToken,
+        ];
         curl_setopt($session, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($session, CURLOPT_POST, true);
+        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 
-        curl_setopt($session, CURLOPT_POST, true); // HTTP POST
-        curl_setopt($session, CURLOPT_RETURNTRANSFER, true); // Receive server response
-        $server_output = curl_exec($session); // Let's do this!
-        $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
-        if ($http_status !== 200) {
+        $serverOutput = curl_exec($session);
+        $httpStatus = curl_getinfo($session, CURLINFO_HTTP_CODE);
+        if ($httpStatus !== 200 || !\is_string($serverOutput)) {
             throw new Exception('Unknown error');
         }
 
-        $result = json_decode($server_output, false, 512, JSON_THROW_ON_ERROR);
+        $result = json_decode($serverOutput, false, 512, JSON_THROW_ON_ERROR);
+        \assert($result instanceof stdClass);
+        \assert(\is_string($result->bucketId));
+        \assert(\is_string($result->uploadUrl));
+        \assert(\is_string($result->authorizationToken));
 
         return new UploadUrl($result->bucketId, $result->uploadUrl, $result->authorizationToken);
     }

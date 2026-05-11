@@ -20,7 +20,10 @@ class Api
                 'Authorization' => 'Basic ' . base64_encode($keyId . ':' . $applicationKey),
             ],
         ]);
-        $result = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+        $result = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        \assert(\is_array($result));
+        \assert(\is_string($result['apiUrl']));
+        \assert(\is_string($result['authorizationToken']));
 
         return new AuthorizedAccount($result['apiUrl'], $result['authorizationToken']);
     }
