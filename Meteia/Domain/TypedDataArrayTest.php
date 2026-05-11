@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Meteia\Domain\TypedDataArray;
-use Meteia\Domain\ValueObjects\Money\PreciseUSD;
+use Meteia\ValueObjects\Money\PreciseUsd;
 
 return;
 it('returns values', function (): void {
@@ -26,7 +26,7 @@ it('returns values', function (): void {
     $this->assertTrue($data->boolean('a_bool', false));
     $this->assertEquals($data->array('an_array', []), $expected['an_array']);
     $this->assertEquals($data->float('a_float', 2.71), $expected['a_float']);
-    $this->assertTrue($data->preciseUSD('usd', 2.71)->equalTo(new PreciseUSD(3.141_59)));
+    $this->assertTrue($data->preciseUSD('usd', 2.71)->equalTo(new PreciseUsd(3.141_59)));
 
     $this->assertEquals($data->all(), $expected);
 });

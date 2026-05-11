@@ -9,7 +9,7 @@ use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
 use Meteia\Domain\PendingCommand;
 use Meteia\Domain\PendingCommands;
-use Meteia\Domain\ValueObjects\AggregateRootId;
+use Meteia\ValueObjects\AggregateRootId;
 use Meteia\ValueObjects\Identity\UniqueId;
 
 trait EventSourcing

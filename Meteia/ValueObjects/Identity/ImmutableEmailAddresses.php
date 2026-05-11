@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Meteia\ValueObjects\Identity;
+
+use Meteia\Domain\Contracts\Identity\EmailAddress;
+use Meteia\Domain\Contracts\Identity\EmailAddresses;
+use Meteia\ValueObjects\ImmutableArrayValueObject;
+
+class ImmutableEmailAddresses extends ImmutableArrayValueObject implements EmailAddresses
+{
+    public const TYPE = EmailAddress::class;
+
+    #[\Override]
+    public function toArray()
+    {
+        $result = [];
+
+        /** @var EmailAddress $email */
+        foreach ($this->values as $email) {
+            $result = array_merge($result, $email->toArray());
+        }
+
+        return $result;
+    }
+}

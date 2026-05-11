@@ -4,6 +4,14 @@ PHP 8.5 features (readonly classes, clone-with, `#[\NoDiscard]`, pipe operator `
 
 Always: `declare(strict_types=1);` at top of every PHP file.
 
+## Naming
+
+PascalCase for type names. Initialisms lowercase the tail: `Uri` not `URI`, `Uuid` not `UUID`, `Rgb` not `RGB`, `Usd` not `USD`, `Id` not `ID`, `Http` not `HTTP`, `Json` not `JSON`, `Xml` not `XML`, `Url` not `URL`, `Api` not `API`, `Cli` not `CLI`, `Sql` not `SQL`, `Pdf` not `PDF`, `Css` not `CSS`, `Html` not `HTML`, `Tcp` not `TCP`, `Tls` not `TLS`, `Dns` not `DNS`, `Ip` not `IP`, `Ssh` not `SSH`, `Smtp` not `SMTP`, `Imap` not `IMAP`, `Mime` not `MIME`, `Ssl` not `SSL`.
+
+Proper-noun whitelist — preserve original case: `GraphQL`, `OAuth`, `OpenID`, `JavaScript`, `TypeScript`, `PostgreSQL`, `MySQL`, `MongoDB`, `GitHub`, `GitLab`, `IPv4`, `IPv6`, `WiFi`, `macOS`, `iOS`. Add to this list (don't invent ad-hoc exceptions) when introducing a new product/brand name.
+
+Method/property names follow camelCase with the same rules (`fromUri`, `httpClient`, `parseJson`).
+
 ## Forbidden in domain code
 
 - **null** — no nullable returns from domain interfaces. Use Null Object, polymorphic result object, or throw.

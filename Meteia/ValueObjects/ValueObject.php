@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects;
 
-use Meteia\Domain\Errors\ValueObjectImmutable;
+use Meteia\ValueObjects\Errors\ValueObjectImmutable;
 
 abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
 {

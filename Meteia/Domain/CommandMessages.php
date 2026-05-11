@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
-use Meteia\Domain\ValueObjects\ImmutableArrayValueObject;
+use Meteia\ValueObjects\ImmutableArrayValueObject;
 
 readonly class CommandMessages extends ImmutableArrayValueObject
 {

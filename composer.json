@@ -35,6 +35,7 @@
     "ext-intl": "*",
     "ext-pdo": "*",
     "ext-sodium": "*",
+    "ext-uri": "*",
     "ext-zlib": "*",
     "guzzlehttp/guzzle": "^7.5.0",
     "kornrunner/blurhash": "^1.2",

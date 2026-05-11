@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Domain;
 
 use Meteia\Commands\Command;
-use Meteia\Domain\ValueObjects\AggregateRootId;
+use Meteia\ValueObjects\AggregateRootId;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 

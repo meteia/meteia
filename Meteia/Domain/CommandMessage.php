@@ -8,7 +8,7 @@ use Meteia\Commands\Command;
 use Meteia\Commands\CommandOutbox;
 use Meteia\Domain\Contracts\AggregateRoot;
 use Meteia\Domain\Contracts\IssuedCommands;
-use Meteia\Domain\ValueObjects\AggregateRootId;
+use Meteia\ValueObjects\AggregateRootId;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 

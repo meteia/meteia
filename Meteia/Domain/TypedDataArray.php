@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Domain;
 
 use Meteia\Domain\Contracts\TypedData;
-use Meteia\Domain\ValueObjects\Money\PreciseUSD;
+use Meteia\ValueObjects\Money\PreciseUsd;
 
 use function Meteia\Library\ArrayUtils\collection_to_array;
 
@@ -77,11 +77,11 @@ class TypedDataArray implements TypedData
         return (string) $this->getOrThrow($name);
     }
 
-    public function preciseUSD(string $name, $default): PreciseUSD
+    public function preciseUSD(string $name, $default): PreciseUsd
     {
         $value = array_get($this->data, $name, (string) $default);
 
-        return new PreciseUSD($value);
+        return new PreciseUsd($value);
     }
 
     public function all(): array

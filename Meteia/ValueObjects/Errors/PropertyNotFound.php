@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Yeso\Exceptions;
+namespace Meteia\ValueObjects\Errors;
 
 class PropertyNotFound extends \Exception {}

@@ -6,7 +6,7 @@ namespace Meteia\Domain;
 
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
-use Meteia\Domain\ValueObjects\ImmutableEvents;
+use Meteia\ValueObjects\ImmutableEvents;
 
 trait ThenEvents
 {

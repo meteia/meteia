@@ -6,7 +6,7 @@ namespace Meteia\Domain;
 
 use Meteia\Commands\Command;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
-use Meteia\Domain\ValueObjects\ImmutableCommands;
+use Meteia\ValueObjects\ImmutableCommands;
 
 trait ThenCommands
 {

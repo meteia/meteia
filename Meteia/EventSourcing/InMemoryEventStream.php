@@ -59,7 +59,10 @@ final class InMemoryEventStream implements EventStream, GlobalEventStream
             static fn(RecordedEvent $event): bool => $event->version()->asInt() > $lower,
         ));
 
-        usort($tail, static fn(RecordedEvent $a, RecordedEvent $b): int => $a->version()->asInt() <=> $b->version()->asInt());
+        usort(
+            $tail,
+            static fn(RecordedEvent $a, RecordedEvent $b): int => $a->version()->asInt() <=> $b->version()->asInt(),
+        );
 
         return new RecordedEvents($tail);
     }

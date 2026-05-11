@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Domain\Errors;
+namespace Meteia\ValueObjects\Errors;
 
 class ValueObjectImmutable extends \Exception {}
