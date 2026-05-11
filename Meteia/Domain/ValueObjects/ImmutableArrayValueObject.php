@@ -40,7 +40,7 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
     }
 
     #[\Override]
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         foreach ($this->values as $key => $values) {
             yield $key => $values;
@@ -66,19 +66,19 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
     }
 
     #[\Override]
-    public function count()
+    public function count(): int
     {
         return \count($this->values);
     }
 
     #[\Override]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->values[$offset]);
     }
 
     #[\Override]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->values[$offset];
     }
@@ -96,7 +96,7 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
     }
 
     #[\Override]
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->toNative();
     }
