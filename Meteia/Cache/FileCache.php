@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Meteia\Cache;
 
 use Cake\Chronos\Chronos;
+use DateTimeInterface;
+use Exception;
 use Meteia\Cache\Configuration\CacheDirectory;
 use Meteia\Cache\Configuration\CacheHmacSecretKey;
 use Meteia\ValueObjects\Identity\FilesystemPath;
@@ -16,7 +18,7 @@ class FileCache
         private CacheHmacSecretKey $secretKey,
     ) {}
 
-    public function remember(string $key, \DateTimeInterface $expires, callable $default): FilesystemPath
+    public function remember(string $key, DateTimeInterface $expires, callable $default): FilesystemPath
     {
         $hashedKey = hash_hmac('sha256', $key, $this->secretKey->bytes());
         $dataPath = $this->path->join(substr($hashedKey, 0, 2), $hashedKey);
@@ -25,7 +27,7 @@ class FileCache
         while (time() <= $retryUntil) {
             if ($metadataPath->exists() && $dataPath->exists()) {
                 $metadata = $metadataPath->readJson();
-                $expiresAt = Chronos::createFromFormat(\DateTimeInterface::RFC3339, $metadata->expires);
+                $expiresAt = Chronos::createFromFormat(DateTimeInterface::RFC3339, $metadata->expires);
                 if ($expiresAt->isPast()) {
                     $dataPath->delete();
                     $metadataPath->delete();
@@ -42,18 +44,18 @@ class FileCache
 
             $value = $default();
             if (!$value instanceof FilesystemPath) {
-                throw new \Exception('The default value must be a FilesystemPath');
+                throw new Exception('The default value must be a FilesystemPath');
             }
             $value->rename($dataPath);
             $metadataPath->writeJson([
-                'expires' => $expires->format(\DateTimeInterface::RFC3339),
+                'expires' => $expires->format(DateTimeInterface::RFC3339),
             ]);
             $this->releaseLock($hashedKey);
 
             return $dataPath;
         }
 
-        throw new \Exception('Could not acquire lock, retry later.');
+        throw new Exception('Could not acquire lock, retry later.');
     }
 
     private function acquireLock(string $lockname, int $timeout = 10)

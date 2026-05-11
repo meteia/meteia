@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Meteia\Authentication;
 
+use Override;
+
 final readonly class AnonymousUser implements RequestingUser
 {
-    #[\Override]
+    #[Override]
     public function pick(mixed $whenAnonymous, mixed $whenAuthenticated): mixed
     {
         return $whenAnonymous;
     }
 
-    #[\Override]
+    #[Override]
     public function fold(callable $whenAnonymous, callable $whenAuthenticated): mixed
     {
         return $whenAnonymous();

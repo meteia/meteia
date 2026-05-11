@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-class CustomAttribute implements \Stringable
+use Override;
+use Stringable;
+
+class CustomAttribute implements Stringable
 {
     public function __construct(
         private readonly string $name,
-        private readonly bool|string|\Stringable $value,
+        private readonly bool|string|Stringable $value,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function __toString(): string
     {
         return sprintf('%s="%s"', $this->name, $this->value);

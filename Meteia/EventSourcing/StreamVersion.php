@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\EventSourcing;
 
+use NoDiscard;
+
 final readonly class StreamVersion
 {
     public function __construct(
@@ -22,7 +24,7 @@ final readonly class StreamVersion
         return $this->value;
     }
 
-    #[\NoDiscard]
+    #[NoDiscard]
     public function next(): self
     {
         return new self($this->value + 1);

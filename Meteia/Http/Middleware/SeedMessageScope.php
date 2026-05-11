@@ -11,10 +11,12 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
 use Meteia\ValueObjects\Identity\ProcessId;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 
 final readonly class SeedMessageScope implements MiddlewareInterface
 {
@@ -25,7 +27,7 @@ final readonly class SeedMessageScope implements MiddlewareInterface
         private ProcessId $processId,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $correlationId = $this->correlationFromRequest($request);
@@ -50,7 +52,7 @@ final readonly class SeedMessageScope implements MiddlewareInterface
 
         try {
             return CorrelationId::fromToken($header);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return CorrelationId::random();
         }
     }

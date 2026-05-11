@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\WebAuthn\Errors;
 
-class AttestationFailed extends \RuntimeException {}
+use RuntimeException;
+
+class AttestationFailed extends RuntimeException {}

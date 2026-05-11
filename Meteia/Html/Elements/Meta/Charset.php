@@ -6,16 +6,18 @@ namespace Meteia\Html\Elements\Meta;
 
 use Meteia\Html\Component;
 use Meteia\Html\Node;
+use Override;
+use Stringable;
 
 use function Meteia\Html\Elements\el;
 
 readonly class Charset implements Component
 {
     public function __construct(
-        private string|\Stringable $characterSet = 'UTF-8',
+        private string|Stringable $characterSet = 'UTF-8',
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return el('meta', ['charset' => (string) $this->characterSet]);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Cache;
 
 use Cake\Chronos\Chronos;
+use DateTimeInterface;
 use Meteia\Cache\Configuration\CacheDirectory;
 use Meteia\Cache\Configuration\CacheHmacSecretKey;
 use Meteia\ValueObjects\Identity\FilesystemPath;
@@ -16,7 +17,7 @@ readonly class Cache
         private CacheHmacSecretKey $secretKey,
     ) {}
 
-    public function remember(string $key, \DateTimeInterface $expires, callable $default): mixed
+    public function remember(string $key, DateTimeInterface $expires, callable $default): mixed
     {
         $hashedKey = hash_hmac('sha256', $key, $this->secretKey->bytes());
         $dataPath = $this->path->join(substr($hashedKey, 0, 2), $hashedKey);
@@ -24,7 +25,7 @@ readonly class Cache
         while (true) {
             if ($metadataPath->exists() && $dataPath->exists()) {
                 $metadata = $metadataPath->readJson();
-                $expiresAt = Chronos::createFromFormat(\DateTimeInterface::RFC3339, $metadata->expires);
+                $expiresAt = Chronos::createFromFormat(DateTimeInterface::RFC3339, $metadata->expires);
                 if ($expiresAt->isFuture()) {
                     $data = $dataPath->read();
 
@@ -40,7 +41,7 @@ readonly class Cache
             $dataPath->write(gzcompress(serialize($data)));
             $metadataPath->writeJson([
                 'key' => $key,
-                'expires' => $expires->format(\DateTimeInterface::RFC3339),
+                'expires' => $expires->format(DateTimeInterface::RFC3339),
             ]);
             $this->releaseLock($hashedKey);
 

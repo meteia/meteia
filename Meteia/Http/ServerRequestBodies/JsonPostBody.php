@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Http\ServerRequestBodies;
 
 use Meteia\Http\RequestBody;
+use Override;
 
 class JsonPostBody implements ServerRequestBody
 {
@@ -20,13 +21,13 @@ class JsonPostBody implements ServerRequestBody
         return $this->data[$name] ?? $default;
     }
 
-    #[\Override]
+    #[Override]
     public function int($key, int $default): int
     {
         return (int) ($this->data[$key] ?? $default);
     }
 
-    #[\Override]
+    #[Override]
     public function string($key, string $default): string
     {
         return trim($this->data[$key] ?? $default);

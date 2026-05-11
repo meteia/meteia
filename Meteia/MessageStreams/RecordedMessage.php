@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\MessageStreams;
 
+use DateTimeImmutable;
 use Meteia\MessageStreams\Contracts\Message;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
@@ -15,7 +16,7 @@ final readonly class RecordedMessage
         private PendingMessage $pending,
         private CausationId $causationId,
         private CorrelationId $correlationId,
-        private \DateTimeImmutable $occurredAt,
+        private DateTimeImmutable $occurredAt,
     ) {}
 
     public function messageStreamId(): UniqueId
@@ -43,7 +44,7 @@ final readonly class RecordedMessage
         return $this->correlationId;
     }
 
-    public function occurredAt(): \DateTimeImmutable
+    public function occurredAt(): DateTimeImmutable
     {
         return $this->occurredAt;
     }

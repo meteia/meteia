@@ -6,10 +6,12 @@ namespace Meteia\Http\Middleware;
 
 use Meteia\Http\Configuration\LogPath;
 use Meteia\Http\RequestBody;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 
 class SimpleLog implements MiddlewareInterface
 {
@@ -18,7 +20,7 @@ class SimpleLog implements MiddlewareInterface
         private readonly LogPath $logPath,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $logFile = $this->logPath->join('http.log');
@@ -32,7 +34,7 @@ class SimpleLog implements MiddlewareInterface
 
         try {
             $response = $handler->handle($request);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $line = sprintf('  <-- %s', $th->getCode()) . PHP_EOL;
             $line .= 'Exception  : ' . $th->getMessage() . PHP_EOL;
             $line .= 'Stack trace: ' . $th->getTraceAsString() . PHP_EOL . PHP_EOL;

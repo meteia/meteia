@@ -6,6 +6,7 @@ namespace Meteia\Http\Responses;
 
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Stream;
+use Override;
 use Psr\Http\Message\StreamInterface;
 
 class BinaryResponse extends Response
@@ -19,7 +20,7 @@ class BinaryResponse extends Response
         parent::__construct($body, $status, $headers);
     }
 
-    #[\Override]
+    #[Override]
     private function getStream($data): StreamInterface
     {
         $stream = new Stream('php://temp', 'wb+');

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\WebAuthn\Endpoints;
 
+use DateTimeImmutable;
 use Laminas\Diactoros\Response\TextResponse;
 use Meteia\Http\Cookies\SameSite;
 use Meteia\Http\Endpoint;
@@ -13,6 +14,7 @@ use Meteia\WebAuthn\Challenge\ChallengePurpose;
 use Meteia\WebAuthn\Contracts\CredentialSourceRepository;
 use Meteia\WebAuthn\Contracts\UserEntityRepository;
 use Meteia\WebAuthn\WebAuthnServer;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -28,7 +30,7 @@ readonly class BeginAuthentication implements Endpoint
         private ResponseCookies $responseCookies,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function response(ServerRequestInterface $request): ResponseInterface
     {
         $challenge = random_bytes(32);
@@ -55,7 +57,7 @@ readonly class BeginAuthentication implements Endpoint
         );
         $this->responseCookies->add(
             $sealedCookie,
-            new \DateTimeImmutable('+' . self::CHALLENGE_TTL_SECONDS . ' seconds'),
+            new DateTimeImmutable('+' . self::CHALLENGE_TTL_SECONDS . ' seconds'),
             sameSite: SameSite::Strict,
         );
 

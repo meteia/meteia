@@ -7,7 +7,7 @@ namespace Meteia\ValueObjects\Identity;
 use PhpSpec\ObjectBehavior;
 
 /**
- * @mixin ImmutableUri
+ * @mixin Uri
  */
 class ImmutableUriSpec extends ObjectBehavior
 {
@@ -18,7 +18,7 @@ class ImmutableUriSpec extends ObjectBehavior
 
     public function it_is_initializable(): void
     {
-        $this->shouldHaveType(ImmutableUri::class);
+        $this->shouldHaveType(Uri::class);
     }
 
     public function it_appends_a_path(): void

@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Http;
 
+use IteratorAggregate;
+use Override;
 use Psr\Http\Server\MiddlewareInterface;
+use Traversable;
 
-class MiddlewareStack implements \IteratorAggregate
+class MiddlewareStack implements IteratorAggregate
 {
     /**
      * @return \Traversable<MiddlewareInterface>
      */
-    #[\Override]
-    public function getIterator(): \Traversable
+    #[Override]
+    public function getIterator(): Traversable
     {
         foreach ($this->middleware as $middleware) {
             if (\is_string($middleware)) {

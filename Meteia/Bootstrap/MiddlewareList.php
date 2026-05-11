@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Bootstrap;
 
 use Meteia\Http\RequestHandler;
+use NoDiscard;
 use Psr\Http\Server\MiddlewareInterface;
 
 final readonly class MiddlewareList
@@ -23,7 +24,7 @@ final readonly class MiddlewareList
     /**
      * @param MiddlewareInterface|class-string ...$middleware
      */
-    #[\NoDiscard]
+    #[NoDiscard]
     public function and(MiddlewareInterface|string ...$middleware): self
     {
         return new self(...$this->items, ...$middleware);

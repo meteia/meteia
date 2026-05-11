@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Meteia\Images;
 
+use Exception;
 use GuzzleHttp\Client;
 use kornrunner\Blurhash\Blurhash;
 use Meteia\Bootstrap\ApplicationPublicDir;
 use Meteia\ValueObjects\Identity\FilesystemPath;
+use RuntimeException;
 
 readonly class Images
 {
@@ -63,7 +65,7 @@ readonly class Images
             1 => 65,
             2 => 55,
             3 => 45,
-            default => throw new \Exception('Unsupported pixel density.'),
+            default => throw new Exception('Unsupported pixel density.'),
         };
 
         $resizedPath = tempnam(sys_get_temp_dir(), 'img');
@@ -73,7 +75,7 @@ readonly class Images
             ImageFormat::GIF => imagegif($dst, $resizedPath),
             ImageFormat::WEBP => imagewebp($dst, $resizedPath, $quality),
             ImageFormat::AVIF => imageavif($dst, $resizedPath, $quality),
-            default => throw new \Exception("Unsupported output image type {$format->value}."),
+            default => throw new Exception("Unsupported output image type {$format->value}."),
         };
 
         return new ImageFile(new FilesystemPath($resizedPath));
@@ -87,7 +89,7 @@ readonly class Images
             'sink' => $tempPath,
         ]);
         if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException('Failed to download image.');
+            throw new RuntimeException('Failed to download image.');
         }
 
         return new ImageFile(new FilesystemPath($tempPath));

@@ -7,6 +7,7 @@ namespace Meteia\ValueObjects\Primitive;
 use Meteia\Domain\Contracts\Comparable;
 use Meteia\ValueObjects\Contracts\Text;
 use Meteia\ValueObjects\PrimitiveValueObject;
+use Override;
 
 abstract class StringLiteral extends PrimitiveValueObject implements Text
 {
@@ -15,19 +16,19 @@ abstract class StringLiteral extends PrimitiveValueObject implements Text
         parent::__construct((string) $value);
     }
 
-    #[\Override]
+    #[Override]
     public function toNative(): string
     {
         return (string) parent::toNative();
     }
 
-    #[\Override]
+    #[Override]
     public function __toString(): string
     {
         return $this->toNative();
     }
 
-    #[\Override]
+    #[Override]
     public function compareTo(Comparable $other): int
     {
         return strcasecmp($this->toNative(), (string) $other->toNative());

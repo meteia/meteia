@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Identity;
 
+use NoDiscard;
+
 final readonly class MessageScope
 {
     public function __construct(
@@ -27,13 +29,13 @@ final readonly class MessageScope
         return $this->processId;
     }
 
-    #[\NoDiscard]
+    #[NoDiscard]
     public function causedBy(UniqueId $messageId): self
     {
         return clone($this, ['causationId' => CausationId::fromHex($messageId->hex())]);
     }
 
-    #[\NoDiscard]
+    #[NoDiscard]
     public function inheriting(CorrelationId $correlationId, UniqueId $messageId): self
     {
         return clone($this, [

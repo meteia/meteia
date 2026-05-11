@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Bluestone\Errors;
 
-class ViewNotFound extends \Exception
+use Exception;
+
+class ViewNotFound extends Exception
 {
     public function __construct(string $view)
     {

@@ -16,6 +16,7 @@ use Meteia\WebAuthn\Errors\UnknownCredential;
 use Meteia\WebAuthn\Events\AuthenticationSucceeded;
 use Meteia\WebAuthn\RelyingParty;
 use Meteia\WebAuthn\WebAuthnServer;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Webauthn\AuthenticatorAssertionResponse;
@@ -31,7 +32,7 @@ readonly class CompleteAuthentication implements Endpoint
         private EventDispatcher $events,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function response(ServerRequestInterface $request): ResponseInterface
     {
         $body = (string) $request->getBody();

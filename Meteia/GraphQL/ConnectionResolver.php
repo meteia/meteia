@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
+use ErrorException;
+use Exception;
 use Meteia\GraphQL\Types\ConnectionField;
 use Tuupola\Base62;
 
@@ -17,7 +19,7 @@ trait ConnectionResolver
     protected function processedRows(array $rows, array $args, array $cursorColumns): object
     {
         if (!$args || !\count($args)) {
-            throw new \Exception(
+            throw new Exception(
                 'A type that has ' . static::class . ' as a field is likely not passing through default arguments.',
             );
         }
@@ -100,7 +102,7 @@ trait ConnectionResolver
         $cursorValues = [];
         foreach ($cursorColumns as $cursorColumn) {
             if (!isset($row->{$cursorColumn})) {
-                throw new \ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
+                throw new ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
             }
             $cursorValues[] = $row->{$cursorColumn};
         }

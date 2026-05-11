@@ -6,6 +6,7 @@ namespace Meteia\Html\Elements;
 
 use Meteia\Html\Component;
 use Meteia\Html\Node;
+use Override;
 
 readonly class Picture implements Component
 {
@@ -17,7 +18,7 @@ readonly class Picture implements Component
         public array $sources,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return el('picture', [], ...[...$this->sources, $this->img]);

@@ -6,6 +6,7 @@ namespace Meteia\Html;
 
 use Meteia\Html\Elements\Body;
 use Meteia\Html\Elements\Head;
+use Override;
 
 use function Meteia\Html\Elements\el;
 
@@ -16,19 +17,19 @@ class HtmlLayout implements Layout
         private readonly Body $body,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return Children::of('<!DOCTYPE html>', el('html', ['lang' => 'en'], $this->head, $this->body));
     }
 
-    #[\Override]
+    #[Override]
     public function body(): Body
     {
         return $this->body;
     }
 
-    #[\Override]
+    #[Override]
     public function head(): Head
     {
         return $this->head;

@@ -6,6 +6,7 @@ namespace Meteia\EventSourcing;
 
 use Meteia\EventSourcing\Contracts\ExpectedVersion;
 use Meteia\EventSourcing\Exceptions\OptimisticConcurrencyFailure;
+use Override;
 
 final readonly class ExactlyAt implements ExpectedVersion
 {
@@ -13,7 +14,7 @@ final readonly class ExactlyAt implements ExpectedVersion
         private StreamVersion $version,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function assertCompatibleWith(StreamVersion $observed): void
     {
         if (!$observed->equalTo($this->version)) {

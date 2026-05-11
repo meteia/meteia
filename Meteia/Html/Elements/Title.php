@@ -7,6 +7,7 @@ namespace Meteia\Html\Elements;
 use Meteia\Html\Children;
 use Meteia\Html\Component;
 use Meteia\Html\Node;
+use Override;
 
 final class Title implements Component
 {
@@ -14,7 +15,7 @@ final class Title implements Component
         private string $title,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return Children::of('<title>' . html($this->title) . '</title>');

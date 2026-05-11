@@ -8,6 +8,7 @@ use Meteia\Database\DatabaseTables;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\GraphQL\Types\ConnectionField;
+use Override;
 
 use function Meteia\Polyfills\array_map_assoc;
 
@@ -21,7 +22,7 @@ abstract class TableConnectionResolver implements Resolver, TableConnectionBindi
         private readonly array $cursorOver = ['id'],
     ) {}
 
-    #[\Override]
+    #[Override]
     public function data(mixed $root, array $args, RequestContext $requestContext): object
     {
         $cursor = $args[ConnectionField::ARG_AFTER] ?? $args[ConnectionField::ARG_BEFORE] ?? false;

@@ -7,6 +7,7 @@ namespace Meteia\WebAuthn\Database;
 use Meteia\Database\DatabaseTables;
 use Meteia\WebAuthn\Configuration\WebAuthnCredentialsTable;
 use Meteia\WebAuthn\Contracts\CredentialSourceRepository;
+use Override;
 use Symfony\Component\Serializer\SerializerInterface;
 use Webauthn\CredentialRecord;
 use Webauthn\PublicKeyCredentialUserEntity;
@@ -19,7 +20,7 @@ readonly class PdoCredentialSourceRepository implements CredentialSourceReposito
         private SerializerInterface $serializer,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function findOneByCredentialId(string $publicKeyCredentialId): ?CredentialRecord
     {
         $rows = $this->db->select((string) $this->table, [
@@ -29,7 +30,7 @@ readonly class PdoCredentialSourceRepository implements CredentialSourceReposito
         return $rows === [] ? null : $this->hydrate(reset($rows));
     }
 
-    #[\Override]
+    #[Override]
     public function findAllForUserEntity(PublicKeyCredentialUserEntity $userEntity): array
     {
         $rows = $this->db->select((string) $this->table, [
@@ -39,7 +40,7 @@ readonly class PdoCredentialSourceRepository implements CredentialSourceReposito
         return array_map($this->hydrate(...), $rows);
     }
 
-    #[\Override]
+    #[Override]
     public function saveCredentialRecord(CredentialRecord $credentialRecord): void
     {
         $payload = $this->serializer->serialize($credentialRecord, 'json');

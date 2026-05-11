@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Http\Cookies;
 
+use DateTimeInterface;
 use Psr\Http\Message\UriInterface;
 
 trait CookieString
@@ -12,7 +13,7 @@ trait CookieString
         string $name,
         string $value,
         UriInterface $url,
-        ?\DateTimeInterface $expiresAt = null,
+        ?DateTimeInterface $expiresAt = null,
         bool $httpOnly = true,
         SameSite $sameSite = SameSite::Lax,
     ): string {

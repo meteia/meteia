@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Logging;
 
+use DateTime;
 use Meteia\ValueObjects\Identity\CorrelationId;
+use Override;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 
@@ -33,7 +35,7 @@ class RFC5424Formatted extends AbstractLogger
         $this->procId = CorrelationId::random();
     }
 
-    #[\Override]
+    #[Override]
     public function log($level, $message, array $context = []): void
     {
         $formatted = $this->formated($level, $message, $context);
@@ -48,7 +50,7 @@ class RFC5424Formatted extends AbstractLogger
             // <PRI>VERSION
             "<{$priority}>1",
             // TIMESTAMP
-            date(\DateTime::ATOM),
+            date(DateTime::ATOM),
             // HOSTNAME
             gethostname() ?? '-',
             // APP-NAME

@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Errors;
 
-class PropertyNotFound extends \Exception {}
+use Exception;
+
+class PropertyNotFound extends Exception {}

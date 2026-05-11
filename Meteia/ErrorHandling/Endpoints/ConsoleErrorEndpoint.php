@@ -7,8 +7,10 @@ namespace Meteia\ErrorHandling\Endpoints;
 use Meteia\ErrorHandling\StackTraces\Frames;
 use Meteia\ErrorHandling\StackTraces\Line;
 use Nyholm\Psr7\Response;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 class ConsoleErrorEndpoint implements ErrorEndpoint
 {
@@ -16,8 +18,8 @@ class ConsoleErrorEndpoint implements ErrorEndpoint
         private readonly Frames $frames,
     ) {}
 
-    #[\Override]
-    public function response(\Throwable $throwable, ServerRequestInterface $request): ResponseInterface
+    #[Override]
+    public function response(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         $output = sprintf('fatal error: %s %s', $throwable::class, $throwable->getMessage()) . PHP_EOL . PHP_EOL;
         $output .= 'stack backtrace (oldest first)' . PHP_EOL;

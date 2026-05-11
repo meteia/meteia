@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Cryptography\Errors;
 
-class DecryptionFailed extends \Exception {}
+use Exception;
+
+class DecryptionFailed extends Exception {}

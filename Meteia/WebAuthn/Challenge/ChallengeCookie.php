@@ -10,6 +10,9 @@ use Meteia\Http\Cookies\RequestCookies;
 use Meteia\Http\Cookies\SealedCookie;
 use Meteia\WebAuthn\Configuration\WebAuthnSecretKey;
 use Meteia\WebAuthn\Errors\InvalidWebAuthnChallenge;
+use RuntimeException;
+use SodiumException;
+use Throwable;
 
 readonly class ChallengeCookie
 {
@@ -23,7 +26,7 @@ readonly class ChallengeCookie
         $expiresAt = time() + $secondsValid;
         try {
             $encoded = sodium_bin2base64($challengeBytes, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
-        } catch (\SodiumException $e) {
+        } catch (SodiumException $e) {
             throw new InvalidWebAuthnChallenge('Failed to encode challenge', previous: $e);
         }
         $payload = $expiresAt . '|' . $encoded;
@@ -36,13 +39,13 @@ readonly class ChallengeCookie
     {
         try {
             $sealed = $cookies->sealed($purpose->cookieName());
-        } catch (\RuntimeException) {
+        } catch (RuntimeException) {
             throw new InvalidWebAuthnChallenge('Challenge cookie missing');
         }
 
         try {
             $opened = $sealed->open($this->XChaCha20Poly1305, $this->secretKey);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             throw new InvalidWebAuthnChallenge('Challenge cookie invalid');
         }
 
@@ -62,7 +65,7 @@ readonly class ChallengeCookie
 
         try {
             return sodium_base642bin($encodedChallenge, SODIUM_BASE64_VARIANT_URLSAFE_NO_PADDING);
-        } catch (\SodiumException) {
+        } catch (SodiumException) {
             throw new InvalidWebAuthnChallenge('Challenge cookie payload invalid');
         }
     }

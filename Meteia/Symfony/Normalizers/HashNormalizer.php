@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Meteia\Symfony\Normalizers;
 
 use Meteia\Cryptography\Hash;
+use Override;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class HashNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    #[\Override]
+    #[Override]
     public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         \assert($object instanceof Hash);
@@ -19,13 +20,13 @@ class HashNormalizer implements NormalizerInterface, DenormalizerInterface
         return $object->hex();
     }
 
-    #[\Override]
+    #[Override]
     public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Hash;
     }
 
-    #[\Override]
+    #[Override]
     public function getSupportedTypes(?string $format): array
     {
         return [
@@ -33,13 +34,13 @@ class HashNormalizer implements NormalizerInterface, DenormalizerInterface
         ];
     }
 
-    #[\Override]
+    #[Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Hash
     {
         return new Hash($data);
     }
 
-    #[\Override]
+    #[Override]
     public function supportsDenormalization(
         mixed $data,
         string $type,

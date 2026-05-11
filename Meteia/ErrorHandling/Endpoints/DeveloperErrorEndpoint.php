@@ -8,8 +8,10 @@ use Meteia\ErrorHandling\Templates\StackTrace;
 use Meteia\Html\Layout;
 use Meteia\Http\Responses\HtmlResponse;
 use Meteia\Http\Responses\JsonResponse;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 class DeveloperErrorEndpoint implements ErrorEndpoint
 {
@@ -18,8 +20,8 @@ class DeveloperErrorEndpoint implements ErrorEndpoint
         private Layout $layout,
     ) {}
 
-    #[\Override]
-    public function response(\Throwable $throwable, ServerRequestInterface $request): ResponseInterface
+    #[Override]
+    public function response(Throwable $throwable, ServerRequestInterface $request): ResponseInterface
     {
         if (str_contains($request->getHeaderLine('Accept'), 'application/json')) {
             return new JsonResponse([

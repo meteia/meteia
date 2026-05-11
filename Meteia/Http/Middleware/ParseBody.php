@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Http\Middleware;
 
+use JsonException;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -11,7 +13,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ParseBody implements MiddlewareInterface
 {
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $isJsonBody = array_any($request->getHeader('Content-Type'), static fn($ct) => str_contains(
@@ -27,7 +29,7 @@ class ParseBody implements MiddlewareInterface
             try {
                 $json = json_decode($contents, true, 256, JSON_THROW_ON_ERROR);
                 $request = $request->withParsedBody($json);
-            } catch (\JsonException) {
+            } catch (JsonException) {
                 // Ignore JSON parse errors
             }
         }

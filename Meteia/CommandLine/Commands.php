@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace Meteia\CommandLine;
 
+use Exception;
+use Generator;
+use IteratorAggregate;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Classy\ClassesImplementing;
 use Meteia\Classy\PsrClasses;
 use Meteia\DependencyInjection\Container;
 use Meteia\ErrorHandling\Endpoints\ConsoleErrorEndpoint;
+use Override;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 use function Meteia\Http\Functions\send;
 
-final readonly class Commands implements \IteratorAggregate
+final readonly class Commands implements IteratorAggregate
 {
     public function __construct(
         private Container $container,
@@ -24,8 +30,8 @@ final readonly class Commands implements \IteratorAggregate
         private ApplicationPath $applicationPath,
     ) {}
 
-    #[\Override]
-    public function getIterator(): \Generator
+    #[Override]
+    public function getIterator(): Generator
     {
         $classes = new PsrClasses(
             $this->applicationPath,
@@ -35,7 +41,7 @@ final readonly class Commands implements \IteratorAggregate
         $commandClassnames = new ClassesImplementing($classes, Command::class);
         foreach ($commandClassnames as $commandClassname) {
             $commandName = $this->commandName($commandClassname);
-            $command = new \Symfony\Component\Console\Command\Command($commandName);
+            $command = new SymfonyCommand($commandName);
             $command->setDefinition($commandClassname::inputDefinition());
             $command->setDescription($commandClassname::description());
             $command->setCode(function (InputInterface $input, OutputInterface $output) use ($commandClassname): void {
@@ -44,11 +50,11 @@ final readonly class Commands implements \IteratorAggregate
                     $this->container->set(OutputInterface::class, $output);
                     $command = $this->container->get($commandClassname);
                     if (!method_exists($command, 'execute')) {
-                        throw new \Exception('Command is missing required execute() method');
+                        throw new Exception('Command is missing required execute() method');
                     }
                     $this->container->call([$command, 'execute']);
-                } catch (\Throwable $throwable) {
-                    $this->container->set(\Throwable::class, $throwable);
+                } catch (Throwable $throwable) {
+                    $this->container->set(Throwable::class, $throwable);
                     $errorEndpoint = $this->container->get(ConsoleErrorEndpoint::class);
 
                     /** @var ResponseInterface $response */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Application;
 
 use Meteia\Application\Exceptions\UnknownCommandEndpoint;
+use Override;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,7 +21,7 @@ final class InProcessCommandBusTest extends TestCase
                 private readonly CommandEndpoint $endpoint,
             ) {}
 
-            #[\Override]
+            #[Override]
             public function endpointFor(string $commandClass): CommandEndpoint
             {
                 return $this->endpoint;
@@ -37,7 +38,7 @@ final class InProcessCommandBusTest extends TestCase
     public function testDispatchPropagatesEndpointResolutionErrors(): void
     {
         $registry = new class implements CommandEndpointRegistry {
-            #[\Override]
+            #[Override]
             public function endpointFor(string $commandClass): CommandEndpoint
             {
                 throw new UnknownCommandEndpoint($commandClass);
@@ -63,7 +64,7 @@ final class RecordingEndpoint implements CommandEndpoint
     /** @var list<Command> */
     public array $received = [];
 
-    #[\Override]
+    #[Override]
     public function handle(Command $command): CommandResult
     {
         $this->received[] = $command;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
+use Override;
+
 class ClassVarianceAuthority implements ClassName
 {
     /**
@@ -19,7 +21,7 @@ class ClassVarianceAuthority implements ClassName
         private readonly array $defaultVariants = [],
     ) {}
 
-    #[\Override]
+    #[Override]
     public function use(array $props): ClassList
     {
         $props = array_merge($this->defaultVariants, $props);
@@ -43,7 +45,7 @@ class ClassVarianceAuthority implements ClassName
         return $list;
     }
 
-    #[\Override]
+    #[Override]
     public function attribute(array $props): ClassAttribute
     {
         return new ClassAttribute($this->use($props));

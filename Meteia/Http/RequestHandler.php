@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Http;
 
+use Exception;
 use Meteia\DependencyInjection\Container;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -26,7 +28,7 @@ final class RequestHandler implements RequestHandlerInterface, MiddlewareInterfa
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->process($request, $this);
@@ -39,13 +41,13 @@ final class RequestHandler implements RequestHandlerInterface, MiddlewareInterfa
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         /** @var MiddlewareInterface $middleware */
         $middleware = array_shift($this->middleware);
         if ($middleware === null) {
-            throw new \Exception('Request was not handled by any middleware');
+            throw new Exception('Request was not handled by any middleware');
         }
         if (\is_string($middleware)) {
             $middleware = $this->container->get($middleware);

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\ErrorHandling\ErrorClassifications;
 
+use Override;
+
 class StrictErrorClassification implements ErrorClassification
 {
-    #[\Override]
+    #[Override]
     public function isFatal(int $errorConstant): bool
     {
         return true;

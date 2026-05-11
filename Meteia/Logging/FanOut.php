@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Logging;
 
+use Override;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 
@@ -13,7 +14,7 @@ class FanOut extends AbstractLogger
         private array $logs,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function log($level, $message, array $context = []): void
     {
         /** @var LoggerInterface $log */

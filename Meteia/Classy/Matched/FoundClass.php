@@ -6,6 +6,7 @@ namespace Meteia\Classy\Matched;
 
 use Meteia\Classy\MatchedClass;
 use Meteia\DependencyInjection\Container;
+use Override;
 
 final readonly class FoundClass implements MatchedClass
 {
@@ -13,7 +14,7 @@ final readonly class FoundClass implements MatchedClass
         private string $className,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function resolveIn(Container $container): object
     {
         $instance = $container->get($this->className);

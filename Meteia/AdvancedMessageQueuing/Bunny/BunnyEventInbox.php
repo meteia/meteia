@@ -15,8 +15,10 @@ use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
+use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Throwable;
 
 final readonly class BunnyEventInbox implements EventInbox
 {
@@ -27,7 +29,7 @@ final readonly class BunnyEventInbox implements EventInbox
         private AmbientMessageScopeSource $scopeSource,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function subscribe(string $eventClassName, string $sinkClassName, EventSink $sink): void
     {
         $channel = $this->loop->channel();
@@ -63,14 +65,14 @@ final readonly class BunnyEventInbox implements EventInbox
                     $sink->drain($event, $scope);
                 });
                 $channel->ack($message);
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), ['queueName' => $queueName]);
             }
         }, $queueName);
     }
 
-    #[\Override]
+    #[Override]
     public function run(): void
     {
         $this->loop->runUntilShutdown('EventWorkers.Shutdown');

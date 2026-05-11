@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\DependencyInjection;
 
+use DateTime;
 use Meteia\DependencyInjection\Fixtures\ClassWithoutConstructor;
 use Meteia\DependencyInjection\Fixtures\Definitions;
 use Meteia\DependencyInjection\Fixtures\FactoryOutput;
@@ -29,7 +30,7 @@ final class ReflectionContainerTest extends TestCase
         $container = new ReflectionContainer(Definitions::get());
         self::assertSame('', $container->get(InnerDependency::class)->option);
 
-        $input = new InnerDependency(new \DateTime(), 'testing');
+        $input = new InnerDependency(new DateTime(), 'testing');
         $container->set(InnerDependency::class, $input);
         self::assertSame('testing', $container->get(InnerDependency::class)->option);
     }
@@ -39,7 +40,7 @@ final class ReflectionContainerTest extends TestCase
         $container = new ReflectionContainer(Definitions::get());
         self::assertSame('', $container->get(InnerDependency::class)->option);
 
-        $container->set(InnerDependency::class, static fn() => new InnerDependency(new \DateTime(), 'testing'));
+        $container->set(InnerDependency::class, static fn() => new InnerDependency(new DateTime(), 'testing'));
         self::assertSame('testing', $container->get(InnerDependency::class)->option);
     }
 

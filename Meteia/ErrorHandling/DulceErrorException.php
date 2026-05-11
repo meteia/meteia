@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\ErrorHandling;
 
-class DulceErrorException extends \ErrorException {}
+use ErrorException;
+
+class DulceErrorException extends ErrorException {}

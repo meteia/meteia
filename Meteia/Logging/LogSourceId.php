@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Meteia\Logging;
 
 use Meteia\ValueObjects\Identity\UniqueId;
+use Override;
 
 readonly class LogSourceId extends UniqueId
 {
-    #[\Override]
+    #[Override]
     public static function prefix(): string
     {
         return 'log';

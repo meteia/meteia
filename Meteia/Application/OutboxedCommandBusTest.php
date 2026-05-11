@@ -6,6 +6,7 @@ namespace Meteia\Application;
 
 use Meteia\Commands\Command as TransportCommand;
 use Meteia\Commands\CommandOutbox;
+use Override;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -54,7 +55,7 @@ final class RecordingCommandOutbox implements CommandOutbox
     /** @var list<TransportCommand> */
     public array $published = [];
 
-    #[\Override]
+    #[Override]
     public function publish(TransportCommand $command): void
     {
         $this->published[] = $command;

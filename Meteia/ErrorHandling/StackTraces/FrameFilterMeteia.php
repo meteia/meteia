@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\ErrorHandling\StackTraces;
 
+use Override;
+
 class FrameFilterMeteia implements FrameFilter
 {
-    #[\Override]
+    #[Override]
     public function filter(array $frame): bool
     {
         if (!isset($frame['file'])) {

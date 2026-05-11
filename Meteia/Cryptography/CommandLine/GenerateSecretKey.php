@@ -6,6 +6,7 @@ namespace Meteia\Cryptography\CommandLine;
 
 use Meteia\CommandLine\Command;
 use Meteia\Cryptography\SecretKey;
+use Override;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -15,20 +16,20 @@ class GenerateSecretKey implements Command
         private readonly OutputInterface $output,
     ) {}
 
-    #[\Override]
+    #[Override]
     public static function description(): string
     {
         return 'Generate a secret key';
     }
 
-    #[\Override]
+    #[Override]
     public function execute(): void
     {
         $sk = new SecretKey(random_bytes(32));
         $this->output->writeln((string) $sk);
     }
 
-    #[\Override]
+    #[Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition();

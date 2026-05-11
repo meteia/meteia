@@ -6,6 +6,8 @@ namespace Meteia\Html;
 
 use Meteia\Html\Elements\Link;
 use Meteia\Resources\ResourceBaseUri;
+use Override;
+use Stringable;
 
 final class Stylesheets implements Component
 {
@@ -16,7 +18,7 @@ final class Stylesheets implements Component
         private readonly ResourceBaseUri $resourceBaseUri,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return Children::of(...array_values($this->stylesheets));
@@ -40,7 +42,7 @@ final class Stylesheets implements Component
         );
     }
 
-    public function load(string|\Stringable $href, ?string $integrity = null, ?string $crossorigin = null): void
+    public function load(string|Stringable $href, ?string $integrity = null, ?string $crossorigin = null): void
     {
         $href = $this->normalize((string) $href);
         $this->stylesheets[$href] = new Link('stylesheet', $href, $integrity, $crossorigin);

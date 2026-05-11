@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Meteia\Database;
 
 use Aura\Sql\ExtendedPdo;
+use InvalidArgumentException;
+use Override;
 
 final class Database extends ExtendedPdo implements DatabaseTables, MigrationDatabase
 {
-    #[\Override]
+    #[Override]
     public function delete(string $table, array $whereBindings): void
     {
         if (\count($whereBindings) === 0) {
-            throw new \InvalidArgumentException('Missing where bindings for delete');
+            throw new InvalidArgumentException('Missing where bindings for delete');
         }
 
         $where = new SqlBoundColumns($whereBindings, 'where');
@@ -20,11 +22,11 @@ final class Database extends ExtendedPdo implements DatabaseTables, MigrationDat
         $this->perform($query, $this->prepareBindings($where->bindings()));
     }
 
-    #[\Override]
+    #[Override]
     public function insert(string $table, array $bindings): void
     {
         if (\count($bindings) === 0) {
-            throw new \InvalidArgumentException('Missing bindings for insert');
+            throw new InvalidArgumentException('Missing bindings for insert');
         }
 
         $insert = new SqlBoundColumns($bindings, 'insert');
@@ -37,17 +39,17 @@ final class Database extends ExtendedPdo implements DatabaseTables, MigrationDat
         $this->perform($query, $this->prepareBindings($insert->bindings()));
     }
 
-    #[\Override]
+    #[Override]
     public function prepareBindings(array $values): array
     {
         return array_map(static fn(mixed $value): mixed => new SqlValue($value)->bound(), $values);
     }
 
-    #[\Override]
+    #[Override]
     public function select(string $table, array $whereBindings): array
     {
         if (\count($whereBindings) === 0) {
-            throw new \InvalidArgumentException('Missing where bindings for select');
+            throw new InvalidArgumentException('Missing where bindings for select');
         }
 
         $where = new SqlBoundColumns($whereBindings, 'where');
@@ -56,11 +58,11 @@ final class Database extends ExtendedPdo implements DatabaseTables, MigrationDat
         return $this->fetchObjects($query, $this->prepareBindings($where->bindings()));
     }
 
-    #[\Override]
+    #[Override]
     public function update(string $table, array $setBindings, array $whereBindings): void
     {
         if (\count($setBindings) === 0 || \count($whereBindings) === 0) {
-            throw new \InvalidArgumentException('Missing set and/or where bindings for update');
+            throw new InvalidArgumentException('Missing set and/or where bindings for update');
         }
 
         $set = new SqlBoundColumns($setBindings, 'set');
@@ -74,11 +76,11 @@ final class Database extends ExtendedPdo implements DatabaseTables, MigrationDat
         $this->fetchAffected($query, $this->prepareBindings([...$set->bindings(), ...$where->bindings()]));
     }
 
-    #[\Override]
+    #[Override]
     public function upsert(string $table, array $setBindings, array $whereBindings): void
     {
         if (\count($setBindings) === 0 && \count($whereBindings) === 0) {
-            throw new \InvalidArgumentException('Missing bindings for upsert');
+            throw new InvalidArgumentException('Missing bindings for upsert');
         }
 
         $insertBindings = [...$setBindings, ...$whereBindings];

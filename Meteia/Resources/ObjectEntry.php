@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Resources;
 
+use Override;
+
 final readonly class ObjectEntry implements EntryTarget
 {
     public function __construct(
@@ -11,7 +13,7 @@ final readonly class ObjectEntry implements EntryTarget
         private bool $isReact = false,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function path(): string
     {
         $name = str_replace('\\', '/', $this->target::class);

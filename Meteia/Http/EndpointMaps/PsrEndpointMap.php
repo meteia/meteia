@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Meteia\Http\EndpointMaps;
 
+use Exception;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Http\Endpoint;
 use Meteia\Http\EndpointMap;
 use Meteia\Http\Host;
 use Meteia\Library\StringCase;
 use Meteia\ValueObjects\Identity\Uri;
+use Override;
 
 class PsrEndpointMap implements EndpointMap
 {
@@ -18,7 +20,7 @@ class PsrEndpointMap implements EndpointMap
         private readonly Host $host,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function classNameFor(string $path): string
     {
         $parts = array_values(array_filter(explode('/', $path)));
@@ -29,11 +31,11 @@ class PsrEndpointMap implements EndpointMap
         return implode('\\', $parts);
     }
 
-    #[\Override]
+    #[Override]
     public function path(string $endpoint): string
     {
         if (!is_subclass_of($endpoint, Endpoint::class)) {
-            throw new \Exception('Invalid Endpoint');
+            throw new Exception('Invalid Endpoint');
         }
         $parts = explode('\\', $endpoint);
         array_shift($parts);
@@ -51,7 +53,7 @@ class PsrEndpointMap implements EndpointMap
         return mb_strtolower($path);
     }
 
-    #[\Override]
+    #[Override]
     public function uri(string $endpoint): Uri
     {
         return $this->host->withPath($this->path($endpoint));

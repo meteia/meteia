@@ -6,6 +6,8 @@ namespace Meteia\Html\Elements;
 
 use Meteia\Html\Component;
 use Meteia\Html\Node;
+use Override;
+use Stringable;
 
 final readonly class Button implements Component
 {
@@ -14,10 +16,10 @@ final readonly class Button implements Component
      */
     public function __construct(
         public array $attributes = [],
-        public null|string|\Stringable|Component $children = null,
+        public null|string|Stringable|Component $children = null,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return el('button', $this->attributes, $this->children ?? '');

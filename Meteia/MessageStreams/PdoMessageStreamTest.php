@@ -12,6 +12,7 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
 use Meteia\ValueObjects\Identity\UniqueId;
+use Override;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -41,13 +42,13 @@ final class PdoMessageStreamTest extends TestCase
         return new class extends MessageSerializer {
             public function __construct() {}
 
-            #[\Override]
+            #[Override]
             public function serialize(mixed $value): string
             {
                 return base64_encode(serialize($value));
             }
 
-            #[\Override]
+            #[Override]
             public function unserialize(string $value): mixed
             {
                 return unserialize(base64_decode($value, true), ['allowed_classes' => true]);
@@ -80,7 +81,7 @@ final class PdoMessageStreamTest extends TestCase
  */
 final readonly class StubStreamId extends UniqueId
 {
-    #[\Override]
+    #[Override]
     public static function prefix(): string
     {
         return 'msg';

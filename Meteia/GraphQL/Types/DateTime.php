@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL\Types;
 
+use DateTimeZone;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
+use Override;
 
 class DateTime extends ScalarType implements Resolver
 {
@@ -22,15 +24,15 @@ class DateTime extends ScalarType implements Resolver
         ];
     }
 
-    #[\Override]
+    #[Override]
     public function data($root, array $args, RequestContext $requestContext): string
     {
-        $date = new \DateTime($root, new \DateTimeZone('UTC'));
+        $date = new \DateTime($root, new DateTimeZone('UTC'));
 
         return $date->format($args['format']);
     }
 
-    #[\Override]
+    #[Override]
     public function parseLiteral($valueNode, ?array $variables = null)
     {
         if ($valueNode instanceof StringValueNode) {
@@ -40,15 +42,15 @@ class DateTime extends ScalarType implements Resolver
         return null;
     }
 
-    #[\Override]
+    #[Override]
     public function parseValue($value)
     {
-        $date = new \DateTime($value, new \DateTimeZone('UTC'));
+        $date = new \DateTime($value, new DateTimeZone('UTC'));
 
         return $date->format(\DateTime::ATOM);
     }
 
-    #[\Override]
+    #[Override]
     public function serialize($value)
     {
         return $value;

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use InvalidArgumentException;
 use Meteia\Domain\Contracts\TypedData;
 use Meteia\ValueObjects\Money\PreciseUsd;
+use Override;
 
 use function Meteia\Library\ArrayUtils\collection_to_array;
 
@@ -21,13 +23,13 @@ class TypedDataArray implements TypedData
         $this->data = collection_to_array($data);
     }
 
-    #[\Override]
+    #[Override]
     public function array(string $name, array $default): array
     {
         return (array) array_get($this->data, $name, $default);
     }
 
-    #[\Override]
+    #[Override]
     public function boolean(string $name, bool $default): bool
     {
         $value = array_get($this->data, $name, $default);
@@ -35,43 +37,43 @@ class TypedDataArray implements TypedData
         return \in_array($value, self::BOOL_VALUES, true);
     }
 
-    #[\Override]
+    #[Override]
     public function booleanOrThrow(string $name): bool
     {
         return \in_array($this->getOrThrow($name), self::BOOL_VALUES, true);
     }
 
-    #[\Override]
+    #[Override]
     public function float(string $name, float $default): float
     {
         return (float) array_get($this->data, $name, $default);
     }
 
-    #[\Override]
+    #[Override]
     public function floatOrThrow(string $name): float
     {
         return (float) $this->getOrThrow($name);
     }
 
-    #[\Override]
+    #[Override]
     public function int(string $name, int $default): int
     {
         return (int) array_get($this->data, $name, $default);
     }
 
-    #[\Override]
+    #[Override]
     public function intOrThrow(string $name): int
     {
         return (int) $this->getOrThrow($name);
     }
 
-    #[\Override]
+    #[Override]
     public function string(string $name, string $default): string
     {
         return (string) array_get($this->data, $name, $default);
     }
 
-    #[\Override]
+    #[Override]
     public function stringOrThrow(string $name): string
     {
         return (string) $this->getOrThrow($name);
@@ -93,7 +95,7 @@ class TypedDataArray implements TypedData
     {
         $value = array_get($this->data, $name, self::NOT_FOUND);
         if ($value === self::NOT_FOUND) {
-            throw new \InvalidArgumentException();
+            throw new InvalidArgumentException();
         }
 
         return $value;

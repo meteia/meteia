@@ -10,6 +10,7 @@ use GraphQL\Type\Definition\LeafType;
 use GraphQL\Type\Definition\OutputType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\Utils;
+use Override;
 
 /**
  * TODO: Where do i have a use for this?
@@ -43,7 +44,7 @@ class NullType extends Type implements OutputType, LeafType
     /**
      * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input.
      */
-    #[\Override]
+    #[Override]
     public function parseLiteral(Node $valueNode, ?array $variables = null)
     {
         return null;
@@ -54,13 +55,13 @@ class NullType extends Type implements OutputType, LeafType
      *
      * @param mixed $value
      */
-    #[\Override]
+    #[Override]
     public function parseValue($value)
     {
         return null;
     }
 
-    #[\Override]
+    #[Override]
     public function serialize($value)
     {
         return $value;

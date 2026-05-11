@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Classy;
 
+use Override;
+use Traversable;
+
 final readonly class ClassesImplementing implements Classes
 {
     public function __construct(
@@ -11,8 +14,8 @@ final readonly class ClassesImplementing implements Classes
         private string $implementing,
     ) {}
 
-    #[\Override]
-    public function getIterator(): \Traversable
+    #[Override]
+    public function getIterator(): Traversable
     {
         foreach ($this->classes as $class) {
             if (!is_subclass_of($class, $this->implementing)) {

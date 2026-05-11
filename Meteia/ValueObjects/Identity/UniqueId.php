@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Identity;
 
+use Exception;
 use Meteia\ValueObjects\Contracts\Identifier;
+use Override;
+use SensitiveParameter;
 use Tuupola\Base62;
 
 abstract readonly class UniqueId implements Identifier
@@ -39,7 +42,7 @@ abstract readonly class UniqueId implements Identifier
         return $this->token;
     }
 
-    #[\Override]
+    #[Override]
     public function __toString(): string
     {
         return $this->token;
@@ -53,7 +56,7 @@ abstract readonly class UniqueId implements Identifier
         return new static($data);
     }
 
-    public static function fromToken(#[\SensitiveParameter] string $token): static
+    public static function fromToken(#[SensitiveParameter] string $token): static
     {
         // Discard any additional data on the token (e.g. a selector).
         [$prefix, $token] = explode('_', $token, 3);
@@ -77,19 +80,19 @@ abstract readonly class UniqueId implements Identifier
     public function randomBytes(int $len): string
     {
         if (static::LEN_RANDOM < $len) {
-            throw new \Exception('Insufficient random data in underlying data');
+            throw new Exception('Insufficient random data in underlying data');
         }
 
         return substr($this->bytes, -$len);
     }
 
-    #[\Override]
+    #[Override]
     public function hex(): string
     {
         return bin2hex($this->bytes);
     }
 
-    #[\Override]
+    #[Override]
     public function hash(): string
     {
         return implode('_', [
@@ -99,13 +102,13 @@ abstract readonly class UniqueId implements Identifier
         ]);
     }
 
-    #[\Override]
+    #[Override]
     public function binaryHash(): string
     {
         return hash('sha256', $this->bytes, true);
     }
 
-    #[\Override]
+    #[Override]
     public function jsonSerialize(): string
     {
         return $this->token;

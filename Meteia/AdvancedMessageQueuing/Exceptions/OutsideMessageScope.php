@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\AdvancedMessageQueuing\Exceptions;
 
-final class OutsideMessageScope extends \RuntimeException
+use RuntimeException;
+
+final class OutsideMessageScope extends RuntimeException
 {
     public function __construct()
     {

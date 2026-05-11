@@ -9,6 +9,7 @@ use Meteia\Html\Metadata;
 use Meteia\Html\Node;
 use Meteia\Html\Scripts;
 use Meteia\Html\Stylesheets;
+use Override;
 
 final class Head implements Component
 {
@@ -43,7 +44,7 @@ final class Head implements Component
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return el('head', [], $this->title, $this->metadata, $this->scripts, $this->stylesheets);

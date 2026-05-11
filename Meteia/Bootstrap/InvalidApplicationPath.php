@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Bootstrap;
 
-final class InvalidApplicationPath extends \DomainException
+use DomainException;
+
+final class InvalidApplicationPath extends DomainException
 {
     public function __construct(string $path)
     {

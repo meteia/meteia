@@ -11,6 +11,8 @@ use Meteia\GraphQL\ClientAwareErrors\InvalidScalarValue;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\ValueObjects\Identity\UniqueId;
+use Override;
+use Throwable;
 
 class UniqueIdType extends ScalarType implements Resolver
 {
@@ -28,13 +30,13 @@ class UniqueIdType extends ScalarType implements Resolver
         ]);
     }
 
-    #[\Override]
+    #[Override]
     public function parseLiteral($valueNode, ?array $variables = null)
     {
         if ($valueNode instanceof StringValueNode) {
             try {
                 return $this->uniqueIdClass::fromToken($valueNode->value);
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 throw new InvalidScalarValue($t->getMessage());
             }
         }
@@ -42,7 +44,7 @@ class UniqueIdType extends ScalarType implements Resolver
         return null;
     }
 
-    #[\Override]
+    #[Override]
     public function parseValue($value)
     {
         if ($value instanceof $this->uniqueIdClass) {
@@ -51,18 +53,18 @@ class UniqueIdType extends ScalarType implements Resolver
 
         try {
             return $this->uniqueIdClass::fromToken($value);
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             throw new InvalidScalarValue($t->getMessage());
         }
     }
 
-    #[\Override]
+    #[Override]
     public function serialize($value)
     {
         return (string) $value;
     }
 
-    #[\Override]
+    #[Override]
     public function data($root, array $args, RequestContext $requestContext): mixed
     {
         if (isset($root->id) && $root->id instanceof $this->uniqueIdClass) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\EventSourcing;
 
+use Exception;
 use Meteia\Commands\Command;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
@@ -11,6 +12,7 @@ use Meteia\Domain\PendingCommand;
 use Meteia\Domain\PendingCommands;
 use Meteia\ValueObjects\AggregateRootId;
 use Meteia\ValueObjects\Identity\UniqueId;
+use ReflectionClass;
 
 trait EventSourcing
 {
@@ -47,13 +49,13 @@ trait EventSourcing
     public function handleEventMessage(UniqueId $streamId, DomainEvent $event, int $eventSequence): void
     {
         if ($eventSequence <= $this->__eventSequence) {
-            throw new \Exception('Event version is older than the aggregates version.');
+            throw new Exception('Event version is older than the aggregates version.');
         }
         $this->__eventSequence = $eventSequence;
 
         $eventName = substr($event::class, strrpos($event::class, '\\') + 1);
         $method = $eventName;
-        $rc = new \ReflectionClass($this);
+        $rc = new ReflectionClass($this);
         $meth = $rc->getMethod($method);
         $args = [];
         foreach ($meth->getParameters() as $parameter) {
@@ -66,7 +68,7 @@ trait EventSourcing
                     $meth->name,
                 );
 
-                throw new \Exception($err);
+                throw new Exception($err);
             }
             $args[$parameter->getPosition()] = $event->{$parameter->name};
         }
@@ -83,7 +85,7 @@ trait EventSourcing
             $method = substr($eventName, $trimMethodFrom + \strlen($aggName));
             $method = lcfirst($method);
         }
-        $rc = new \ReflectionClass($this);
+        $rc = new ReflectionClass($this);
         $meth = $rc->getMethod($method);
         $args = [];
         foreach ($meth->getParameters() as $parameter) {
@@ -96,7 +98,7 @@ trait EventSourcing
                     $meth->name,
                 );
 
-                throw new \Exception($err);
+                throw new Exception($err);
             }
             $args[$parameter->getPosition()] = $command->{$parameter->name};
         }
@@ -105,15 +107,15 @@ trait EventSourcing
 
     public function aggregateRootId(): AggregateRootId
     {
-        $re = new \ReflectionClass($this);
+        $re = new ReflectionClass($this);
         $firstParam = $re->getConstructor()->getParameters()[0];
         $type = (string) $firstParam->getType();
         if (!is_subclass_of($type, AggregateRootId::class)) {
-            throw new \Exception('First param must be an AggregateRootId');
+            throw new Exception('First param must be an AggregateRootId');
         }
         $name = $firstParam->getName();
 
-        return $this->{$name} ?? throw new \Exception("{$name} must be a property on " . $this::class);
+        return $this->{$name} ?? throw new Exception("{$name} must be a property on " . $this::class);
     }
 
     private function streamId(): StreamId

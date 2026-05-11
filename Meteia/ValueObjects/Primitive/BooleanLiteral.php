@@ -6,6 +6,7 @@ namespace Meteia\ValueObjects\Primitive;
 
 use Meteia\Domain\Contracts\Comparable;
 use Meteia\ValueObjects\PrimitiveValueObject;
+use Override;
 
 abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
 {
@@ -19,13 +20,13 @@ abstract class BooleanLiteral extends PrimitiveValueObject implements Comparable
         return $this->isTrue() ? 'TRUE' : 'FALSE';
     }
 
-    #[\Override]
+    #[Override]
     public function compareTo(Comparable $other)
     {
         return $this->toNative() <=> $other->toNative();
     }
 
-    #[\Override]
+    #[Override]
     public function jsonSerialize()
     {
         return $this->isTrue();

@@ -6,12 +6,13 @@ namespace Meteia\Http\Cookies;
 
 use Meteia\Cryptography\SecretKey;
 use Meteia\Cryptography\SecretKey\XChaCha20Poly1305;
+use SensitiveParameter;
 
 readonly class SealedCookie extends PlaintextCookie
 {
     use CookieString;
 
-    public function open(XChaCha20Poly1305 $XChaCha20Poly1305, #[\SensitiveParameter] SecretKey $secret): OpenedCookie
+    public function open(XChaCha20Poly1305 $XChaCha20Poly1305, #[SensitiveParameter] SecretKey $secret): OpenedCookie
     {
         [$ciphertext, $associatedData] = explode('_', $this->value, 2);
         $ad = implode('_', array_filter([$this->name, $associatedData]));

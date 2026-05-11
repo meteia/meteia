@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\DependencyInjection;
 
+use Exception;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 use PhpSpec\ObjectBehavior;
 
@@ -21,6 +22,6 @@ class DefinitionsSpec extends ObjectBehavior
     public function it_throws_on_invalid_definitions(): void
     {
         $examples = new FilesystemPath(__DIR__, 'Stubs', 'Invalid', '*', 'DependencyInjection.php');
-        $this->shouldThrow(\Exception::class)->during('glob', [$examples]);
+        $this->shouldThrow(Exception::class)->during('glob', [$examples]);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\EventSourcing;
 
 use Aura\Sql\ExtendedPdoInterface;
+use DateTimeImmutable;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\EventSourcing\Contracts\GlobalEventStream;
 use Meteia\MessageStreams\MessageSerializer;
@@ -13,6 +14,8 @@ use Meteia\Projections\ProjectableEvent;
 use Meteia\Projections\ProjectableEvents;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
+use Override;
+use stdClass;
 
 final readonly class PdoGlobalEventStream implements GlobalEventStream
 {
@@ -21,7 +24,7 @@ final readonly class PdoGlobalEventStream implements GlobalEventStream
         private MessageSerializer $messageSerializer,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function readGlobally(GlobalSequence $after = new GlobalSequence(0)): ProjectableEvents
     {
         $rows = $this->db->fetchObjects('
@@ -32,7 +35,7 @@ final readonly class PdoGlobalEventStream implements GlobalEventStream
         ', ['lowerBound' => $after->asInt()]);
 
         $projectable = array_map(
-            fn(\stdClass $row): ProjectableEvent => new ProjectableEvent(
+            fn(stdClass $row): ProjectableEvent => new ProjectableEvent(
                 $this->hydrate($row),
                 new GlobalSequence((int) $row->id),
             ),
@@ -42,7 +45,7 @@ final readonly class PdoGlobalEventStream implements GlobalEventStream
         return new ProjectableEvents($projectable);
     }
 
-    private function hydrate(\stdClass $row): RecordedEvent
+    private function hydrate(stdClass $row): RecordedEvent
     {
         $streamId = new StreamId($row->aggregate_root_id);
         /** @var DomainEvent $event */
@@ -53,7 +56,7 @@ final readonly class PdoGlobalEventStream implements GlobalEventStream
             $pending,
             new CausationId($row->causation_id),
             new CorrelationId($row->correlation_id),
-            new \DateTimeImmutable((string) $row->created),
+            new DateTimeImmutable((string) $row->created),
         );
     }
 }

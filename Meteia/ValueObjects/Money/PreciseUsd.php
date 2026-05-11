@@ -7,6 +7,7 @@ namespace Meteia\ValueObjects\Money;
 use BCMathExtended\BC;
 use Meteia\ValueObjects\Contracts\Money\PreciseMoney;
 use Meteia\ValueObjects\Primitive\FloatLiteral;
+use Override;
 
 class PreciseUsd implements PreciseMoney
 {
@@ -25,7 +26,7 @@ class PreciseUsd implements PreciseMoney
         return $this->amount;
     }
 
-    #[\Override]
+    #[Override]
     public function round($precision = 2)
     {
         return new RoundedUsd(BC::round($this->amount, $precision));

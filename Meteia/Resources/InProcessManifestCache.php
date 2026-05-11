@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Meteia\Resources;
 
 use Meteia\ValueObjects\Contracts\Path;
+use Override;
 
 final class InProcessManifestCache implements ManifestCache
 {
     /** @var array<string, array<string, mixed>> */
     private array $cache = [];
 
-    #[\Override]
+    #[Override]
     public function entriesAt(Path $manifest): array
     {
         $key = (string) $manifest;

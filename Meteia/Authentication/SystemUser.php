@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Authentication;
 
+use Override;
+
 final readonly class SystemUser implements RequestingUser
 {
     public function __construct(
@@ -15,13 +17,13 @@ final readonly class SystemUser implements RequestingUser
         return $this->systemId;
     }
 
-    #[\Override]
+    #[Override]
     public function pick(mixed $whenAnonymous, mixed $whenAuthenticated): mixed
     {
         return $whenAuthenticated;
     }
 
-    #[\Override]
+    #[Override]
     public function fold(callable $whenAnonymous, callable $whenAuthenticated): mixed
     {
         return $whenAuthenticated($this->systemId);

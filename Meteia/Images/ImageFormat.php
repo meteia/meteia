@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Images;
 
+use Exception;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
 enum ImageFormat: string
@@ -25,7 +26,7 @@ enum ImageFormat: string
             'image/gif' => self::GIF,
             'image/webp' => self::WEBP,
             'image/avif' => self::AVIF,
-            default => throw new \Exception("Unsupported source image type {$mimeType}."),
+            default => throw new Exception("Unsupported source image type {$mimeType}."),
         };
     }
 
@@ -37,7 +38,7 @@ enum ImageFormat: string
             'gif' => self::GIF,
             'webp' => self::WEBP,
             'avif' => self::AVIF,
-            default => throw new \Exception("Unsupported file extension {$fileExtension}."),
+            default => throw new Exception("Unsupported file extension {$fileExtension}."),
         };
     }
 

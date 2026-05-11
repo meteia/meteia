@@ -13,7 +13,9 @@ use Meteia\Html\Scripts;
 use Meteia\Html\Stylesheets;
 use Meteia\Resources\ManifestSource;
 use Meteia\Resources\ResourceBaseUri;
+use Override;
 use PHPUnit\Framework\TestCase;
+use Stringable;
 
 /**
  * @internal
@@ -60,7 +62,7 @@ final class ViteManifestTest extends TestCase
     private function source(): ManifestSource
     {
         return new class implements ManifestSource {
-            #[\Override]
+            #[Override]
             public function entries(): array
             {
                 return [
@@ -85,19 +87,19 @@ final class ViteManifestTest extends TestCase
                 private readonly array $values,
             ) {}
 
-            #[\Override]
-            public function string(string $name, string|\Stringable $default): string
+            #[Override]
+            public function string(string $name, string|Stringable $default): string
             {
                 return $this->values[$name] ?? (string) $default;
             }
 
-            #[\Override]
+            #[Override]
             public function int(string $name, int $default): int
             {
                 return $default;
             }
 
-            #[\Override]
+            #[Override]
             public function boolean(string $name, bool $default): bool
             {
                 unset($name);
@@ -105,7 +107,7 @@ final class ViteManifestTest extends TestCase
                 return $default;
             }
 
-            #[\Override]
+            #[Override]
             public function float(string $name, float $default): float
             {
                 return $default;

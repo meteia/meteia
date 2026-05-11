@@ -16,6 +16,7 @@ use Meteia\Http\PsrResponseSink;
 use Meteia\Http\RequestHandler;
 use Meteia\Http\ResponseSink;
 use Meteia\Performance\Timings;
+use Override;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -28,7 +29,7 @@ final readonly class MeteiaKernel implements Kernel
         private ResponseSink $sink = new PsrResponseSink(),
     ) {}
 
-    #[\Override]
+    #[Override]
     public function run(MiddlewareList $middleware = new MiddlewareList()): void
     {
         $container = $this->container();
@@ -40,7 +41,7 @@ final readonly class MeteiaKernel implements Kernel
         $this->sink->send($response);
     }
 
-    #[\Override]
+    #[Override]
     public function container(array $definitions = []): Container
     {
         $timings = new Timings();
@@ -63,7 +64,7 @@ final readonly class MeteiaKernel implements Kernel
         return new TimedContainer($timings, $container);
     }
 
-    #[\Override]
+    #[Override]
     public function requestHandler(
         Container $container,
         MiddlewareList $middleware = new MiddlewareList(),

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Contracts;
 
+use Iterator;
 use Meteia\Cryptography\Hash;
 use Meteia\Cryptography\SecretKey;
 use Meteia\ValueObjects\Identity\Resource;
+use Stringable;
 
 interface Path extends Text
 {
@@ -26,7 +28,7 @@ interface Path extends Text
 
     public function realpath(): self;
 
-    public function join(string|\Stringable ...$paths): self;
+    public function join(string|Stringable ...$paths): self;
 
     public function read(): string;
 
@@ -35,9 +37,9 @@ interface Path extends Text
     /**
      * @return \Iterator<int, string>
      */
-    public function lines(int $start = 0, ?int $end = null): \Iterator;
+    public function lines(int $start = 0, ?int $end = null): Iterator;
 
-    public function find(string ...$regex): \Iterator;
+    public function find(string ...$regex): Iterator;
 
     public function hash(string $algo, ?SecretKey $hmacKey = null): Hash;
 

@@ -10,6 +10,7 @@ use Meteia\Html\Elements\Script;
 use Meteia\Resources\EntryTarget;
 use Meteia\Resources\ManifestSource;
 use Meteia\Resources\Resources;
+use Override;
 
 final readonly class ViteManifest implements Resources
 {
@@ -20,19 +21,19 @@ final readonly class ViteManifest implements Resources
         private Configuration $configuration,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function scriptsFor(EntryTarget $entry): iterable
     {
         yield from $this->moduleScripts($entry->path());
     }
 
-    #[\Override]
+    #[Override]
     public function stylesheetsFor(EntryTarget $entry): iterable
     {
         yield from $this->styleLinks($entry->path());
     }
 
-    #[\Override]
+    #[Override]
     public function moduleScripts(string $path): iterable
     {
         $path = trim($path, '/');
@@ -52,7 +53,7 @@ final readonly class ViteManifest implements Resources
         }
     }
 
-    #[\Override]
+    #[Override]
     public function styleLinks(string $path): iterable
     {
         $path = trim($path, '/');

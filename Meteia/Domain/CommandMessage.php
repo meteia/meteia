@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use DateTimeImmutable;
 use Meteia\Commands\Command;
 use Meteia\Commands\CommandOutbox;
 use Meteia\Domain\Contracts\AggregateRoot;
@@ -18,7 +19,7 @@ final readonly class CommandMessage
         private PendingCommand $pending,
         private CausationId $causationId,
         private CorrelationId $correlationId,
-        private \DateTimeImmutable $issuedAt,
+        private DateTimeImmutable $issuedAt,
     ) {}
 
     public function command(): Command
@@ -41,7 +42,7 @@ final readonly class CommandMessage
         return $this->correlationId;
     }
 
-    public function issuedAt(): \DateTimeImmutable
+    public function issuedAt(): DateTimeImmutable
     {
         return $this->issuedAt;
     }

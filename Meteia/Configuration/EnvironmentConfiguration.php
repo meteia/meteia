@@ -6,6 +6,8 @@ namespace Meteia\Configuration;
 
 use Dotenv\Dotenv;
 use Meteia\Configuration\Errors\UnexpectedType;
+use Override;
+use Stringable;
 
 readonly class EnvironmentConfiguration implements Configuration
 {
@@ -28,7 +30,7 @@ readonly class EnvironmentConfiguration implements Configuration
         };
     }
 
-    #[\Override]
+    #[Override]
     public function boolean(string $name, bool $default): bool
     {
         $value = $this->env[$name] ?? null;
@@ -46,7 +48,7 @@ readonly class EnvironmentConfiguration implements Configuration
         throw new UnexpectedType('Expected boolean, got ' . $value);
     }
 
-    #[\Override]
+    #[Override]
     public function float(string $name, float $default): float
     {
         $value = $this->env[$name] ?? null;
@@ -60,7 +62,7 @@ readonly class EnvironmentConfiguration implements Configuration
         return (float) $value;
     }
 
-    #[\Override]
+    #[Override]
     public function int(string $name, int $default): int
     {
         $value = $this->env[$name] ?? null;
@@ -75,8 +77,8 @@ readonly class EnvironmentConfiguration implements Configuration
         return (int) $value;
     }
 
-    #[\Override]
-    public function string(string $name, string|\Stringable $default): string
+    #[Override]
+    public function string(string $name, string|Stringable $default): string
     {
         $value = $this->env[$name] ?? null;
         if ($value === null) {

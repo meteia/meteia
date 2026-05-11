@@ -10,6 +10,7 @@ use Meteia\Http\Endpoint;
 use Meteia\Http\EndpointMap;
 use Meteia\Http\HomepageEndpoint;
 use Meteia\Performance\Timings;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -24,7 +25,7 @@ class PsrEndpoints implements MiddlewareInterface
         private readonly Timings $timings,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $endpoint = $this->timings->measure('endpoint.lookup', fn() => $this->endpoint($request));

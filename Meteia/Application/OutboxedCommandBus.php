@@ -6,6 +6,7 @@ namespace Meteia\Application;
 
 use Meteia\Commands\Command as TransportCommand;
 use Meteia\Commands\CommandOutbox;
+use Override;
 
 /**
  * Publishes the application command to the AMQP `CommandOutbox`, deferring execution to a worker.
@@ -18,7 +19,7 @@ final readonly class OutboxedCommandBus implements CommandBus
         private CommandOutbox $outbox,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function dispatch(Command $command): CommandResult
     {
         if (!$command instanceof TransportCommand) {

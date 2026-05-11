@@ -6,6 +6,7 @@ namespace Meteia\Cryptography\SecretKey;
 
 use Meteia\Cryptography\Errors\DecryptionFailed;
 use Meteia\Cryptography\SecretKey;
+use SensitiveParameter;
 use Tuupola\Base62;
 
 class XChaCha20Poly1305
@@ -17,7 +18,7 @@ class XChaCha20Poly1305
     public function decrypt(
         string $ciphertext,
         string $associatedData,
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         SecretKey $secret,
     ): XChaCha20Poly1305DecryptionResult {
         $ciphertext = $this->codec->decode($ciphertext);
@@ -43,7 +44,7 @@ class XChaCha20Poly1305
     public function encrypt(
         string $plaintext,
         string $associatedData,
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         ?SecretKey $secret = null,
     ): XChaCha20Poly1305EncryptionResult {
         if (!$secret) {

@@ -9,6 +9,7 @@ use Meteia\Commands\Command;
 use Meteia\Commands\CommandId;
 use Meteia\Domain\Contracts\IssuedCommands;
 use Meteia\MessageStreams\MessageSerializer;
+use Override;
 
 final readonly class PdoIssuedCommands implements IssuedCommands
 {
@@ -17,7 +18,7 @@ final readonly class PdoIssuedCommands implements IssuedCommands
         private MessageSerializer $messageSerializer,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function pending(): CommandMessages
     {
         // Reading pending issued commands back into typed `CommandMessage` instances requires
@@ -26,7 +27,7 @@ final readonly class PdoIssuedCommands implements IssuedCommands
         return new CommandMessages();
     }
 
-    #[\Override]
+    #[Override]
     public function append(CommandMetadata $metadata, Command $command): void
     {
         $commandId = CommandId::random();

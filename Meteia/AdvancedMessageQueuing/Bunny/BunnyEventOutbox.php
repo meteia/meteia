@@ -10,6 +10,7 @@ use Meteia\Events\Event;
 use Meteia\Events\EventId;
 use Meteia\Events\EventOutbox;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
+use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -22,7 +23,7 @@ final readonly class BunnyEventOutbox implements EventOutbox
         private MessageScopeSource $scopeSource,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function publish(Event $event): void
     {
         $exchangeName = str_replace('\\', '.', $event::class);

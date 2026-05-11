@@ -6,6 +6,8 @@ namespace Meteia\Html;
 
 use Meteia\Html\Elements\Script;
 use Meteia\Resources\ResourceBaseUri;
+use Override;
+use Stringable;
 
 final class Scripts implements Component
 {
@@ -16,7 +18,7 @@ final class Scripts implements Component
         private readonly ResourceBaseUri $resourceBaseUri,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return Children::of(...array_values($this->scripts));
@@ -41,7 +43,7 @@ final class Scripts implements Component
     }
 
     public function load(
-        string|\Stringable $src,
+        string|Stringable $src,
         bool $async = false,
         bool $defer = false,
         string $integrity = '',
@@ -51,7 +53,7 @@ final class Scripts implements Component
         $this->scripts[$src] = new Script($src, $async, $defer, '', $integrity, $crossorigin);
     }
 
-    public function module(string|\Stringable $src): void
+    public function module(string|Stringable $src): void
     {
         $src = $this->normalize((string) $src);
         $this->scripts[$src] = new Script($src, false, false, 'module');

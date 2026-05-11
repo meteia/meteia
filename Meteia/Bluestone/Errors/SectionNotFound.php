@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Bluestone\Errors;
 
-class SectionNotFound extends \Exception {}
+use Exception;
+
+class SectionNotFound extends Exception {}

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\EventSourcing;
 
 use Aura\Sql\ExtendedPdoInterface;
+use DateTimeImmutable;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\EventSourcing\Contracts\EventSourced;
 use Meteia\EventSourcing\Contracts\EventStream;
@@ -16,6 +17,10 @@ use Meteia\MessageStreams\MessageSerializer;
 use Meteia\Performance\Timings;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
+use Override;
+use PDOException;
+use ReflectionClass;
+use stdClass;
 
 class PdoEventStream implements EventStream
 {
@@ -28,7 +33,7 @@ class PdoEventStream implements EventStream
         private Timings $timings,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function append(StreamId $streamId, ExpectedVersion $expected, RecordedEvent ...$events): void
     {
         if ($events === []) {
@@ -52,7 +57,7 @@ class PdoEventStream implements EventStream
                     'causationId' => $event->causedBy()->bytes(),
                     'correlationId' => $event->correlatedTo()->bytes(),
                 ]);
-            } catch (\PDOException $exception) {
+            } catch (PDOException $exception) {
                 if ($this->isUniqueConstraintViolation($exception)) {
                     throw new OptimisticConcurrencyFailure($event->version(), $this->observedVersion($streamId));
                 }
@@ -65,7 +70,7 @@ class PdoEventStream implements EventStream
         }
     }
 
-    #[\Override]
+    #[Override]
     public function read(StreamId $streamId, FromVersion $from = new FromFirst()): RecordedEvents
     {
         $rows = $this->db->fetchObjects('
@@ -79,13 +84,13 @@ class PdoEventStream implements EventStream
             'lowerBound' => $from->lowerBoundExclusive(),
         ]);
 
-        return new RecordedEvents(array_map(fn(\stdClass $row): RecordedEvent => $this->hydrate(
+        return new RecordedEvents(array_map(fn(stdClass $row): RecordedEvent => $this->hydrate(
             $streamId,
             $row,
         ), $rows));
     }
 
-    #[\Override]
+    #[Override]
     public function replay(StreamId $streamId, EventSourced $target): EventSourced
     {
         return $this->loadLatestSnapshot($streamId, $target);
@@ -107,12 +112,12 @@ class PdoEventStream implements EventStream
         return new StreamVersion((int) $max + 1);
     }
 
-    private function isUniqueConstraintViolation(\PDOException $exception): bool
+    private function isUniqueConstraintViolation(PDOException $exception): bool
     {
         return $exception->getCode() === '23000' || ($exception->errorInfo[0] ?? '') === '23000';
     }
 
-    private function hydrate(StreamId $streamId, \stdClass $row): RecordedEvent
+    private function hydrate(StreamId $streamId, stdClass $row): RecordedEvent
     {
         /** @var DomainEvent $event */
         $event = $this->messageSerializer->unserialize($row->event);
@@ -122,14 +127,14 @@ class PdoEventStream implements EventStream
             $pending,
             new CausationId($row->causation_id),
             new CorrelationId($row->correlation_id),
-            new \DateTimeImmutable((string) $row->created),
+            new DateTimeImmutable((string) $row->created),
         );
     }
 
     private function loadLatestSnapshot(StreamId $streamId, EventSourced $target): EventSourced
     {
         if (!isset($this->aggregateHashes[$target::class])) {
-            $rc = new \ReflectionClass($target);
+            $rc = new ReflectionClass($target);
             $hash = substr(hash_file('sha256', $rc->getFileName(), true), 0, 16);
             $this->aggregateHashes[$target::class] = $hash;
         }

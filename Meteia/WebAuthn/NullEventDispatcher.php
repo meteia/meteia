@@ -6,9 +6,10 @@ namespace Meteia\WebAuthn;
 
 use Meteia\Events\Event;
 use Meteia\WebAuthn\Contracts\EventDispatcher;
+use Override;
 
 class NullEventDispatcher implements EventDispatcher
 {
-    #[\Override]
+    #[Override]
     public function dispatch(Event $event): void {}
 }

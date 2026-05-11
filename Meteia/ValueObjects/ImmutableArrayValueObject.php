@@ -9,6 +9,8 @@ use Meteia\Domain\Contracts\Comparable;
 use Meteia\Domain\Contracts\PrimitiveValueObject;
 use Meteia\ValueObjects\Errors\ObjectMutationProhibited;
 use Meteia\ValueObjects\Errors\ValueObjectInvalid;
+use Override;
+use Traversable;
 
 abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObject, ArrayValueObject
 {
@@ -20,7 +22,7 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         $this->guardType($values);
     }
 
-    #[\Override]
+    #[Override]
     public function __toString()
     {
         return implode(', ', $this->values);
@@ -36,8 +38,8 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         return $this->values;
     }
 
-    #[\Override]
-    public function getIterator(): \Traversable
+    #[Override]
+    public function getIterator(): Traversable
     {
         foreach ($this->values as $key => $values) {
             yield $key => $values;
@@ -62,37 +64,37 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
         return $this->values;
     }
 
-    #[\Override]
+    #[Override]
     public function count(): int
     {
         return \count($this->values);
     }
 
-    #[\Override]
+    #[Override]
     public function offsetExists($offset): bool
     {
         return isset($this->values[$offset]);
     }
 
-    #[\Override]
+    #[Override]
     public function offsetGet($offset): mixed
     {
         return $this->values[$offset];
     }
 
-    #[\Override]
+    #[Override]
     public function offsetSet($offset, $value): void
     {
         throw new ObjectMutationProhibited();
     }
 
-    #[\Override]
+    #[Override]
     public function offsetUnset($offset): void
     {
         throw new ObjectMutationProhibited();
     }
 
-    #[\Override]
+    #[Override]
     public function jsonSerialize(): mixed
     {
         return $this->toNative();

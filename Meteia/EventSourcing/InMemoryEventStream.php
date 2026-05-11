@@ -13,6 +13,7 @@ use Meteia\EventSourcing\Exceptions\OptimisticConcurrencyFailure;
 use Meteia\Projections\GlobalSequence;
 use Meteia\Projections\ProjectableEvent;
 use Meteia\Projections\ProjectableEvents;
+use Override;
 
 final class InMemoryEventStream implements EventStream, GlobalEventStream
 {
@@ -24,7 +25,7 @@ final class InMemoryEventStream implements EventStream, GlobalEventStream
 
     private int $globalCursor = 0;
 
-    #[\Override]
+    #[Override]
     public function append(StreamId $streamId, ExpectedVersion $expected, RecordedEvent ...$events): void
     {
         if ($events === []) {
@@ -48,7 +49,7 @@ final class InMemoryEventStream implements EventStream, GlobalEventStream
         }
     }
 
-    #[\Override]
+    #[Override]
     public function read(StreamId $streamId, FromVersion $from = new FromFirst()): RecordedEvents
     {
         $key = $streamId->hex();
@@ -67,7 +68,7 @@ final class InMemoryEventStream implements EventStream, GlobalEventStream
         return new RecordedEvents($tail);
     }
 
-    #[\Override]
+    #[Override]
     public function replay(StreamId $streamId, EventSourced $target): EventSourced
     {
         foreach ($this->read($streamId) as $recorded) {
@@ -77,7 +78,7 @@ final class InMemoryEventStream implements EventStream, GlobalEventStream
         return $target;
     }
 
-    #[\Override]
+    #[Override]
     public function readGlobally(GlobalSequence $after = new GlobalSequence(0)): ProjectableEvents
     {
         $projectable = [];

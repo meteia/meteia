@@ -9,6 +9,8 @@ use Meteia\Html\Children;
 use Meteia\Html\Component;
 use Meteia\Html\Tag;
 use Meteia\Html\TagName;
+use NoDiscard;
+use Stringable;
 
 function html(string $raw): string
 {
@@ -41,8 +43,8 @@ function attributes(array $attributes): string
 /**
  * @param array<int|string, mixed> $attributes
  */
-#[\NoDiscard]
-function el(string $name, array $attributes = [], string|\Stringable|Component ...$children): Tag
+#[NoDiscard]
+function el(string $name, array $attributes = [], string|Stringable|Component ...$children): Tag
 {
     return new Tag(TagName::of($name), Attrs::from($attributes), Children::of(...$children));
 }

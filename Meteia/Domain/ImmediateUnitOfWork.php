@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use DateTimeImmutable;
 use Meteia\Commands\CommandOutbox;
 use Meteia\Domain\Contracts\IssuedCommands;
 use Meteia\Domain\Contracts\UnitOfWork;
@@ -14,6 +15,7 @@ use Meteia\EventSourcing\PendingEvent;
 use Meteia\EventSourcing\PendingEvents;
 use Meteia\EventSourcing\RecordedEvent;
 use Meteia\ValueObjects\Identity\MessageScope;
+use Override;
 
 class ImmediateUnitOfWork implements UnitOfWork
 {
@@ -31,22 +33,22 @@ class ImmediateUnitOfWork implements UnitOfWork
         $this->pendingCommands = new PendingCommands();
     }
 
-    #[\Override]
+    #[Override]
     public function caused(PendingEvents $events): void
     {
         $this->pendingEvents = $this->pendingEvents->merge($events);
     }
 
-    #[\Override]
+    #[Override]
     public function wantsTo(PendingCommands $commands): void
     {
         $this->pendingCommands = $this->pendingCommands->merge($commands);
     }
 
-    #[\Override]
+    #[Override]
     public function complete(MessageScope $scope): void
     {
-        $occurredAt = new \DateTimeImmutable();
+        $occurredAt = new DateTimeImmutable();
         $byStream = [];
         /** @var PendingEvent $pending */
         foreach ($this->pendingEvents as $pending) {
@@ -63,7 +65,7 @@ class ImmediateUnitOfWork implements UnitOfWork
         }
         $this->pendingEvents = new PendingEvents();
 
-        $issuedAt = new \DateTimeImmutable();
+        $issuedAt = new DateTimeImmutable();
         /** @var PendingCommand $pending */
         foreach ($this->pendingCommands as $pending) {
             $message = $pending->issuedWith($scope->causationId(), $scope->correlationId(), $issuedAt);

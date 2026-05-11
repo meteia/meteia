@@ -6,6 +6,7 @@ namespace Meteia\Html\Elements;
 
 use Meteia\Html\Component;
 use Meteia\Html\Node;
+use Override;
 
 final readonly class Source implements Component
 {
@@ -19,7 +20,7 @@ final readonly class Source implements Component
         public ?string $height = null,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return el('source', [

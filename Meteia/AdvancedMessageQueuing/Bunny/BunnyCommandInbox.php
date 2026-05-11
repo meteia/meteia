@@ -16,8 +16,10 @@ use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
+use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Throwable;
 
 final readonly class BunnyCommandInbox implements CommandInbox
 {
@@ -29,7 +31,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
         private AmbientMessageScopeSource $scopeSource,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function subscribe(string $commandClassName, CommandSink $sink): void
     {
         $channel = $this->loop->channel();
@@ -66,14 +68,14 @@ final readonly class BunnyCommandInbox implements CommandInbox
                     $sink->drain($command, $scope);
                 });
                 $channel->ack($message);
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), ['queueName' => $queueName]);
             }
         }, $queueName);
     }
 
-    #[\Override]
+    #[Override]
     public function run(): void
     {
         $this->loop->runUntilShutdown('CommandWorkers.Shutdown');

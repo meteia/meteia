@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\EventSourcing;
 
+use DateTimeImmutable;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
@@ -34,7 +35,7 @@ final readonly class PendingEvent
     public function recordedWith(
         CausationId $causationId,
         CorrelationId $correlationId,
-        \DateTimeImmutable $occurredAt,
+        DateTimeImmutable $occurredAt,
     ): RecordedEvent {
         return new RecordedEvent($this, $causationId, $correlationId, $occurredAt);
     }

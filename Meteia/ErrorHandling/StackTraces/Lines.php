@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Meteia\ErrorHandling\StackTraces;
 
-class Lines implements \IteratorAggregate
+use IteratorAggregate;
+use Override;
+
+class Lines implements IteratorAggregate
 {
     public function __construct() {}
 
-    #[\Override]
+    #[Override]
     public function getIterator()
     {
         yield '';

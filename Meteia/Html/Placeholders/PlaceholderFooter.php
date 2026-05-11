@@ -8,10 +8,11 @@ use Meteia\Bluestone\MutableString;
 use Meteia\Html\Children;
 use Meteia\Html\Footer;
 use Meteia\Html\Node;
+use Override;
 
 class PlaceholderFooter extends MutableString implements Footer
 {
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return Children::of($this->rendered());

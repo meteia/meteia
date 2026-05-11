@@ -6,6 +6,7 @@ namespace Meteia\EventSourcing;
 
 use Aura\Sql\ExtendedPdo;
 use Aura\Sql\ExtendedPdoInterface;
+use DateTimeImmutable;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Domain\Contracts\UnitOfWorkContext;
 use Meteia\EventSourcing\Contracts\EventSourced;
@@ -16,6 +17,7 @@ use Meteia\Projections\GlobalSequence;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\UniqueId;
+use Override;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -46,7 +48,7 @@ final class PdoEventStreamTest extends TestCase
         $stream->append(
             $streamId,
             new AnyVersion(),
-            new RecordedEvent($pending, $causation, $correlation, new \DateTimeImmutable()),
+            new RecordedEvent($pending, $causation, $correlation, new DateTimeImmutable()),
         );
 
         $events = $stream->read($streamId);
@@ -150,7 +152,7 @@ final class PdoEventStreamTest extends TestCase
     {
         $pending = new PendingEvent($streamId, new StreamVersion($version), $event);
 
-        return new RecordedEvent($pending, CausationId::random(), CorrelationId::random(), new \DateTimeImmutable());
+        return new RecordedEvent($pending, CausationId::random(), CorrelationId::random(), new DateTimeImmutable());
     }
 
     private function stream(): PdoEventStream
@@ -163,13 +165,13 @@ final class PdoEventStreamTest extends TestCase
         return new class extends MessageSerializer {
             public function __construct() {}
 
-            #[\Override]
+            #[Override]
             public function serialize(mixed $value): string
             {
                 return base64_encode(serialize($value));
             }
 
-            #[\Override]
+            #[Override]
             public function unserialize(string $value): mixed
             {
                 return unserialize(base64_decode($value, true), ['allowed_classes' => true]);
@@ -213,7 +215,7 @@ final class PdoEventStreamTest extends TestCase
  */
 final readonly class RecordedSomething implements DomainEvent
 {
-    #[\Override]
+    #[Override]
     public static function eventTypeId(): EventTypeId
     {
         return EventTypeId::random();
@@ -229,10 +231,10 @@ final class CountingTarget implements EventSourced
 
     public int $sequence = -1;
 
-    #[\Override]
+    #[Override]
     public function commitInto(UnitOfWorkContext $unitOfWorkContext): void {}
 
-    #[\Override]
+    #[Override]
     public function handleEventMessage(UniqueId $streamId, DomainEvent $event, int $eventSequence): void
     {
         ++$this->count;

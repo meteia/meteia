@@ -11,6 +11,7 @@ use Meteia\Commands\Command;
 use Meteia\Commands\CommandId;
 use Meteia\Commands\CommandOutbox;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
+use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -24,7 +25,7 @@ final readonly class BunnyCommandOutbox implements CommandOutbox
         private MessageScopeSource $scopeSource,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function publish(Command $command): void
     {
         $this->channel->exchangeDeclare((string) $this->exchangeName, durable: true);

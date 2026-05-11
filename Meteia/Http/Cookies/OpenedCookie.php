@@ -6,6 +6,7 @@ namespace Meteia\Http\Cookies;
 
 use Meteia\Cryptography\SecretKey;
 use Meteia\Cryptography\SecretKey\XChaCha20Poly1305;
+use SensitiveParameter;
 
 readonly class OpenedCookie
 {
@@ -17,7 +18,7 @@ readonly class OpenedCookie
 
     public function seal(
         XChaCha20Poly1305 $XChaCha20Poly1305,
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         ?SecretKey $secret = null,
     ): SealCookieResult {
         $ad = implode('_', array_filter([$this->name, $this->associatedData]));

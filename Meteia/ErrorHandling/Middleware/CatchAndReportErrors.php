@@ -8,11 +8,13 @@ use Meteia\Bootstrap\MeteiaKernel;
 use Meteia\ErrorHandling\DulceErrorException;
 use Meteia\ErrorHandling\Endpoints\ErrorEndpoint;
 use Meteia\ErrorHandling\ErrorClassifications\ErrorClassification;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 use function Meteia\Http\Functions\send;
 
@@ -60,14 +62,14 @@ class CatchAndReportErrors implements MiddlewareInterface
         }
     }
 
-    public function handleThrowableGlobal(\Throwable $throwable): void
+    public function handleThrowableGlobal(Throwable $throwable): void
     {
         $response = $this->handleThrowable($throwable);
         send($response);
         exit();
     }
 
-    private function handleError(\Throwable $throwable): void
+    private function handleError(Throwable $throwable): void
     {
         $this->logger->error($throwable->getMessage(), [
             'file' => $throwable->getFile(),
@@ -75,12 +77,12 @@ class CatchAndReportErrors implements MiddlewareInterface
         ]);
     }
 
-    private function handleThrowable(\Throwable $throwable): ResponseInterface
+    private function handleThrowable(Throwable $throwable): ResponseInterface
     {
         $this->handleError($throwable);
 
         $freshContainer = $this->kernel->container([
-            \Throwable::class => $throwable,
+            Throwable::class => $throwable,
         ]);
         $errorEndpoint = $freshContainer->get(ErrorEndpoint::class);
 
@@ -90,12 +92,12 @@ class CatchAndReportErrors implements MiddlewareInterface
         ], [$throwable]);
     }
 
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
             return $handler->handle($request);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             return $this->handleThrowable($throwable);
         }
     }

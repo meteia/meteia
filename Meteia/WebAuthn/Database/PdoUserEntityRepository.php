@@ -7,6 +7,7 @@ namespace Meteia\WebAuthn\Database;
 use Meteia\Database\DatabaseTables;
 use Meteia\WebAuthn\Configuration\WebAuthnUsersTable;
 use Meteia\WebAuthn\Contracts\UserEntityRepository;
+use Override;
 use Webauthn\PublicKeyCredentialUserEntity;
 
 readonly class PdoUserEntityRepository implements UserEntityRepository
@@ -16,7 +17,7 @@ readonly class PdoUserEntityRepository implements UserEntityRepository
         private WebAuthnUsersTable $table,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function findOneByUsername(string $username): ?PublicKeyCredentialUserEntity
     {
         $rows = $this->db->select((string) $this->table, ['username' => $username]);
@@ -24,7 +25,7 @@ readonly class PdoUserEntityRepository implements UserEntityRepository
         return $rows === [] ? null : $this->hydrate(reset($rows));
     }
 
-    #[\Override]
+    #[Override]
     public function findOneByUserHandle(string $userHandle): ?PublicKeyCredentialUserEntity
     {
         $rows = $this->db->select((string) $this->table, ['user_handle' => $userHandle]);
@@ -32,7 +33,7 @@ readonly class PdoUserEntityRepository implements UserEntityRepository
         return $rows === [] ? null : $this->hydrate(reset($rows));
     }
 
-    #[\Override]
+    #[Override]
     public function saveUserEntity(PublicKeyCredentialUserEntity $userEntity): void
     {
         $this->db->upsert(

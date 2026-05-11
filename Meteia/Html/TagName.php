@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-final readonly class TagName implements \Stringable
+use Override;
+use Stringable;
+
+final readonly class TagName implements Stringable
 {
     private const array VOID = [
         'area' => true,
@@ -37,7 +40,7 @@ final readonly class TagName implements \Stringable
         return isset(self::VOID[$this->value]);
     }
 
-    #[\Override]
+    #[Override]
     public function __toString(): string
     {
         return $this->value;

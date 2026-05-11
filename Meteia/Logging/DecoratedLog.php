@@ -6,8 +6,10 @@ namespace Meteia\Logging;
 
 use Meteia\Bootstrap\RepositoryPath;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
+use Override;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+use Stringable;
 
 class DecoratedLog extends AbstractLogger
 {
@@ -23,8 +25,8 @@ class DecoratedLog extends AbstractLogger
         $this->pathPrefix = trim((string) $repositoryPath, \DIRECTORY_SEPARATOR);
     }
 
-    #[\Override]
-    public function log($level, string|\Stringable $message, array $context = []): void
+    #[Override]
+    public function log($level, string|Stringable $message, array $context = []): void
     {
         if (!isset($context['file'], $context['line'])) {
             $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);

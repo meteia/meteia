@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Http;
 
+use JsonSerializable;
 use Meteia\Http\Responses\JsonResponse;
 
 class UploadProgress
@@ -23,7 +24,7 @@ class UploadProgress
         $this->totalWork += $amount;
     }
 
-    public function complete(array|\JsonSerializable $data): JsonResponse
+    public function complete(array|JsonSerializable $data): JsonResponse
     {
         return new JsonResponse([
             'status' => 'complete',

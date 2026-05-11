@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 
 use function Meteia\Html\Elements\el;
@@ -48,7 +49,7 @@ final class HtmlEncoderTest extends TestCase
     public function testComponentChildIsRenderedRecursively(): void
     {
         $component = new class implements Component {
-            #[\Override]
+            #[Override]
             public function render(): Node
             {
                 return el('span', [], 'x');

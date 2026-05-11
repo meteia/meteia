@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Application\Exceptions;
 
-final class UnknownCommandEndpoint extends \RuntimeException
+use RuntimeException;
+
+final class UnknownCommandEndpoint extends RuntimeException
 {
     public function __construct(string $commandClass)
     {

@@ -6,6 +6,7 @@ namespace Meteia\Html\Elements;
 
 use Meteia\Html\Component;
 use Meteia\Html\Node;
+use Override;
 
 final readonly class Script implements Component
 {
@@ -18,7 +19,7 @@ final readonly class Script implements Component
         public string $crossorigin = '',
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return el('script', [

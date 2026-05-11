@@ -6,11 +6,13 @@ namespace Meteia\Domain;
 
 use Aura\Sql\ExtendedPdo;
 use Aura\Sql\ExtendedPdoInterface;
+use DateTimeImmutable;
 use Meteia\Commands\Command;
 use Meteia\MessageStreams\MessageSerializer;
 use Meteia\ValueObjects\AggregateRootId;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
+use Override;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,7 +28,7 @@ final class PdoIssuedCommandsTest extends TestCase
         $aggregateRootId = SampleAggregateRootId::random();
         $causation = CausationId::random();
         $correlation = CorrelationId::random();
-        $issuedAt = new \DateTimeImmutable('2026-05-07 12:00:00');
+        $issuedAt = new DateTimeImmutable('2026-05-07 12:00:00');
 
         $issued->append(
             new CommandMetadata($aggregateRootId, $causation, $correlation, $issuedAt),
@@ -51,7 +53,7 @@ final class PdoIssuedCommandsTest extends TestCase
                 SampleAggregateRootId::random(),
                 CausationId::random(),
                 CorrelationId::random(),
-                new \DateTimeImmutable(),
+                new DateTimeImmutable(),
             ),
             new SampleCommand(),
         );
@@ -64,13 +66,13 @@ final class PdoIssuedCommandsTest extends TestCase
         return new class extends MessageSerializer {
             public function __construct() {}
 
-            #[\Override]
+            #[Override]
             public function serialize(mixed $value): string
             {
                 return base64_encode(serialize($value));
             }
 
-            #[\Override]
+            #[Override]
             public function unserialize(string $value): mixed
             {
                 return unserialize(base64_decode($value, true), ['allowed_classes' => true]);
@@ -103,7 +105,7 @@ final class PdoIssuedCommandsTest extends TestCase
  */
 final readonly class SampleAggregateRootId extends AggregateRootId
 {
-    #[\Override]
+    #[Override]
     public static function prefix(): string
     {
         return 'sar';

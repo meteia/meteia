@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Polyfills;
 
+use Exception;
+use stdClass;
+
 /**
  * @source: http://stackoverflow.com/a/15973172
  *
@@ -71,7 +74,7 @@ function array_reorder(array $toSort, array $order, callable $comparedValue)
  */
 function array_to_object($array)
 {
-    $resultObj = new \stdClass();
+    $resultObj = new stdClass();
     $resultArr = [];
     $hasIntKeys = false;
     $hasStrKeys = false;
@@ -83,7 +86,7 @@ function array_to_object($array)
             $hasStrKeys = \is_string($k);
         }
         if ($hasIntKeys && $hasStrKeys) {
-            $e = new \Exception(
+            $e = new Exception(
                 'Current level has both integer and string keys, thus it is impossible to keep array or convert to object',
             );
             $e->vars = ['level' => $array];

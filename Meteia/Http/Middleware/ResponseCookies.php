@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Meteia\Http\Middleware;
 
+use DateTimeImmutable;
+use DateTimeInterface;
+use DateTimeZone;
 use Meteia\Http\Configuration\CookieHost;
 use Meteia\Http\Cookies\PlaintextCookie;
 use Meteia\Http\Cookies\SameSite;
 use Meteia\Http\Host;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -23,7 +27,7 @@ class ResponseCookies implements MiddlewareInterface
         private readonly CookieHost $cookieHost,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $response = $handler->handle($request);
@@ -37,14 +41,14 @@ class ResponseCookies implements MiddlewareInterface
 
     public function add(
         PlaintextCookie $cookie,
-        ?\DateTimeInterface $expiresAt = null,
+        ?DateTimeInterface $expiresAt = null,
         bool $httpOnly = true,
         SameSite $sameSite = SameSite::Lax,
     ): void {
         $maxAge = $expiresAt ? $expiresAt->getTimestamp() - time() : null;
         $expiresGmt = $expiresAt
-            ? \DateTimeImmutable::createFromInterface($expiresAt)
-                ->setTimezone(new \DateTimeZone('GMT'))
+            ? DateTimeImmutable::createFromInterface($expiresAt)
+                ->setTimezone(new DateTimeZone('GMT'))
                 ->format('D, d M Y H:i:s \G\M\T')
             : null;
         $kvParts = array_filter([

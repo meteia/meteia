@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Errors;
 
-class ValueObjectInvalid extends \InvalidArgumentException
+use InvalidArgumentException;
+
+class ValueObjectInvalid extends InvalidArgumentException
 {
     public function __construct($value, array $allowed_types)
     {

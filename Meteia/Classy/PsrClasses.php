@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Meteia\Classy;
 
+use Generator;
 use Meteia\ValueObjects\Identity\FilesystemPath;
+use Override;
+use Stringable;
 
 final readonly class PsrClasses implements Classes
 {
     public function __construct(
         private FilesystemPath $baseDirectory,
-        private string|\Stringable $namespacePrefix,
+        private string|Stringable $namespacePrefix,
         private array $regex,
     ) {}
 
-    #[\Override]
-    public function getIterator(): \Generator
+    #[Override]
+    public function getIterator(): Generator
     {
         $searchRoot = $this->baseDirectory->join($this->namespacePrefix)->realpath();
         foreach ($searchRoot->find(...$this->regex) as $file) {

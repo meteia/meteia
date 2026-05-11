@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Meteia\Bluestone;
 
-class ImmutableString implements \Stringable
+use Override;
+use Stringable;
+
+class ImmutableString implements Stringable
 {
     public function __construct(
         private readonly string $string = '',
     ) {}
 
-    #[\Override]
+    #[Override]
     public function __toString()
     {
         return $this->string;

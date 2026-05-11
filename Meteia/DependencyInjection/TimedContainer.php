@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\DependencyInjection;
 
 use Meteia\Performance\Timings;
+use Override;
 
 readonly class TimedContainer implements Container
 {
@@ -13,25 +14,25 @@ readonly class TimedContainer implements Container
         private Container $container,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function call($callable, array $parameters = []): mixed
     {
         return $this->timings->measure('di-call', fn() => $this->container->call($callable, $parameters));
     }
 
-    #[\Override]
+    #[Override]
     public function get(string $id)
     {
         return $this->timings->measure('di-get-' . $id, fn() => $this->container->get($id));
     }
 
-    #[\Override]
+    #[Override]
     public function has(string $id): bool
     {
         return $this->timings->measure('di-has-' . $id, fn() => $this->container->has($id));
     }
 
-    #[\Override]
+    #[Override]
     public function set(string $id, mixed $value): void
     {
         $this->timings->measure('di-set-' . $id, fn() => $this->container->set($id, $value));

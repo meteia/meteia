@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\EventSourcing;
 
+use DateTimeImmutable;
 use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\EventSourcing\Contracts\EventMessageTarget;
 use Meteia\ValueObjects\Identity\CausationId;
@@ -15,7 +16,7 @@ final readonly class RecordedEvent
         private PendingEvent $pending,
         private CausationId $causationId,
         private CorrelationId $correlationId,
-        private \DateTimeImmutable $occurredAt,
+        private DateTimeImmutable $occurredAt,
     ) {}
 
     public function streamId(): StreamId
@@ -48,7 +49,7 @@ final readonly class RecordedEvent
         return $this->correlationId;
     }
 
-    public function occurredAt(): \DateTimeImmutable
+    public function occurredAt(): DateTimeImmutable
     {
         return $this->occurredAt;
     }

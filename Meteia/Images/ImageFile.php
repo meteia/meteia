@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Images;
 
+use Exception;
+use GdImage;
 use Meteia\ValueObjects\Identity\FilesystemPath;
+use Override;
 
 readonly class ImageFile implements Image
 {
@@ -15,7 +18,7 @@ readonly class ImageFile implements Image
         $this->path = $path;
     }
 
-    #[\Override]
+    #[Override]
     public function dimensions(): array
     {
         [$sourceWidth, $sourceHeight] = getimagesize((string) $this->path);
@@ -23,8 +26,8 @@ readonly class ImageFile implements Image
         return [$sourceWidth, $sourceHeight];
     }
 
-    #[\Override]
-    public function gdImage(): \GdImage
+    #[Override]
+    public function gdImage(): GdImage
     {
         $imageFormat = ImageFormat::of($this->path);
         $src = match ($imageFormat) {
@@ -33,10 +36,10 @@ readonly class ImageFile implements Image
             ImageFormat::GIF => imagecreatefromgif((string) $this->path),
             ImageFormat::WEBP => imagecreatefromwebp((string) $this->path),
             ImageFormat::AVIF => imagecreatefromavif((string) $this->path),
-            default => throw new \Exception("Unexpected match value {$imageFormat->value}."),
+            default => throw new Exception("Unexpected match value {$imageFormat->value}."),
         };
         if (!$src) {
-            throw new \Exception('Failed to read source.');
+            throw new Exception('Failed to read source.');
         }
 
         return $src;

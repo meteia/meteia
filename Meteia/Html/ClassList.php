@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
-final readonly class ClassList implements \Stringable
+use NoDiscard;
+use Override;
+use Stringable;
+
+final readonly class ClassList implements Stringable
 {
     /**
      * @param list<string> $tokens
@@ -35,19 +39,19 @@ final readonly class ClassList implements \Stringable
         return new self(array_keys($seen));
     }
 
-    #[\NoDiscard]
+    #[NoDiscard]
     public function add(string ...$class): self
     {
         return self::of($this, ...$class);
     }
 
-    #[\NoDiscard]
+    #[NoDiscard]
     public function merge(self $other): self
     {
         return self::of($this, $other);
     }
 
-    #[\Override]
+    #[Override]
     public function __toString(): string
     {
         return implode(' ', $this->tokens);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
+use Exception;
+
 trait DeferredResolve
 {
     /** @var array */
@@ -69,6 +71,6 @@ trait DeferredResolve
 
     private function load(): array
     {
-        throw new \Exception('load() must be implemented by the using class');
+        throw new Exception('load() must be implemented by the using class');
     }
 }

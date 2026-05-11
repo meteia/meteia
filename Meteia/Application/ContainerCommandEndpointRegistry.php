@@ -6,6 +6,7 @@ namespace Meteia\Application;
 
 use Meteia\Application\Exceptions\UnknownCommandEndpoint;
 use Meteia\DependencyInjection\Container;
+use Override;
 
 /**
  * Resolves a `CommandEndpoint` by container lookup, using a configurable name-derivation rule.
@@ -17,7 +18,7 @@ final readonly class ContainerCommandEndpointRegistry implements CommandEndpoint
         private Container $container,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function endpointFor(string $commandClass): CommandEndpoint
     {
         $endpointClass = $this->endpointClassFor($commandClass);

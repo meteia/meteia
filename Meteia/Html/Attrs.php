@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
+use NoDiscard;
+use Stringable;
+
 final readonly class Attrs
 {
     /**
@@ -25,13 +28,13 @@ final readonly class Attrs
         return new self($raw);
     }
 
-    #[\NoDiscard]
-    public function with(string $name, bool|string|int|float|\Stringable|null $value): self
+    #[NoDiscard]
+    public function with(string $name, bool|string|int|float|Stringable|null $value): self
     {
         return clone($this, ['values' => [...$this->values, $name => $value]]);
     }
 
-    #[\NoDiscard]
+    #[NoDiscard]
     public function withClass(ClassList|string $class): self
     {
         $class = $class instanceof ClassList ? $class : ClassList::of($class);
@@ -40,7 +43,7 @@ final readonly class Attrs
         return $this->with('class', $existing->merge($class));
     }
 
-    #[\NoDiscard]
+    #[NoDiscard]
     public function merge(self $other): self
     {
         return clone($this, ['values' => [...$this->values, ...$other->values]]);

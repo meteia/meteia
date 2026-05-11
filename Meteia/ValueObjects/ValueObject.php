@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects;
 
+use IteratorAggregate;
+use JsonSerializable;
 use Meteia\ValueObjects\Errors\ValueObjectImmutable;
+use Override;
+use Traversable;
 
-abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
+abstract class ValueObject implements JsonSerializable, IteratorAggregate
 {
     public function __get($key)
     {
@@ -32,8 +36,8 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         }
     }
 
-    #[\Override]
-    public function getIterator(): \Traversable
+    #[Override]
+    public function getIterator(): Traversable
     {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
@@ -45,7 +49,7 @@ abstract class ValueObject implements \JsonSerializable, \IteratorAggregate
         }
     }
 
-    #[\Override]
+    #[Override]
     public function jsonSerialize(): array
     {
         $data = [];

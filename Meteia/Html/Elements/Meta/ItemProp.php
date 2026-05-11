@@ -6,17 +6,19 @@ namespace Meteia\Html\Elements\Meta;
 
 use Meteia\Html\Component;
 use Meteia\Html\Node;
+use Override;
+use Stringable;
 
 use function Meteia\Html\Elements\el;
 
 readonly class ItemProp implements Component
 {
     public function __construct(
-        private string|\Stringable $name,
-        private string|\Stringable $content,
+        private string|Stringable $name,
+        private string|Stringable $content,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return el('meta', ['itemprop' => (string) $this->name, 'content' => (string) $this->content]);

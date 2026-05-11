@@ -8,10 +8,11 @@ use Meteia\Bluestone\MutableString;
 use Meteia\Html\Children;
 use Meteia\Html\Header;
 use Meteia\Html\Node;
+use Override;
 
 class PlaceholderHeader extends MutableString implements Header
 {
-    #[\Override]
+    #[Override]
     public function title($title): Header
     {
         $this->set('<h1>' . $title . '</h1>');
@@ -19,7 +20,7 @@ class PlaceholderHeader extends MutableString implements Header
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     public function render(): Node
     {
         return Children::of($this->rendered());

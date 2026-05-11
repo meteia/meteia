@@ -9,6 +9,7 @@ use Meteia\Http\Cookies\RequestCookies;
 use Meteia\WebAuthn\Configuration\WebAuthnSecretKey;
 use Meteia\WebAuthn\Errors\InvalidWebAuthnChallenge;
 use Nyholm\Psr7\ServerRequest;
+use Override;
 use PHPUnit\Framework\TestCase;
 use Tuupola\Base62;
 
@@ -16,7 +17,7 @@ class ChallengeCookieTest extends TestCase
 {
     private ChallengeCookie $uut;
 
-    #[\Override]
+    #[Override]
     protected function setUp(): void
     {
         $crypto = new XChaCha20Poly1305(new Base62());

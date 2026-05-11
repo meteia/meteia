@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
+use Stringable;
+
 final readonly class HtmlEncoder
 {
-    public function encode(string|\Stringable|Component $node): string
+    public function encode(string|Stringable|Component $node): string
     {
         return match (true) {
             $node instanceof Component => $this->encode($node->render()),

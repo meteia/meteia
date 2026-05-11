@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use DateTimeImmutable;
 use Meteia\ValueObjects\AggregateRootId;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
@@ -14,6 +15,6 @@ final readonly class CommandMetadata
         public AggregateRootId $aggregateRootId,
         public CausationId $causationId,
         public CorrelationId $correlationId,
-        public \DateTimeImmutable $issuedAt,
+        public DateTimeImmutable $issuedAt,
     ) {}
 }

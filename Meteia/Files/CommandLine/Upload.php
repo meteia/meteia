@@ -7,6 +7,7 @@ namespace Meteia\Files\CommandLine;
 use Meteia\CommandLine\Command;
 use Meteia\Files\ContentAddressableStorage;
 use Meteia\ValueObjects\Identity\FilesystemPath;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,13 +21,13 @@ class Upload implements Command
         private readonly InputInterface $input,
     ) {}
 
-    #[\Override]
+    #[Override]
     public static function description(): string
     {
         return 'Upload one or more files to the configured storage';
     }
 
-    #[\Override]
+    #[Override]
     public function execute(): void
     {
         $files = $this->input->getArgument(self::ARG_FILES);
@@ -37,7 +38,7 @@ class Upload implements Command
         }
     }
 
-    #[\Override]
+    #[Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition([

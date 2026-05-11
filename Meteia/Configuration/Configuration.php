@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\Configuration;
 
+use Stringable;
+
 interface Configuration
 {
-    public function string(string $name, string|\Stringable $default): string;
+    public function string(string $name, string|Stringable $default): string;
 
     public function int(string $name, int $default): int;
 

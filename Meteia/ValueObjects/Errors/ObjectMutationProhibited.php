@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Errors;
 
-class ObjectMutationProhibited extends \Exception {}
+use Exception;
+
+class ObjectMutationProhibited extends Exception {}

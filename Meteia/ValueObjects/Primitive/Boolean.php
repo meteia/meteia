@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Primitive;
 
+use JsonSerializable;
 use Meteia\Domain\Contracts\Comparable;
 use Meteia\ValueObjects\PrimitiveValueObject;
+use Override;
 
-class Boolean extends PrimitiveValueObject implements Comparable, \JsonSerializable
+class Boolean extends PrimitiveValueObject implements Comparable, JsonSerializable
 {
     public function __construct($value)
     {
         parent::__construct(filter_var($value, FILTER_VALIDATE_BOOLEAN));
     }
 
-    #[\Override]
+    #[Override]
     public function __toString()
     {
         if ($this->isTrue()) {
@@ -24,7 +26,7 @@ class Boolean extends PrimitiveValueObject implements Comparable, \JsonSerializa
         return 'FALSE';
     }
 
-    #[\Override]
+    #[Override]
     public function compareTo(Comparable $other)
     {
         if ($this->toNative() === $other->toNative()) {
@@ -56,7 +58,7 @@ class Boolean extends PrimitiveValueObject implements Comparable, \JsonSerializa
         return new self(true);
     }
 
-    #[\Override]
+    #[Override]
     public function jsonSerialize()
     {
         return $this->isTrue();

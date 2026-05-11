@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Meteia\Database\CommandLine;
 
+use InvalidArgumentException;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Meteia\Library\StringCase;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,20 +25,20 @@ final readonly class NewMigration implements Command
         private ApplicationPath $applicationPath,
     ) {}
 
-    #[\Override]
+    #[Override]
     public static function description(): string
     {
         return 'Create a new migration';
     }
 
-    #[\Override]
+    #[Override]
     public function execute(): void
     {
         $id = date('YmdHis');
 
         $isIdempotent = (string) $this->input->getArgument(self::ARG_TYPE);
         if (!\in_array(strtolower($isIdempotent), ['i', 'idempotent', 'ni', 'non-idempotent'], true)) {
-            throw new \InvalidArgumentException('Valid migration type are: i (idempotent) or ni (non-idempotent)');
+            throw new InvalidArgumentException('Valid migration type are: i (idempotent) or ni (non-idempotent)');
         }
         $isIdempotent = \in_array(strtolower($isIdempotent), ['i', 'idempotent'], true);
         $migrationType = $isIdempotent ? 'i' : 'ni';
@@ -54,7 +56,7 @@ final readonly class NewMigration implements Command
         $this->output->writeln('Created Migration: ' . $filename);
     }
 
-    #[\Override]
+    #[Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition([

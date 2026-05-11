@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Database;
 
+use InvalidArgumentException;
+
 final readonly class SqlBoundColumns
 {
     public function __construct(
@@ -58,7 +60,7 @@ final readonly class SqlBoundColumns
     {
         $column = array_key_first($this->bindings);
         if ($column === null) {
-            throw new \InvalidArgumentException('Cannot create self-assignment without columns');
+            throw new InvalidArgumentException('Cannot create self-assignment without columns');
         }
 
         $column = $this->quoted($this->column($column));
@@ -81,7 +83,7 @@ final readonly class SqlBoundColumns
     private function column(int|string $column): string
     {
         if (!\is_string($column) || $column === '') {
-            throw new \InvalidArgumentException('Database column names must be non-empty strings');
+            throw new InvalidArgumentException('Database column names must be non-empty strings');
         }
 
         return $column;

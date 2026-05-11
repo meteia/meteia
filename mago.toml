@@ -20,14 +20,20 @@ integrations = ["symfony", "phpunit"]
 [linter.rules]
 ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
-interface-name = { enabled = false }
-too-many-methods = { enabled = false }
 halstead = { effort-threshold = 7000 }
+no-fully-qualified-global-class-like = { enabled = true }
 
 [analyzer]
+plugins = []
 find-unused-definitions = true
 find-unused-expressions = true
-analyze-dead-code = true
-check-throws = true
-allow-possibly-undefined-array-keys = true
-perform-heuristic-checks = true
+analyze-dead-code = false
+memoize-properties = true
+strict-array-index-existence = true
+check-throws = false
+check-missing-override = true
+find-unused-parameters = true
+strict-list-index-checks = true
+no-boolean-literal-comparison = false
+check-missing-type-hints = false
+register-super-globals = true

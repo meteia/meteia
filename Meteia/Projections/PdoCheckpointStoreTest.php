@@ -6,6 +6,7 @@ namespace Meteia\Projections;
 
 use Aura\Sql\ExtendedPdo;
 use Aura\Sql\ExtendedPdoInterface;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -48,7 +49,7 @@ final class PdoCheckpointStoreTest extends TestCase
     {
         $checkpoint = new PersistedCheckpoint(new GlobalSequence(50));
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         (void) $checkpoint->advancedTo(new GlobalSequence(49));
     }
 

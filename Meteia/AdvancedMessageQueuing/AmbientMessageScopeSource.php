@@ -6,6 +6,7 @@ namespace Meteia\AdvancedMessageQueuing;
 
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
+use Override;
 
 final class AmbientMessageScopeSource implements MessageScopeSource
 {
@@ -15,7 +16,7 @@ final class AmbientMessageScopeSource implements MessageScopeSource
         private readonly MessageScope $default,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function current(): MessageScope
     {
         return $this->current ?? $this->default;

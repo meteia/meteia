@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Database;
 
+use InvalidArgumentException;
+
 final readonly class SqlIdentifier
 {
     public function __construct(
@@ -13,7 +15,7 @@ final readonly class SqlIdentifier
     public function quoted(): string
     {
         if ($this->identifier === '') {
-            throw new \InvalidArgumentException('Database identifiers must be non-empty strings');
+            throw new InvalidArgumentException('Database identifiers must be non-empty strings');
         }
 
         return '`' . str_replace('`', '``', $this->identifier) . '`';

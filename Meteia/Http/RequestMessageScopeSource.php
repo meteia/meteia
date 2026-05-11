@@ -7,6 +7,7 @@ namespace Meteia\Http;
 use Meteia\Http\Exceptions\MissingMessageScope;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
+use Override;
 use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class RequestMessageScopeSource implements MessageScopeSource
@@ -15,7 +16,7 @@ final readonly class RequestMessageScopeSource implements MessageScopeSource
         private ServerRequestInterface $request,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function current(): MessageScope
     {
         $scope = $this->request->getAttribute(MessageScope::class);

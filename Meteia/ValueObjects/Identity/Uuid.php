@@ -6,6 +6,7 @@ namespace Meteia\ValueObjects\Identity;
 
 use Meteia\ValueObjects\Errors\ValueObjectInvalid;
 use Meteia\ValueObjects\PrimitiveValueObject;
+use Override;
 
 class Uuid extends PrimitiveValueObject
 {
@@ -44,7 +45,7 @@ class Uuid extends PrimitiveValueObject
         parent::__construct($value);
     }
 
-    #[\Override]
+    #[Override]
     public function __toString()
     {
         return $this->value;

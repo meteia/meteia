@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\ObjectType;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\GraphQL\ResolveWith;
+use Override;
 
 class Color extends ObjectType implements Resolver
 {
@@ -26,7 +27,7 @@ class Color extends ObjectType implements Resolver
         ]);
     }
 
-    #[\Override]
+    #[Override]
     public function data(mixed $root, array $args, RequestContext $requestContext): object
     {
         $color = \is_string($root) ? $root : '10203040';

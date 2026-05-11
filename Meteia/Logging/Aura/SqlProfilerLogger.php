@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Logging\Aura;
 
+use Override;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 
@@ -19,7 +20,7 @@ class SqlProfilerLogger extends AbstractLogger
         $this->logger = $logger;
     }
 
-    #[\Override]
+    #[Override]
     public function log($level, $message, array $context = []): void
     {
         if ($context['statement']) {

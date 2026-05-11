@@ -9,6 +9,7 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * @internal
@@ -50,8 +51,8 @@ final class AmbientMessageScopeSourceTest extends TestCase
         $source = new AmbientMessageScopeSource($default);
 
         try {
-            $source->using($this->scope(), static fn(): never => throw new \RuntimeException('boom'));
-        } catch (\RuntimeException) {
+            $source->using($this->scope(), static fn(): never => throw new RuntimeException('boom'));
+        } catch (RuntimeException) {
         }
 
         static::assertSame($default, $source->current());

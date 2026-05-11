@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Bootstrap;
 
+use DomainException;
 use Meteia\ValueObjects\Identity\FilesystemPath;
 
-final class MissingPrimaryNamespace extends \DomainException
+final class MissingPrimaryNamespace extends DomainException
 {
     public function __construct(FilesystemPath $composerJson)
     {

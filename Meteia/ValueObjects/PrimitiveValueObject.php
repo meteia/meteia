@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects;
 
-abstract class PrimitiveValueObject implements \JsonSerializable
+use JsonSerializable;
+use Override;
+
+abstract class PrimitiveValueObject implements JsonSerializable
 {
     public function __construct(
         protected readonly mixed $value,
@@ -15,7 +18,7 @@ abstract class PrimitiveValueObject implements \JsonSerializable
         return $this->value;
     }
 
-    #[\Override]
+    #[Override]
     public function jsonSerialize(): mixed
     {
         return $this->toNative();

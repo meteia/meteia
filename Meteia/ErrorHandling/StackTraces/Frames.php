@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\ErrorHandling\StackTraces;
 
 use Meteia\ValueObjects\Identity\FilesystemPath;
+use Throwable;
 
 class Frames
 {
@@ -16,7 +17,7 @@ class Frames
     /**
      * @return Frame[]
      */
-    public function from(\Throwable $throwable): array
+    public function from(Throwable $throwable): array
     {
         $throwable = $this->rootCause($throwable);
         $frames = $throwable->getTrace();
@@ -37,7 +38,7 @@ class Frames
         return new Frame($path, $line, $fileFragment);
     }
 
-    private function rootCause(\Throwable $throwable): \Throwable
+    private function rootCause(Throwable $throwable): Throwable
     {
         return $throwable->getPrevious() ? $this->rootCause($throwable->getPrevious()) : $throwable;
     }

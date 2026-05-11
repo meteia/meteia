@@ -6,6 +6,8 @@ namespace Meteia\ValueObjects\Money;
 
 use Meteia\ValueObjects\Primitive\FloatLiteral;
 use Meteia\ValueObjects\ValueObject;
+use NumberFormatter;
+use Override;
 
 class Money extends ValueObject
 {
@@ -13,13 +15,13 @@ class Money extends ValueObject
 
     protected Currency $currency;
 
-    private \NumberFormatter $formatter;
+    private NumberFormatter $formatter;
 
     public function __construct(FloatLiteral $value, Currency $currency)
     {
         $this->value = $value;
         $this->currency = $currency;
-        $this->formatter = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
+        $this->formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
     }
 
     public function __toString()
@@ -64,7 +66,7 @@ class Money extends ValueObject
         return new PreciseUsd($this->value);
     }
 
-    #[\Override]
+    #[Override]
     public function jsonSerialize()
     {
         return [

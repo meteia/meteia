@@ -6,6 +6,7 @@ namespace Meteia\ErrorHandling\Templates;
 
 use Meteia\Bluestone\PhpTemplate;
 use Meteia\Bootstrap\RepositoryPath;
+use Throwable;
 
 use function Meteia\Polyfills\without_prefix;
 
@@ -13,13 +14,13 @@ class StackTrace
 {
     use PhpTemplate;
 
-    private \Throwable $throwable;
+    private Throwable $throwable;
 
     public function __construct(
         private readonly RepositoryPath $repositoryPath,
     ) {}
 
-    public function for(\Throwable $throwable): self
+    public function for(Throwable $throwable): self
     {
         $copy = clone $this;
         $copy->throwable = $throwable;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Database;
 
+use InvalidArgumentException;
+
 final readonly class SqlTableName
 {
     public function __construct(
@@ -13,7 +15,7 @@ final readonly class SqlTableName
     public function quoted(): string
     {
         if ($this->table === '') {
-            throw new \InvalidArgumentException('Database table names must be non-empty strings');
+            throw new InvalidArgumentException('Database table names must be non-empty strings');
         }
 
         return implode('.', array_map(

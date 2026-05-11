@@ -15,8 +15,10 @@ use Meteia\Commands\CommandSink;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\ValueObjects\Identity\MessageScope;
+use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputDefinition;
+use Throwable;
 
 readonly class RunWorker implements CLICommand, CommandSink
 {
@@ -38,19 +40,19 @@ readonly class RunWorker implements CLICommand, CommandSink
         $this->container = ContainerBuilder::build($this->path, $this->namespace, $applicationDefinitions);
     }
 
-    #[\Override]
+    #[Override]
     public static function description(): string
     {
         return 'Run the command worker queue';
     }
 
-    #[\Override]
+    #[Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition();
     }
 
-    #[\Override]
+    #[Override]
     public function execute(): void
     {
         foreach ($this->commands as $command) {
@@ -61,13 +63,13 @@ readonly class RunWorker implements CLICommand, CommandSink
         $this->commandInbox->run();
     }
 
-    #[\Override]
+    #[Override]
     public function drain(Command $command, MessageScope $scope): void
     {
         try {
             \assert(method_exists($command, 'invoke'));
             $this->container->call($command->invoke(...));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log->error('Command failed', ['exception' => $e]);
         }
 

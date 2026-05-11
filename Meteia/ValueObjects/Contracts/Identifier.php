@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\ValueObjects\Contracts;
 
-interface Identifier extends \Stringable, \JsonSerializable, HasPrefix
+use JsonSerializable;
+use Stringable;
+
+interface Identifier extends Stringable, JsonSerializable, HasPrefix
 {
     public function hex(): string;
 

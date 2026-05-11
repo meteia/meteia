@@ -7,6 +7,7 @@ namespace Meteia\Vite;
 use Meteia\Resources\ManifestCache;
 use Meteia\Resources\ManifestSource;
 use Meteia\Resources\ResourceManifestPath;
+use Override;
 
 final readonly class ViteFileManifestSource implements ManifestSource
 {
@@ -15,7 +16,7 @@ final readonly class ViteFileManifestSource implements ManifestSource
         private ManifestCache $cache,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function entries(): array
     {
         return $this->cache->entriesAt($this->path);

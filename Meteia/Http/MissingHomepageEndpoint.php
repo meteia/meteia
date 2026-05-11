@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Meteia\Http;
 
 use Laminas\Diactoros\Response\HtmlResponse;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class MissingHomepageEndpoint implements Endpoint
 {
-    #[\Override]
+    #[Override]
     public function response(ServerRequestInterface $request): ResponseInterface
     {
         return new HtmlResponse(

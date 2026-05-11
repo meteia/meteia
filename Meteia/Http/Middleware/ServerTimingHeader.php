@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Http\Middleware;
 
 use Meteia\Performance\Timings;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -27,7 +28,7 @@ class ServerTimingHeader implements MiddlewareInterface
         return $response->withHeader('Server-Timing', $value);
     }
 
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $response = $handler->handle($request);

@@ -6,6 +6,7 @@ namespace Meteia\Commands\CommandLine;
 
 use Bunny\Channel;
 use Meteia\CommandLine\Command;
+use Override;
 use Symfony\Component\Console\Input\InputDefinition;
 
 readonly class StopWorker implements Command
@@ -14,19 +15,19 @@ readonly class StopWorker implements Command
         private Channel $channel,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function execute(): void
     {
         $this->channel->publish('', [], 'CommandWorkers.Shutdown');
     }
 
-    #[\Override]
+    #[Override]
     public static function description(): string
     {
         return 'Stop the command worker queue.';
     }
 
-    #[\Override]
+    #[Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition();

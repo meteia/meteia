@@ -10,6 +10,7 @@ use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
+use Override;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -87,7 +88,7 @@ final class SeedMessageScopeTest extends TestCase
         return new class implements RequestHandlerInterface {
             public ?MessageScope $observed = null;
 
-            #[\Override]
+            #[Override]
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 $scope = $request->getAttribute(MessageScope::class);
@@ -104,25 +105,25 @@ final class SeedMessageScopeTest extends TestCase
             /** @var array<string, mixed> */
             private array $bindings = [];
 
-            #[\Override]
+            #[Override]
             public function get(string $id): mixed
             {
                 return $this->bindings[$id] ?? null;
             }
 
-            #[\Override]
+            #[Override]
             public function has(string $id): bool
             {
                 return isset($this->bindings[$id]);
             }
 
-            #[\Override]
+            #[Override]
             public function set(string $id, mixed $value): void
             {
                 $this->bindings[$id] = $value;
             }
 
-            #[\Override]
+            #[Override]
             public function call($callable, array $parameters = []): mixed
             {
                 return $callable(...$parameters);

@@ -9,6 +9,7 @@ use Meteia\DependencyInjection\Container;
 use Meteia\Events\EventInbox;
 use Meteia\Events\EventSink;
 use Meteia\Events\EventToEventSinksMap;
+use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 
@@ -21,19 +22,19 @@ final readonly class RunWorker implements Command
         private EventToEventSinksMap $eventToEventSinksMap,
     ) {}
 
-    #[\Override]
+    #[Override]
     public static function description(): string
     {
         return 'Run the event worker queue';
     }
 
-    #[\Override]
+    #[Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition();
     }
 
-    #[\Override]
+    #[Override]
     public function execute(): void
     {
         foreach ($this->eventToEventSinksMap as $event => $sinks) {

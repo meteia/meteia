@@ -10,6 +10,7 @@ use Meteia\GraphQL\Contracts\QueryField;
 use Meteia\GraphQL\Contracts\RequestContext;
 use Meteia\GraphQL\Contracts\Resolver;
 use Meteia\Http\NamedEndpoints;
+use Override;
 
 class Endpoints extends ListOfType implements QueryField, Resolver
 {
@@ -20,7 +21,7 @@ class Endpoints extends ListOfType implements QueryField, Resolver
         parent::__construct(self::nonNull($link));
     }
 
-    #[\Override]
+    #[Override]
     public function data(mixed $root, array $args, RequestContext $requestContext): array
     {
         $set = $requestContext->requestingUser()->pick($args['anon'], $args['user']);

@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Meteia\Events;
 
-readonly class EventToEventSinksMap implements \IteratorAggregate
+use IteratorAggregate;
+use Override;
+use Traversable;
+
+readonly class EventToEventSinksMap implements IteratorAggregate
 {
     public function __construct(
         public Events $events,
         public EventSinks $eventSinks,
     ) {}
 
-    #[\Override]
-    public function getIterator(): \Traversable
+    #[Override]
+    public function getIterator(): Traversable
     {
         $sinks = iterator_to_array($this->eventSinks);
         foreach ($this->events as $event) {

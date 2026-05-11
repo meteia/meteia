@@ -6,6 +6,7 @@ namespace Meteia\Database;
 
 use Aura\Sql\Profiler\ProfilerInterface;
 use Meteia\Performance\Timings;
+use Override;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
@@ -27,7 +28,7 @@ final class ServerTimingProfiler implements ProfilerInterface
         private readonly LoggerInterface $logger = new NullLogger(),
     ) {}
 
-    #[\Override]
+    #[Override]
     public function finish(?string $statement = null, array $values = []): void
     {
         if (!$this->active || $this->startTime === 0.0) {
@@ -39,49 +40,49 @@ final class ServerTimingProfiler implements ProfilerInterface
         $this->startTime = 0.0;
     }
 
-    #[\Override]
+    #[Override]
     public function getLogFormat(): string
     {
         return $this->logFormat;
     }
 
-    #[\Override]
+    #[Override]
     public function getLogLevel(): string
     {
         return $this->logLevel;
     }
 
-    #[\Override]
+    #[Override]
     public function getLogger(): LoggerInterface
     {
         return $this->logger;
     }
 
-    #[\Override]
+    #[Override]
     public function isActive(): bool
     {
         return $this->active;
     }
 
-    #[\Override]
+    #[Override]
     public function setActive($active): void
     {
         $this->active = $active;
     }
 
-    #[\Override]
+    #[Override]
     public function setLogFormat(string $logFormat): void
     {
         $this->logFormat = $logFormat;
     }
 
-    #[\Override]
+    #[Override]
     public function setLogLevel(string $logLevel): void
     {
         $this->logLevel = $logLevel;
     }
 
-    #[\Override]
+    #[Override]
     public function start(string $function): void
     {
         if (!$this->active) {

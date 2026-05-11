@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Http\Middleware;
 
 use Meteia\DependencyInjection\Container;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -16,7 +17,7 @@ readonly class SetServerRequestInterface implements MiddlewareInterface
         private Container $container,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $this->container->set(ServerRequestInterface::class, $request);

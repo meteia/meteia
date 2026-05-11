@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace Meteia\Database\CommandLine;
 
+use AppendIterator;
+use GlobIterator;
+use InvalidArgumentException;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\CommandLine\Command;
 use Meteia\Database\MigrationDatabase;
 use Meteia\Database\MigrationsTableName;
+use Override;
+use PDOException;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,13 +32,13 @@ readonly class Migrate implements Command
         private MigrationsTableName $migrationsTableName,
     ) {}
 
-    #[\Override]
+    #[Override]
     public static function description(): string
     {
         return 'Apply any pending migrations';
     }
 
-    #[\Override]
+    #[Override]
     public function execute(): void
     {
         $retryCount = 0;
@@ -41,12 +47,12 @@ readonly class Migrate implements Command
                 $this->db->fetchValue('SELECT 1');
 
                 break;
-            } catch (\PDOException $exception) {
+            } catch (PDOException $exception) {
                 ++$retryCount;
                 $this->output->writeln('PDOException: ' . $exception->getMessage());
                 $this->output->writeln('Database not available, retrying in ' . $retryCount . ' seconds...');
                 if ($retryCount > 10) {
-                    throw new \RuntimeException('Database not available');
+                    throw new RuntimeException('Database not available');
                 }
             }
             sleep($retryCount);
@@ -70,7 +76,7 @@ readonly class Migrate implements Command
             "SELECT DATE_FORMAT(id, '%Y%m%d%H%i%s') FROM {$migrationsTableName} ORDER BY id;",
         );
 
-        $allMigrationFiles = new \AppendIterator();
+        $allMigrationFiles = new AppendIterator();
         $meteiaMigrationsDirectory = implode(\DIRECTORY_SEPARATOR, [
             __DIR__,
             '..',
@@ -78,14 +84,14 @@ readonly class Migrate implements Command
             'migrations',
             '*.sql',
         ]);
-        $allMigrationFiles->append(new \GlobIterator($meteiaMigrationsDirectory));
-        $allMigrationFiles->append(new \GlobIterator((string) $this->applicationPath->join('migrations', '*.sql')));
+        $allMigrationFiles->append(new GlobIterator($meteiaMigrationsDirectory));
+        $allMigrationFiles->append(new GlobIterator((string) $this->applicationPath->join('migrations', '*.sql')));
 
         /** @var \SplFileInfo $file */
         foreach ($allMigrationFiles as $file) {
             $filename = $file->getBasename('.sql');
             if (!preg_match('/^(?<id>\d{14})\.(?<type>i|ni)\.(?<name>.+)$/', $filename, $matches)) {
-                throw new \RuntimeException('Invalid migration filename: ' . $file->getBasename());
+                throw new RuntimeException('Invalid migration filename: ' . $file->getBasename());
             }
 
             $id = $matches['id'];
@@ -102,14 +108,14 @@ readonly class Migrate implements Command
             }
             $sql = file_get_contents($realPath);
             if ($sql === false) {
-                throw new \RuntimeException('Unable to read migration: ' . $realPath);
+                throw new RuntimeException('Unable to read migration: ' . $realPath);
             }
 
             try {
                 $this->output->writeln(\sprintf('applying : %s', $filename));
                 $this->db->exec($sql);
                 $this->output->writeln(\sprintf('applied  : %s', $filename));
-            } catch (\PDOException $t) {
+            } catch (PDOException $t) {
                 if ($type === 'ni') {
                     $this->output->writeln(\sprintf('ignoring error during non-idempotent migration %s', $filename));
                     $this->output->writeln(\sprintf("\t%s", $t->getMessage()));
@@ -135,7 +141,7 @@ readonly class Migrate implements Command
         $parts = explode('.', $table);
         $parts = array_map(static function (string $part): string {
             if ($part === '') {
-                throw new \InvalidArgumentException('Database table names must be non-empty strings');
+                throw new InvalidArgumentException('Database table names must be non-empty strings');
             }
 
             return '`' . str_replace('`', '``', $part) . '`';
@@ -144,7 +150,7 @@ readonly class Migrate implements Command
         return implode('.', $parts);
     }
 
-    #[\Override]
+    #[Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition([

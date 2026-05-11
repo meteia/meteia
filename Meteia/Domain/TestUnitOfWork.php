@@ -8,6 +8,7 @@ use Meteia\Domain\Contracts\UnitOfWork;
 use Meteia\EventSourcing\PendingEvent;
 use Meteia\EventSourcing\PendingEvents;
 use Meteia\ValueObjects\Identity\MessageScope;
+use Override;
 
 use function PHPUnit\Framework\assertEquals;
 
@@ -23,7 +24,7 @@ class TestUnitOfWork implements UnitOfWork
         private array $expected,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function caused(PendingEvents $events): void
     {
         /** @var PendingEvent $pending */
@@ -32,13 +33,13 @@ class TestUnitOfWork implements UnitOfWork
         }
     }
 
-    #[\Override]
+    #[Override]
     public function complete(MessageScope $scope): void
     {
         assertEquals($this->expected, $this->actual);
     }
 
-    #[\Override]
+    #[Override]
     public function wantsTo(PendingCommands $commands): void
     {
         /** @var PendingCommand $pending */

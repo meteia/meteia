@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Meteia\Projections;
 
 use Aura\Sql\ExtendedPdoInterface;
+use DateTimeImmutable;
 use Meteia\Projections\Contracts\Checkpoint;
 use Meteia\Projections\Contracts\CheckpointStore;
+use Override;
 
 final readonly class PdoCheckpointStore implements CheckpointStore
 {
@@ -14,7 +16,7 @@ final readonly class PdoCheckpointStore implements CheckpointStore
         private ExtendedPdoInterface $db,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function load(ProjectionName $name): Checkpoint
     {
         $row = $this->db->fetchObject('
@@ -30,7 +32,7 @@ final readonly class PdoCheckpointStore implements CheckpointStore
         return new PersistedCheckpoint(new GlobalSequence((int) $row->global_sequence));
     }
 
-    #[\Override]
+    #[Override]
     public function save(ProjectionName $name, Checkpoint $checkpoint): void
     {
         $this->db->fetchAffected('
@@ -39,7 +41,7 @@ final readonly class PdoCheckpointStore implements CheckpointStore
         ', [
             'name' => (string) $name,
             'position' => $checkpoint->position()->asInt(),
-            'updatedAt' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
+            'updatedAt' => new DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\GraphQL;
 
+use Generator;
 use GraphQL\Type\Definition\Type;
 use Meteia\Classy\Classes;
 use Meteia\Classy\ClassesImplementing;
@@ -17,7 +18,7 @@ final readonly class SchemaFields
         private Classes $fieldClasses,
     ) {}
 
-    public function implementing(string $interface): \Generator
+    public function implementing(string $interface): Generator
     {
         $classes = new ClassesImplementing($this->fieldClasses, $interface);
         foreach ($classes as $queryFieldClassName) {

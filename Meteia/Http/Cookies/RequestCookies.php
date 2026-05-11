@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Http\Cookies;
 
 use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 
 class RequestCookies
 {
@@ -23,7 +24,7 @@ class RequestCookies
     {
         $cookies = $this->serverRequest->getCookieParams();
         if (!isset($cookies[$name])) {
-            throw new \RuntimeException("Cookie '{$name}' not found");
+            throw new RuntimeException("Cookie '{$name}' not found");
         }
 
         return new SealedCookie($name, $cookies[$name]);

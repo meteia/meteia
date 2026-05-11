@@ -16,6 +16,7 @@ use Meteia\WebAuthn\Errors\AttestationFailed;
 use Meteia\WebAuthn\Events\CredentialRegistered;
 use Meteia\WebAuthn\RelyingParty;
 use Meteia\WebAuthn\WebAuthnServer;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Webauthn\AuthenticatorAttestationResponse;
@@ -32,7 +33,7 @@ readonly class CompleteRegistration implements Endpoint
         private EventDispatcher $events,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function response(ServerRequestInterface $request): ResponseInterface
     {
         $body = (string) $request->getBody();

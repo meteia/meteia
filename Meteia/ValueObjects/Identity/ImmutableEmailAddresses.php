@@ -7,12 +7,13 @@ namespace Meteia\ValueObjects\Identity;
 use Meteia\Domain\Contracts\Identity\EmailAddress;
 use Meteia\Domain\Contracts\Identity\EmailAddresses;
 use Meteia\ValueObjects\ImmutableArrayValueObject;
+use Override;
 
 class ImmutableEmailAddresses extends ImmutableArrayValueObject implements EmailAddresses
 {
     public const TYPE = EmailAddress::class;
 
-    #[\Override]
+    #[Override]
     public function toArray()
     {
         $result = [];
