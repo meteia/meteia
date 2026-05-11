@@ -4,42 +4,41 @@ declare(strict_types=1);
 
 namespace Meteia\Logging;
 
-class Logfmt
+final readonly class Logfmt
 {
-    public function write($level, $message, array $context = []): string
+    /**
+     * @param array<array-key, mixed> $context
+     */
+    public function format(string $level, string $message, array $context = []): string
     {
         $lineData = $context;
 
         $lineData['level'] = $level;
         $lineData['msg'] = $message;
 
-        $lineData = array_map(
-            static function ($k, $v) {
-                // ASCII printable only
-                $k = preg_replace('/[^\x20-\x7E]/', '', $k);
+        $formatted = [];
+        foreach ($lineData as $rawKey => $value) {
+            $key = (string) preg_replace('/[^\x20-\x7E]/', '', (string) $rawKey);
+            if ($key === '') {
+                continue;
+            }
+            if (\is_bool($value)) {
+                $formatted[] = $key . '=' . ($value ? 'true' : 'false');
+                continue;
+            }
+            if (\is_float($value)) {
+                $formatted[] = $key . '=' . round($value, 4);
+                continue;
+            }
+            $stringValue = \is_scalar($value) || $value instanceof \Stringable ? (string) $value : '';
+            if (preg_match('/[ "]/', $stringValue) === 1) {
+                $formatted[] = sprintf('%s="%s"', $key, $stringValue);
+                continue;
+            }
+            $formatted[] = sprintf('%s=%s', $key, $stringValue);
+        }
+        sort($formatted);
 
-                if ($k === '') {
-                    // FIXME: Feels messy
-                    return '';
-                }
-                if (\is_bool($v)) {
-                    return $k . '=' . ($v ? 'true' : 'false');
-                }
-                if (\is_float($v)) {
-                    return $k . '=' . round($v, 4);
-                }
-                if (\is_string($v) && preg_match('/[ "]/', $v)) {
-                    return sprintf('%s="%s"', $k, $v);
-                }
-
-                return sprintf('%s=%s', $k, $v);
-            },
-            array_keys($lineData),
-            $lineData,
-        );
-        $lineData = array_filter($lineData);
-        sort($lineData);
-
-        return implode(' ', $lineData);
+        return implode(' ', $formatted);
     }
 }

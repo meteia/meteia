@@ -7,17 +7,20 @@ namespace Meteia\Logging;
 use Override;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+use Stringable;
 
 class FanOut extends AbstractLogger
 {
+    /**
+     * @param iterable<LoggerInterface> $logs
+     */
     public function __construct(
-        private array $logs,
+        private iterable $logs,
     ) {}
 
     #[Override]
-    public function log($level, $message, array $context = []): void
+    public function log($level, string|Stringable $message, array $context = []): void
     {
-        /** @var LoggerInterface $log */
         foreach ($this->logs as $log) {
             $log->log($level, $message, $context);
         }

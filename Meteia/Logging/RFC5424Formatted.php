@@ -9,8 +9,7 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Override;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
-
-use function Polyfills\array_map_assoc;
+use Stringable;
 
 class RFC5424Formatted extends AbstractLogger
 {
@@ -25,9 +24,9 @@ class RFC5424Formatted extends AbstractLogger
         'EMERGENCY' => 0,
     ];
 
-    private $msgNumber = 1;
+    private int $msgNumber = 1;
 
-    private $procId;
+    private CorrelationId $procId;
 
     public function __construct(
         private LoggerInterface $log,
@@ -36,9 +35,9 @@ class RFC5424Formatted extends AbstractLogger
     }
 
     #[Override]
-    public function log($level, $message, array $context = []): void
+    public function log($level, string|Stringable $message, array $context = []): void
     {
-        $formatted = $this->formated($level, $message, $context);
+        $formatted = $this->formated((string) $level, (string) $message, $context);
         $this->log->log($level, $formatted);
     }
 
@@ -52,7 +51,7 @@ class RFC5424Formatted extends AbstractLogger
             // TIMESTAMP
             date(DateTime::ATOM),
             // HOSTNAME
-            gethostname() ?? '-',
+            gethostname() ?: '-',
             // APP-NAME
             'appName',
             // PROCID
@@ -64,31 +63,34 @@ class RFC5424Formatted extends AbstractLogger
         ]);
     }
 
+    /**
+     * @param array<array-key, mixed> $context
+     */
     private function formated(string $level, string $message, array $context): string
     {
-        $elements = array_map_assoc(
-            function ($elementSourceId, $elementSourceParams) {
-                $elementParams = array_map_assoc(function ($paramName, $paramValue) {
-                    if (\is_object($paramValue) || \is_array($paramValue)) {
-                        $paramValue = '!' . \gettype($paramValue) . '!';
-                    }
+        $sources = array_filter([
+            'Meteia.log@30452' => [
+                'seq' => $this->msgNumber++,
+            ],
+            'psr.log.context@17589' => $context,
+        ]);
 
-                    return [
-                        $paramName => sprintf('%s="%s"', $paramName, $this->escapeParamValue((string) $paramValue)),
-                    ];
-                }, $elementSourceParams);
-                $element = sprintf('[%s %s]', $elementSourceId, implode(' ', $elementParams));
-
-                return [$elementSourceId => $element];
-            },
-            array_filter([
-                'Meteia.log@30452' => [
-                    'seq' => $this->msgNumber++,
-                ],
-                'psr.log.context@17589' => $context,
-            ]),
-        );
-        $structuredData = \count($elements) ? implode('', $elements) . ' ' : '';
+        $elements = [];
+        foreach ($sources as $elementSourceId => $elementSourceParams) {
+            $paramStrings = [];
+            foreach ($elementSourceParams as $paramName => $paramValue) {
+                if (\is_object($paramValue) || \is_array($paramValue)) {
+                    $paramValue = '!' . \gettype($paramValue) . '!';
+                }
+                $paramStrings[] = sprintf(
+                    '%s="%s"',
+                    (string) $paramName,
+                    $this->escapeParamValue((string) $paramValue),
+                );
+            }
+            $elements[] = sprintf('[%s %s]', $elementSourceId, implode(' ', $paramStrings));
+        }
+        $structuredData = $elements === [] ? '' : implode('', $elements) . ' ';
 
         $lines = array_map('trim', explode(PHP_EOL, $message));
 
@@ -97,12 +99,12 @@ class RFC5424Formatted extends AbstractLogger
         return $this->prefixed($level, $formattedMessage);
     }
 
-    private function escapeParamValue($value): string
+    private function escapeParamValue(string $value): string
     {
         $lines = array_map('trim', explode(PHP_EOL, $value));
         $lines = array_filter($lines);
         $value = implode(' ', $lines);
 
-        return preg_replace('%(["\]\\\\]+)%', '\\\\$1', $value);
+        return (string) preg_replace('%(["\]\\\\]+)%', '\\\\$1', $value);
     }
 }

@@ -31,13 +31,14 @@ class DecoratedLog extends AbstractLogger
         if (!isset($context['file'], $context['line'])) {
             $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             $frame = $trace[self::SKIP_FRAMES];
-            $context['file'] = $frame['file'];
-            $context['line'] = $frame['line'];
+            $context['file'] = $frame['file'] ?? 'unknown';
+            $context['line'] = $frame['line'] ?? 0;
         }
 
-        $context['source'] = str_replace($this->pathPrefix, '', $context['file'] ?? 'unknown');
-        $context['source'] = trim($context['source'], \DIRECTORY_SEPARATOR);
-        $context['source'] .= ':' . $context['line'] ?? '0';
+        $file = \is_string($context['file']) ? $context['file'] : 'unknown';
+        $line = \is_scalar($context['line']) ? (string) $context['line'] : '0';
+        $source = trim(str_replace($this->pathPrefix, '', $file), \DIRECTORY_SEPARATOR);
+        $context['source'] = $source . ':' . $line;
 
         unset($context['file'], $context['line']);
 

@@ -7,31 +7,31 @@ namespace Meteia\Logging\Aura;
 use Override;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+use Stringable;
 
 class SqlProfilerLogger extends AbstractLogger
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
+    public function __construct(
+        private LoggerInterface $logger,
+    ) {}
 
     #[Override]
-    public function log($level, $message, array $context = []): void
+    public function log($level, string|Stringable $message, array $context = []): void
     {
-        if ($context['statement']) {
-            $lines = array_map('trim', explode(PHP_EOL, $context['statement']));
-            $lines = array_filter($lines);
+        $statement = null;
+        $rawStatement = $context['statement'] ?? null;
+        if (\is_string($rawStatement) && $rawStatement !== '') {
+            $lines = array_filter(array_map('trim', explode(PHP_EOL, $rawStatement)));
             $statement = implode(' ', $lines);
         }
+
+        $duration = $context['duration'] ?? 0;
+        $durationMs = \is_int($duration) || \is_float($duration) ? number_format($duration * 1000, 2) : '0.00';
+
         $shortContext = [
-            'function' => $context['function'],
-            'durationMs' => number_format($context['duration'] * 1000, 2),
-            'statement' => $statement ?? null,
+            'function' => $context['function'] ?? null,
+            'durationMs' => $durationMs,
+            'statement' => $statement,
             'values' => $context['values'] ?? null,
         ];
 

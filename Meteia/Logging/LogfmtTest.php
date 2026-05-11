@@ -2,76 +2,81 @@
 
 declare(strict_types=1);
 
-use Meteia\Logging\Logfmt;
+namespace Meteia\Logging;
 
-beforeEach(function (): void {
-    $this->uut = new Logfmt();
-});
+use Override;
+use PHPUnit\Framework\TestCase;
 
-test('simple message', function (): void {
-    $out = $this->uut->format('info', 'world');
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class LogfmtTest extends TestCase
+{
+    private Logfmt $uut;
 
-    $this->assertEquals('level=info msg=world', $out);
-});
+    #[Override]
+    protected function setUp(): void
+    {
+        $this->uut = new Logfmt();
+    }
 
-test('message with context', function (): void {
-    $out = $this->uut->format('info', 'world', ['one' => 1]);
+    public function testSimpleMessage(): void
+    {
+        static::assertSame('level=info msg=world', $this->uut->format('info', 'world'));
+    }
 
-    $this->assertEquals('level=info msg=world one=1', $out);
-});
+    public function testMessageWithContext(): void
+    {
+        static::assertSame('level=info msg=world one=1', $this->uut->format('info', 'world', ['one' => 1]));
+    }
 
-test('keys are sorted', function (): void {
-    $out = $this->uut->format('info', 'world', ['alpha' => 1, 'zero' => 'zero']);
+    public function testKeysAreSorted(): void
+    {
+        static::assertSame('alpha=1 level=info msg=world zero=zero', $this->uut->format('info', 'world', [
+            'alpha' => 1,
+            'zero' => 'zero',
+        ]));
+    }
 
-    $this->assertEquals('alpha=1 level=info msg=world zero=zero', $out);
-});
+    public function testZeroValuesAreNotDropped(): void
+    {
+        static::assertSame('level=info msg=world one=1 zero=0', $this->uut->format('info', 'world', [
+            'one' => 1,
+            'zero' => 0,
+        ]));
+    }
 
-test('zero-values are not-dropped', function (): void {
-    $out = $this->uut->format('info', 'world', ['one' => 1, 'zero' => 0]);
+    public function testPrintsBoolAsTrueFalse(): void
+    {
+        static::assertSame('false=false level=info msg=world true=true', $this->uut->format('info', 'world', [
+            'true' => true,
+            'false' => false,
+        ]));
+    }
 
-    $this->assertEquals('level=info msg=world one=1 zero=0', $out);
-});
+    public function testStringsWithSpacesAreQuoted(): void
+    {
+        static::assertSame('level=info msg=world special="four score"', $this->uut->format('info', 'world', [
+            'special' => 'four score',
+        ]));
+    }
 
-test('prints bool as 0/1', function (): void {
-    $out = $this->uut->format('info', 'world', ['true' => true, 'false' => false]);
+    public function testKeyNamesAreAsciiOnly(): void
+    {
+        static::assertSame('level=info msg=world z12=n', $this->uut->format('info', 'world', ['z1≥2' => 'n']));
+    }
 
-    $this->assertEquals('false=false level=info msg=world true=true', $out);
-});
+    public function testKeyNamesCanNotBeEmpty(): void
+    {
+        static::assertSame('level=info msg=world', $this->uut->format('info', 'world', ['≥' => 'n']));
+    }
 
-test('strings with spaces are quoted', function (): void {
-    $out = $this->uut->format('info', 'world', ['special' => 'four score']);
-
-    $this->assertEquals('level=info msg=world special="four score"', $out);
-});
-
-test('key names are ASCII only', function (): void {
-    $out = $this->uut->format('info', 'world', ['z1≥2' => 'n']);
-
-    $this->assertEquals('level=info msg=world z12=n', $out);
-});
-
-test('key names can not be empty', function (): void {
-    $out = $this->uut->format('info', 'world', ['≥' => 'n']);
-
-    $this->assertEquals('level=info msg=world', $out);
-});
-
-test('floats are rounded', function (): void {
-    $out = $this->uut->format('info', 'world', ['num' => 3.141_592_65]);
-
-    $this->assertEquals('level=info msg=world num=3.1416', $out);
-});
-
-// test('strings with quotes are escaped', function () {
-//    $out = $this->>uut->format("info", "world", ['special' => 'four"score']);
-
-//    /** @var \PHPUnit\Framework\TestCase $this */
-//    $this->assertEquals('level=info msg=world special=four\"score', $out);
-// });
-
-// test('strings with spaces & quotes are quoted & escaped', function () {
-//    $out = $this->>uut->format("info", "world", ['special' => 'four "score']);
-
-//    /** @var \PHPUnit\Framework\TestCase $this */
-//    $this->assertEquals('level=info msg=world special="four \"score"', $out);
-// });
+    public function testFloatsAreRounded(): void
+    {
+        static::assertSame('level=info msg=world num=3.1416', $this->uut->format('info', 'world', [
+            'num' => 3.141_592_65,
+        ]));
+    }
+}

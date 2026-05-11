@@ -6,25 +6,24 @@ namespace Meteia\Logging;
 
 use Override;
 use Psr\Log\AbstractLogger;
+use RuntimeException;
+use Socket;
 use Stringable;
 
 class UdpSystemLog extends AbstractLogger
 {
-    // private const FACILITY_MAX = 23;
-    // private const FACILITY_MIN = 0;
-
-    /**
-     * @var resource
-     */
-    private $socket;
+    private Socket $socket;
 
     public function __construct(
         private string $hostname = '127.0.0.1',
         private int $port = 10_514,
         $facility = 23,
     ) {
-        // Assertion::between($facility, self::FACILITY_MIN, self::FACILITY_MAX);
-        $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        if ($socket === false) {
+            throw new RuntimeException('Failed to create UDP socket');
+        }
+        $this->socket = $socket;
     }
 
     public function __destruct()
@@ -35,7 +34,7 @@ class UdpSystemLog extends AbstractLogger
     #[Override]
     public function log($level, string|Stringable $message, array $context = []): void
     {
-        $message .= PHP_EOL;
-        socket_sendto($this->socket, $message, \strlen($message), 0, $this->hostname, $this->port);
+        $payload = $message . PHP_EOL;
+        socket_sendto($this->socket, $payload, \strlen($payload), 0, $this->hostname, $this->port);
     }
 }
