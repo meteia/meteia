@@ -8,6 +8,9 @@ use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\AdvancedMessageQueuing\Configuration\DelayedCommandsExchangeName;
+use Meteia\AdvancedMessageQueuing\Management\BunnyRabbitMqManagement;
+use Meteia\AdvancedMessageQueuing\Management\RabbitMqManagement;
+use Meteia\AdvancedMessageQueuing\Management\VHostName;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Configuration\Configuration;
 use Meteia\ValueObjects\Identity\MessageScope;
@@ -31,6 +34,7 @@ return [
 
         return $client->channel();
     },
+    ChannelInterface::class => static fn(Channel $channel): ChannelInterface => $channel,
     CommandsExchangeName::class => static fn(
         Configuration $configuration,
         ApplicationNamespace $applicationNamespace,
@@ -48,4 +52,9 @@ return [
     AmbientMessageScopeSource::class =>
         static fn(MessageScope $scope): AmbientMessageScopeSource => new AmbientMessageScopeSource($scope),
     MessageScopeSource::class => static fn(AmbientMessageScopeSource $source): MessageScopeSource => $source,
+    VHostName::class => static fn(Configuration $config): VHostName => new VHostName(
+        $config->string('RABBITMQ_VIRTUALHOST', '/'),
+    ),
+    RabbitMqManagement::class =>
+        static fn(ChannelInterface $channel): RabbitMqManagement => new BunnyRabbitMqManagement($channel),
 ];
