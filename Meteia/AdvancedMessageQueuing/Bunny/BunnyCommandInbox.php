@@ -9,6 +9,7 @@ use Bunny\Client;
 use Bunny\Message;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
+use Meteia\Commands\Command;
 use Meteia\Commands\CommandId;
 use Meteia\Commands\CommandInbox;
 use Meteia\Commands\CommandSink;
@@ -54,7 +55,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
 
             try {
                 $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
-                \assert($command instanceof \Meteia\Commands\Command);
+                \assert($command instanceof Command);
                 $this->scopeSource->using($scope, function () use (
                     $sink,
                     $command,
