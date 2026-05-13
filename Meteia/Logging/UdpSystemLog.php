@@ -15,8 +15,8 @@ class UdpSystemLog extends AbstractLogger
     private Socket $socket;
 
     public function __construct(
-        private string $hostname = '127.0.0.1',
-        private int $port = 10_514,
+        private readonly string $hostname = '127.0.0.1',
+        private readonly int $port = 10_514,
         $facility = 23,
     ) {
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);

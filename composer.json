@@ -34,6 +34,7 @@
     "ext-gmp": "*",
     "ext-intl": "*",
     "ext-pdo": "*",
+    "ext-sockets": "*",
     "ext-sodium": "*",
     "ext-uri": "*",
     "ext-zlib": "*",
