@@ -35,14 +35,14 @@ return [
         Configuration $configuration,
         ApplicationNamespace $applicationNamespace,
     ): CommandsExchangeName => new CommandsExchangeName($configuration->string(
-        'METEIA_RABBITMQ_COMMANDS_EXCHANGE_NAME',
+        'METEIA_AMQ_COMMANDS_EXCHANGE_NAME',
         $applicationNamespace . '.Commands',
     )),
     DelayedCommandsExchangeName::class => static fn(
         Configuration $configuration,
         ApplicationNamespace $applicationNamespace,
     ): DelayedCommandsExchangeName => new DelayedCommandsExchangeName($configuration->string(
-        'METEIA_RABBITMQ_DELAYED_COMMANDS_EXCHANGE_NAME',
+        'METEIA_AMQ_DELAYED_COMMANDS_EXCHANGE_NAME',
         $applicationNamespace . '.DelayedCommands',
     )),
     AmbientMessageScopeSource::class =>
