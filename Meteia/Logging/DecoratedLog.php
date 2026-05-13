@@ -43,15 +43,10 @@ class DecoratedLog extends AbstractLogger
         unset($context['file'], $context['line']);
 
         $scope = $this->scopeSource->current();
-        $this->log->log(
-            $level,
-            implode(' -> ', [
-                $scope->correlationId(),
-                $scope->causationId(),
-                $scope->processId(),
-                $message,
-            ]),
-            $context,
-        );
+        $context['correlation_id'] = $scope->correlationId();
+        $context['causation_id'] = $scope->causationId();
+        $context['process_id'] = $scope->processId();
+
+        $this->log->log($level, $message, $context);
     }
 }

@@ -18,6 +18,7 @@ class UdpSystemLog extends AbstractLogger
         private readonly string $hostname = '127.0.0.1',
         private readonly int $port = 10_514,
         $facility = 23,
+        private readonly Logfmt $logfmt = new Logfmt(),
     ) {
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         if ($socket === false) {
@@ -34,7 +35,7 @@ class UdpSystemLog extends AbstractLogger
     #[Override]
     public function log($level, string|Stringable $message, array $context = []): void
     {
-        $payload = $message . PHP_EOL;
+        $payload = $this->logfmt->format((string) $level, (string) $message, $context) . PHP_EOL;
         socket_sendto($this->socket, $payload, \strlen($payload), 0, $this->hostname, $this->port);
     }
 }

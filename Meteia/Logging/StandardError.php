@@ -16,8 +16,9 @@ class StandardError extends AbstractLogger
      */
     private $stderr;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly Logfmt $logfmt = new Logfmt(),
+    ) {
         $stderr = fopen('php://stderr', 'w');
         if ($stderr === false) {
             throw new RuntimeException('Failed to open php://stderr');
@@ -28,6 +29,7 @@ class StandardError extends AbstractLogger
     #[Override]
     public function log($level, string|Stringable $message, array $context = []): void
     {
-        fwrite($this->stderr, $message . PHP_EOL);
+        $line = $this->logfmt->format((string) $level, (string) $message, $context);
+        fwrite($this->stderr, $line . PHP_EOL);
     }
 }
