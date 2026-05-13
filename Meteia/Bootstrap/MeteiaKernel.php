@@ -7,6 +7,7 @@ namespace Meteia\Bootstrap;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\DependencyInjection\TimedContainer;
+use Meteia\Domain\Contracts\UnitOfWork;
 use Meteia\ErrorHandling\Middleware\CatchAndReportErrors;
 use Meteia\Http\Middleware\PsrEndpoints;
 use Meteia\Http\Middleware\ResponseCookies;
@@ -16,9 +17,12 @@ use Meteia\Http\PsrResponseSink;
 use Meteia\Http\RequestHandler;
 use Meteia\Http\ResponseSink;
 use Meteia\Performance\Timings;
+use Meteia\ValueObjects\Identity\MessageScope;
 use Override;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 final readonly class MeteiaKernel implements Kernel
 {
@@ -36,10 +40,34 @@ final readonly class MeteiaKernel implements Kernel
 
         $requestHandler = $this->requestHandler($container, $middleware);
         $serverRequest = $container->get(ServerRequestInterface::class);
-        \assert($serverRequest instanceof ServerRequestInterface);
+        \assert($serverRequest instanceof ServerRequestInterface, 'ServerRequestInterface is bound at request boundary');
         $response = $requestHandler->handle($serverRequest);
 
         $this->sink->send($response);
+
+        $this->flushUnitOfWork($container);
+    }
+
+    private function flushUnitOfWork(Container $container): void
+    {
+        try {
+            $unitOfWork = $container->get(UnitOfWork::class);
+            \assert($unitOfWork instanceof UnitOfWork, 'UnitOfWork binding resolves to UnitOfWork instance');
+            $scope = $container->get(MessageScope::class);
+            \assert($scope instanceof MessageScope, 'MessageScope is seeded by SeedMessageScope middleware');
+            $unitOfWork->complete($scope);
+        } catch (Throwable $error) {
+            try {
+                $log = $container->get(LoggerInterface::class);
+                \assert($log instanceof LoggerInterface, 'LoggerInterface is bound by Logging DependencyInjection');
+                $log->error('UnitOfWork flush failed after response', [
+                    'exception' => $error::class,
+                    'message' => $error->getMessage(),
+                ]);
+                // @mago-expect lint:no-empty-catch-clause -- response already sent; logging is best-effort.
+            } catch (Throwable) {
+            }
+        }
     }
 
     #[Override]
