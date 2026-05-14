@@ -9,6 +9,5 @@ use Meteia\Domain\Contracts\CommitEventsInUnitOfWork;
 
 interface EventSourced extends EventMessageTarget, AggregateRoot, CommitEventsInUnitOfWork
 {
-    // TODO: Was there a good reason for this? Hmm....
-    // public function withEventVersion($eventVersion);
+    public function exists(): bool;
 }

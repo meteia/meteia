@@ -208,4 +208,10 @@ final class CountingTarget implements EventSourced
         ++$this->count;
         $this->sequence = $eventSequence;
     }
+
+    #[Override]
+    public function exists(): bool
+    {
+        return $this->count > 0;
+    }
 }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Commands\CommandLine;
 
+use Meteia\Application\Command as ApplicationCommand;
+use Meteia\Application\CommandBus;
+use Meteia\Application\Rejected;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Bootstrap\ApplicationPublicDir;
@@ -68,8 +71,19 @@ readonly class RunWorker implements CLICommand, CommandSink
     public function drain(Command $command, MessageScope $scope): void
     {
         try {
-            \assert(method_exists($command, 'invoke'));
-            $this->container->call($command->invoke(...));
+            \assert(
+                $command instanceof ApplicationCommand,
+                sprintf('Queued command %s must also implement %s', $command::class, ApplicationCommand::class),
+            );
+            $bus = $this->container->get(CommandBus::class);
+            \assert($bus instanceof CommandBus);
+            $result = $bus->dispatch($command);
+            if ($result instanceof Rejected) {
+                $this->log->error('Command rejected', [
+                    'command' => $command::class,
+                    'reason' => $result->reason(),
+                ]);
+            }
         } catch (Throwable $e) {
             $this->log->error('Command failed', ['exception' => $e]);
         }
