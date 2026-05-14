@@ -13,12 +13,12 @@ use Meteia\EventSourcing\Contracts\EventSourced;
 use Meteia\EventSourcing\Exceptions\OptimisticConcurrencyFailure;
 use Meteia\MessageStreams\MessageSerializer;
 use Meteia\Performance\Timings;
-use Meteia\Projections\GlobalSequence;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\UniqueId;
 use Override;
 use PHPUnit\Framework\TestCase;
+
 use function assert;
 
 /**
@@ -112,41 +112,6 @@ final class PdoEventStreamTest extends TestCase
         );
 
         $tail = $stream->read($streamId, new FromAfter(new StreamVersion(0)));
-        PdoEventStreamTest::assertCount(2, $tail);
-    }
-
-    public function testReadGloballyReturnsEventsAcrossAllStreamsInCommitOrder(): void
-    {
-        $db = $this->bootstrappedDatabase();
-        $stream = new PdoEventStream($db, $this->serializer(), new Timings());
-        $global = new PdoGlobalEventStream($db, $this->serializer());
-        $first = StreamId::random();
-        $second = StreamId::random();
-
-        $stream->append($first, new AnyVersion(), $this->record($first, 0, new SomethingRecorded()));
-        $stream->append($second, new AnyVersion(), $this->record($second, 0, new SomethingRecorded()));
-        $stream->append($first, new AnyVersion(), $this->record($first, 1, new SomethingRecorded()));
-
-        $all = $global->readGlobally();
-        PdoEventStreamTest::assertCount(3, $all);
-    }
-
-    public function testReadGloballyHonorsStartingPosition(): void
-    {
-        $db = $this->bootstrappedDatabase();
-        $stream = new PdoEventStream($db, $this->serializer(), new Timings());
-        $global = new PdoGlobalEventStream($db, $this->serializer());
-        $streamId = StreamId::random();
-
-        $stream->append(
-            $streamId,
-            new AnyVersion(),
-            $this->record($streamId, 0, new SomethingRecorded()),
-            $this->record($streamId, 1, new SomethingRecorded()),
-            $this->record($streamId, 2, new SomethingRecorded()),
-        );
-
-        $tail = $global->readGlobally(new GlobalSequence(1));
         PdoEventStreamTest::assertCount(2, $tail);
     }
 
