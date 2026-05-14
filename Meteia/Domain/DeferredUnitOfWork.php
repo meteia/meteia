@@ -27,8 +27,6 @@ use Throwable;
  * (event store, Bunny outboxes) are resolved lazily via the
  * container so a request with nothing buffered — for example a GraphQL
  * read query — never opens a RabbitMQ connection.
- *
- * @mago-expect lint:kan-defect -- coordinating event store, outboxes, and command issuance is intrinsic to a UnitOfWork flush.
  */
 final class DeferredUnitOfWork implements UnitOfWork
 {
@@ -97,7 +95,11 @@ final class DeferredUnitOfWork implements UnitOfWork
         foreach ($byStream as [$streamId, $recorded]) {
             $eventStream->append($streamId, new AnyVersion(), ...$recorded);
             foreach ($recorded as $event) {
-                $eventOutbox->publish($event->event());
+                try {
+                    $eventOutbox->publish($event->event());
+                } catch (Throwable) {
+                    // @mago-expect lint:no-empty-catch-clause -- outbox publish is best-effort side effect for eventual reactors/sinks; pdo append is the source of truth
+                }
             }
         }
     }
@@ -118,7 +120,11 @@ final class DeferredUnitOfWork implements UnitOfWork
         foreach ($this->pendingCommands as $pending) {
             $message = $pending->issuedWith($scope->causationId(), $scope->correlationId(), $issuedAt);
             $message->appendInto($issuedCommands);
-            $message->publishTo($commandOutbox);
+            try {
+                $message->publishTo($commandOutbox);
+            } catch (Throwable) {
+                // @mago-expect lint:no-empty-catch-clause -- outbox publish is best-effort side effect
+            }
         }
     }
 

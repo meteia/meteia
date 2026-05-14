@@ -60,10 +60,6 @@ return [
         )),
     AttestationStatementSupportManager::class =>
         static fn(): AttestationStatementSupportManager => new AttestationStatementSupportManager([new NoneAttestationStatementSupport()]),
-    SerializerInterface::class =>
-        static fn(AttestationStatementSupportManager $manager): SerializerInterface => new WebauthnSerializerFactory(
-            $manager,
-        )->create(),
     CeremonyStepManagerFactory::class => static function (RelyingParty $relyingParty): CeremonyStepManagerFactory {
         $factory = new CeremonyStepManagerFactory();
         $factory->setAllowedOrigins($relyingParty->allowedOrigins());

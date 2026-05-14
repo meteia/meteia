@@ -20,6 +20,7 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Override;
 use PDOException;
 use ReflectionClass;
+use stdClass;
 use function assert;
 use function is_string;
 
