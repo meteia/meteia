@@ -16,10 +16,10 @@ use ReflectionClass;
 
 trait EventSourcing
 {
-    /** @var PendingEvent[] */
+    /** @var list<PendingEvent> */
     protected array $__pendingEvents = [];
 
-    /** @var PendingCommand[] */
+    /** @var list<PendingCommand> */
     protected array $__pendingCommands = [];
 
     protected int $__eventSequence = -1;
@@ -28,8 +28,7 @@ trait EventSourcing
     {
         $streamId = $this->streamId();
         $version = new StreamVersion($this->__eventSequence + 1);
-        $pending = new PendingEvent($streamId, $version, $event);
-        $this->__pendingEvents[] = $pending;
+        $this->__pendingEvents[] = new PendingEvent($streamId, $version, $event);
         $this->handleEventMessage($streamId, $event, $version->asInt());
     }
 
@@ -40,10 +39,17 @@ trait EventSourcing
 
     public function commitInto(UnitOfWorkContext $unitOfWorkContext): void
     {
-        $unitOfWorkContext->caused(new PendingEvents($this->__pendingEvents));
-        $unitOfWorkContext->wantsTo(new PendingCommands($this->__pendingCommands));
-        $this->__pendingEvents = [];
-        $this->__pendingCommands = [];
+        if ($this->__pendingEvents === [] && $this->__pendingCommands === []) {
+            return;
+        }
+        if ($this->__pendingEvents !== []) {
+            $unitOfWorkContext->caused(new PendingEvents($this->__pendingEvents));
+            $this->__pendingEvents = [];
+        }
+        if ($this->__pendingCommands !== []) {
+            $unitOfWorkContext->wantsTo(new PendingCommands($this->__pendingCommands));
+            $this->__pendingCommands = [];
+        }
     }
 
     public function handleEventMessage(UniqueId $streamId, DomainEvent $event, int $eventSequence): void
@@ -51,28 +57,8 @@ trait EventSourcing
         if ($eventSequence <= $this->__eventSequence) {
             throw new Exception('Event version is older than the aggregates version.');
         }
+        $this->dispatchDomainEvent($event);
         $this->__eventSequence = $eventSequence;
-
-        $eventName = substr($event::class, strrpos($event::class, '\\') + 1);
-        $method = $eventName;
-        $rc = new ReflectionClass($this);
-        $meth = $rc->getMethod($method);
-        $args = [];
-        foreach ($meth->getParameters() as $parameter) {
-            if (!isset($event->{$parameter->name})) {
-                $err = sprintf(
-                    'The event `%s` is missing the property named `%s` as expected by `%s->%s()`',
-                    $event::class,
-                    $parameter->name,
-                    $rc->getName(),
-                    $meth->name,
-                );
-
-                throw new Exception($err);
-            }
-            $args[$parameter->getPosition()] = $event->{$parameter->name};
-        }
-        $this->{$method}(...$args);
     }
 
     public function handleCommandMessage(Command $command): void
@@ -125,8 +111,24 @@ trait EventSourcing
         return $value;
     }
 
-    private function streamId(): StreamId
+    protected function streamId(): StreamId
     {
         return new StreamId($this->aggregateRootId()->bytes());
+    }
+
+    private function dispatchDomainEvent(DomainEvent $event): void
+    {
+        $eventName = substr($event::class, strrpos($event::class, '\\') + 1);
+        $applyMethod = 'apply' . $eventName;
+        if (!method_exists($this, $applyMethod)) {
+            throw new Exception(sprintf(
+                'No handler for `%s` on `%s`. Define `%s(%s $event)`.',
+                $event::class,
+                $this::class,
+                $applyMethod,
+                $event::class,
+            ));
+        }
+        $this->{$applyMethod}($event);
     }
 }
