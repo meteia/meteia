@@ -19,6 +19,7 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\UniqueId;
 use Override;
 use PHPUnit\Framework\TestCase;
+use function assert;
 
 /**
  * @internal
@@ -29,13 +30,13 @@ final class PdoEventStreamTest extends TestCase
     {
         $stream = $this->stream();
         $streamId = StreamId::random();
-        $event = new RecordedSomething();
+        $event = new SomethingRecorded();
 
         $stream->append($streamId, new EmptyStream(), $this->record($streamId, 0, $event));
 
         $target = new CountingTarget();
         $stream->replay($streamId, $target);
-        static::assertSame(1, $target->count);
+        PdoEventStreamTest::assertSame(1, $target->count);
     }
 
     public function testReadReturnsRecordedEventsWithIdsIntact(): void
@@ -44,7 +45,7 @@ final class PdoEventStreamTest extends TestCase
         $streamId = StreamId::random();
         $causation = CausationId::random();
         $correlation = CorrelationId::random();
-        $pending = new PendingEvent($streamId, new StreamVersion(0), new RecordedSomething());
+        $pending = new PendingEvent($streamId, new StreamVersion(0), new SomethingRecorded());
         $stream->append(
             $streamId,
             new AnyVersion(),
@@ -52,34 +53,34 @@ final class PdoEventStreamTest extends TestCase
         );
 
         $events = $stream->read($streamId);
-        static::assertCount(1, $events);
+        PdoEventStreamTest::assertCount(1, $events);
         $first = $events[0];
-        \assert($first instanceof \Meteia\EventSourcing\RecordedEvent);
-        static::assertSame((string) $causation, (string) $first->causedBy());
-        static::assertSame((string) $correlation, (string) $first->correlatedTo());
+        assert($first instanceof RecordedEvent);
+        PdoEventStreamTest::assertSame((string) $causation, (string) $first->causedBy());
+        PdoEventStreamTest::assertSame((string) $correlation, (string) $first->correlatedTo());
     }
 
     public function testEmptyStreamRejectsNonZeroVersion(): void
     {
         $stream = $this->stream();
         $streamId = StreamId::random();
-        $stream->append($streamId, new EmptyStream(), $this->record($streamId, 0, new RecordedSomething()));
+        $stream->append($streamId, new EmptyStream(), $this->record($streamId, 0, new SomethingRecorded()));
 
         $this->expectException(OptimisticConcurrencyFailure::class);
-        $stream->append($streamId, new EmptyStream(), $this->record($streamId, 1, new RecordedSomething()));
+        $stream->append($streamId, new EmptyStream(), $this->record($streamId, 1, new SomethingRecorded()));
     }
 
     public function testExactlyAtMismatchRaisesConcurrencyFailure(): void
     {
         $stream = $this->stream();
         $streamId = StreamId::random();
-        $stream->append($streamId, new AnyVersion(), $this->record($streamId, 0, new RecordedSomething()));
+        $stream->append($streamId, new AnyVersion(), $this->record($streamId, 0, new SomethingRecorded()));
 
         $this->expectException(OptimisticConcurrencyFailure::class);
         $stream->append(
             $streamId,
             new ExactlyAt(new StreamVersion(5)),
-            $this->record($streamId, 1, new RecordedSomething()),
+            $this->record($streamId, 1, new SomethingRecorded()),
         );
     }
 
@@ -87,15 +88,15 @@ final class PdoEventStreamTest extends TestCase
     {
         $stream = $this->stream();
         $streamId = StreamId::random();
-        $stream->append($streamId, new AnyVersion(), $this->record($streamId, 0, new RecordedSomething()));
+        $stream->append($streamId, new AnyVersion(), $this->record($streamId, 0, new SomethingRecorded()));
 
         $stream->append(
             $streamId,
             new ExactlyAt(new StreamVersion(1)),
-            $this->record($streamId, 1, new RecordedSomething()),
+            $this->record($streamId, 1, new SomethingRecorded()),
         );
 
-        static::assertCount(2, $stream->read($streamId));
+        PdoEventStreamTest::assertCount(2, $stream->read($streamId));
     }
 
     public function testReadAfterReturnsLaterEventsOnly(): void
@@ -105,13 +106,13 @@ final class PdoEventStreamTest extends TestCase
         $stream->append(
             $streamId,
             new AnyVersion(),
-            $this->record($streamId, 0, new RecordedSomething()),
-            $this->record($streamId, 1, new RecordedSomething()),
-            $this->record($streamId, 2, new RecordedSomething()),
+            $this->record($streamId, 0, new SomethingRecorded()),
+            $this->record($streamId, 1, new SomethingRecorded()),
+            $this->record($streamId, 2, new SomethingRecorded()),
         );
 
         $tail = $stream->read($streamId, new FromAfter(new StreamVersion(0)));
-        static::assertCount(2, $tail);
+        PdoEventStreamTest::assertCount(2, $tail);
     }
 
     public function testReadGloballyReturnsEventsAcrossAllStreamsInCommitOrder(): void
@@ -122,12 +123,12 @@ final class PdoEventStreamTest extends TestCase
         $first = StreamId::random();
         $second = StreamId::random();
 
-        $stream->append($first, new AnyVersion(), $this->record($first, 0, new RecordedSomething()));
-        $stream->append($second, new AnyVersion(), $this->record($second, 0, new RecordedSomething()));
-        $stream->append($first, new AnyVersion(), $this->record($first, 1, new RecordedSomething()));
+        $stream->append($first, new AnyVersion(), $this->record($first, 0, new SomethingRecorded()));
+        $stream->append($second, new AnyVersion(), $this->record($second, 0, new SomethingRecorded()));
+        $stream->append($first, new AnyVersion(), $this->record($first, 1, new SomethingRecorded()));
 
         $all = $global->readGlobally();
-        static::assertCount(3, $all);
+        PdoEventStreamTest::assertCount(3, $all);
     }
 
     public function testReadGloballyHonorsStartingPosition(): void
@@ -140,13 +141,13 @@ final class PdoEventStreamTest extends TestCase
         $stream->append(
             $streamId,
             new AnyVersion(),
-            $this->record($streamId, 0, new RecordedSomething()),
-            $this->record($streamId, 1, new RecordedSomething()),
-            $this->record($streamId, 2, new RecordedSomething()),
+            $this->record($streamId, 0, new SomethingRecorded()),
+            $this->record($streamId, 1, new SomethingRecorded()),
+            $this->record($streamId, 2, new SomethingRecorded()),
         );
 
         $tail = $global->readGlobally(new GlobalSequence(1));
-        static::assertCount(2, $tail);
+        PdoEventStreamTest::assertCount(2, $tail);
     }
 
     private function record(StreamId $streamId, int $version, DomainEvent $event): RecordedEvent
@@ -164,8 +165,6 @@ final class PdoEventStreamTest extends TestCase
     private function serializer(): MessageSerializer
     {
         return new class extends MessageSerializer {
-            public function __construct() {}
-
             #[Override]
             public function serialize(mixed $value): string
             {
@@ -176,7 +175,7 @@ final class PdoEventStreamTest extends TestCase
             public function unserialize(string $value): mixed
             {
                 $decoded = base64_decode($value, true);
-                \assert($decoded !== false);
+                assert($decoded !== false);
 
                 return unserialize($decoded, ['allowed_classes' => true]);
             }
@@ -217,7 +216,7 @@ final class PdoEventStreamTest extends TestCase
 /**
  * @internal
  */
-final readonly class RecordedSomething implements DomainEvent
+final readonly class SomethingRecorded implements DomainEvent
 {
     #[Override]
     public static function eventTypeId(): EventTypeId

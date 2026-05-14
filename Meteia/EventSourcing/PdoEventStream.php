@@ -20,18 +20,20 @@ use Meteia\ValueObjects\Identity\CorrelationId;
 use Override;
 use PDOException;
 use ReflectionClass;
-use stdClass;
+use function assert;
+use function is_string;
 
-class PdoEventStream implements EventStream
+ class PdoEventStream implements EventStream
 {
-    /** @var array<class-string, string> */
-    private array $aggregateHashes = [];
+    private array $aggregateHashes;
 
     public function __construct(
-        private ExtendedPdoInterface $db,
-        private MessageSerializer $messageSerializer,
-        private Timings $timings,
-    ) {}
+        readonly private ExtendedPdoInterface $db,
+        readonly private MessageSerializer $messageSerializer,
+        readonly private Timings $timings,
+    ) {
+        $this->aggregateHashes = [];
+    }
 
     #[Override]
     public function append(StreamId $streamId, ExpectedVersion $expected, RecordedEvent ...$events): void
@@ -125,7 +127,7 @@ class PdoEventStream implements EventStream
         $eventRaw = $row->event;
         $causationIdRaw = $row->causation_id;
         $correlationIdRaw = $row->correlation_id;
-        \assert(\is_string($eventRaw) && \is_string($causationIdRaw) && \is_string($correlationIdRaw));
+        assert(is_string($eventRaw) && is_string($causationIdRaw) && is_string($correlationIdRaw));
         /** @var DomainEvent $event */
         $event = $this->messageSerializer->unserialize($eventRaw);
         $pending = new PendingEvent($streamId, new StreamVersion((int) $row->aggregate_sequence), $event);
@@ -143,12 +145,13 @@ class PdoEventStream implements EventStream
         if (!isset($this->aggregateHashes[$target::class])) {
             $rc = new ReflectionClass($target);
             $fileName = $rc->getFileName();
-            \assert($fileName !== false);
+            assert($fileName !== false);
             $fileHash = hash_file('sha256', $fileName, true);
-            \assert($fileHash !== false);
+            assert($fileHash !== false);
             $hash = substr($fileHash, 0, 16);
             $this->aggregateHashes[$target::class] = $hash;
         }
+        $hash = $this->aggregateHashes[$target::class];
 
         $snapshotRow = $this->db->fetchObject('
             SELECT snapshot, aggregate_sequence
@@ -158,15 +161,15 @@ class PdoEventStream implements EventStream
             LIMIT 1
         ', [
             'aggregateRootId' => $streamId->bytes(),
-            'aggregateHash' => $this->aggregateHashes[$target::class],
+            'aggregateHash' => $hash,
         ]);
 
         $fromVersion = new FromFirst();
         if ($snapshotRow !== false) {
             $snapshotData = $snapshotRow->snapshot;
-            \assert(\is_string($snapshotData));
+            assert(is_string($snapshotData));
             $hydrated = $this->messageSerializer->unserialize($snapshotData);
-            \assert($hydrated instanceof EventSourced);
+            assert($hydrated instanceof EventSourced);
             $target = $hydrated;
             $fromVersion = new FromAfter(new StreamVersion((int) $snapshotRow->aggregate_sequence));
         }
@@ -177,7 +180,7 @@ class PdoEventStream implements EventStream
         $count = 0;
         $lastSequence = -1;
         foreach ($events as $recorded) {
-            \assert($recorded instanceof RecordedEvent);
+            assert($recorded instanceof RecordedEvent);
             $recorded->applyTo($target);
             $lastSequence = $recorded->version()->asInt();
             ++$count;

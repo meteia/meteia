@@ -16,6 +16,8 @@ use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Override;
 use stdClass;
+use function assert;
+use function is_string;
 
 final readonly class PdoGlobalEventStream implements GlobalEventStream
 {
@@ -51,11 +53,11 @@ final readonly class PdoGlobalEventStream implements GlobalEventStream
         $eventRaw = $row->event;
         $causationIdRaw = $row->causation_id;
         $correlationIdRaw = $row->correlation_id;
-        \assert(
-            \is_string($aggregateRootIdRaw)
-            && \is_string($eventRaw)
-            && \is_string($causationIdRaw)
-            && \is_string($correlationIdRaw),
+        assert(
+            is_string($aggregateRootIdRaw)
+            && is_string($eventRaw)
+            && is_string($causationIdRaw)
+            && is_string($correlationIdRaw),
         );
         $streamId = new StreamId($aggregateRootIdRaw);
         /** @var DomainEvent $event */
