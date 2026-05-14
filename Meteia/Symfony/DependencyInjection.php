@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 return [
     Serializer::class => static function (): Serializer {
@@ -35,4 +36,5 @@ return [
 
         return new Serializer($normalizers, $encoders);
     },
+    SerializerInterface::class => static fn(Serializer $serializer): SerializerInterface => $serializer,
 ];
