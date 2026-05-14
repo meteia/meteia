@@ -17,8 +17,6 @@ use Meteia\EventSourcing\PendingEvent;
 use Meteia\EventSourcing\PendingEvents;
 use Meteia\EventSourcing\RecordedEvent;
 use Meteia\EventSourcing\StreamId;
-use Meteia\Projections\Contracts\Projection;
-use Meteia\Projections\Projections;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Override;
 use Throwable;
@@ -26,11 +24,11 @@ use Throwable;
 /**
  * Collects domain events and commands during a request and flushes them
  * after the HTTP response has been sent. Infrastructure dependencies
- * (event store, Bunny outboxes, projections) are resolved lazily via the
+ * (event store, Bunny outboxes) are resolved lazily via the
  * container so a request with nothing buffered — for example a GraphQL
  * read query — never opens a RabbitMQ connection.
  *
- * @mago-expect lint:kan-defect -- coordinating event store, projections, outboxes, and command issuance is intrinsic to a UnitOfWork flush.
+ * @mago-expect lint:kan-defect -- coordinating event store, outboxes, and command issuance is intrinsic to a UnitOfWork flush.
  */
 final class DeferredUnitOfWork implements UnitOfWork
 {
@@ -84,7 +82,6 @@ final class DeferredUnitOfWork implements UnitOfWork
         $eventStream = $this->container->get(EventStream::class);
         /** @var EventOutbox $eventOutbox */
         $eventOutbox = $this->container->get(EventOutbox::class);
-        $projections = $this->projections();
 
         $occurredAt = new DateTimeImmutable();
         /** @var array<string, array{StreamId, list<RecordedEvent>}> $byStream */
@@ -94,19 +91,12 @@ final class DeferredUnitOfWork implements UnitOfWork
             $streamId = $pending->streamId();
             $key = $streamId->hex();
             $byStream[$key] ??= [$streamId, []];
-            $byStream[$key][1][] = $pending->recordedWith(
-                $scope->causationId(),
-                $scope->correlationId(),
-                $occurredAt,
-            );
+            $byStream[$key][1][] = $pending->recordedWith($scope->causationId(), $scope->correlationId(), $occurredAt);
         }
 
         foreach ($byStream as [$streamId, $recorded]) {
             $eventStream->append($streamId, new AnyVersion(), ...$recorded);
             foreach ($recorded as $event) {
-                foreach ($projections as $projection) {
-                    $projection->project($event);
-                }
                 $eventOutbox->publish($event->event());
             }
         }
@@ -132,27 +122,6 @@ final class DeferredUnitOfWork implements UnitOfWork
         }
     }
 
-    /**
-     * @return list<Projection>
-     */
-    private function projections(): array
-    {
-        if (!$this->container->has(Projections::class)) {
-            return [];
-        }
-
-        /** @var Projections $registry */
-        $registry = $this->container->get(Projections::class);
-        $projections = [];
-        foreach ($registry as $className) {
-            /** @var Projection $projection */
-            $projection = $this->container->get($className);
-            $projections[] = $projection;
-        }
-
-        return $projections;
-    }
-
     private function disconnectBunny(): void
     {
         if (!$this->container->has(BunnyClient::class)) {
@@ -165,6 +134,7 @@ final class DeferredUnitOfWork implements UnitOfWork
             if ($client->isConnected()) {
                 $client->disconnect();
             }
+
             // @mago-expect lint:no-empty-catch-clause -- disconnecting is best-effort; heartbeat will reap.
         } catch (Throwable) {
         }
