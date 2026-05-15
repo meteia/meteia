@@ -15,6 +15,7 @@ use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
@@ -31,14 +32,26 @@ final readonly class Send implements Command
     #[Override]
     public static function description(): string
     {
-        return 'Send a domain event (Meteia\Events\Event) to the outbox. Target: dotted class name. Payload via --dotted=val or @json.file';
+        return 'Send a domain event (Meteia\Events\Event) to the outbox. Target: dotted class name. Payload via --dotted=val or @json.file. Supports --username/--password or RABBITMQ_* env vars for RabbitMQ auth (same connection path as web client).';
     }
 
     #[Override]
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition([
-            new InputArgument('target', InputArgument::REQUIRED, 'Dotted class name, e.g. App.Events.UserRegistered'),
+            new InputArgument('target', InputArgument::REQUIRED, 'Dotted class name, e.g. Events.Debug.Pong'),
+            new InputOption(
+                'username',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'RabbitMQ username (falls back to RABBITMQ_USERNAME env)',
+            ),
+            new InputOption(
+                'password',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'RabbitMQ password (falls back to RABBITMQ_PASSWORD env)',
+            ),
         ]);
     }
 
@@ -55,6 +68,9 @@ final readonly class Send implements Command
                 Event::class,
             ));
         }
+
+        // Apply auth overrides from CLI args (or fall back to RABBITMQ_* env) before Rabbit services are resolved.
+        $this->applyRabbitAuthOverrides();
 
         $tokens = $this->payloadTokens();
         $parsed = $parser->parseTokens($tokens);
@@ -92,5 +108,18 @@ final readonly class Send implements Command
         }
 
         return array_slice($argv, $idx + 2);
+    }
+
+    private function applyRabbitAuthOverrides(): void
+    {
+        $username = $this->input->getOption('username');
+        if (is_string($username) && $username !== '') {
+            $_ENV['RABBITMQ_USERNAME'] = $username;
+        }
+
+        $password = $this->input->getOption('password');
+        if (is_string($password) && $password !== '') {
+            $_ENV['RABBITMQ_PASSWORD'] = $password;
+        }
     }
 }

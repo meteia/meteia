@@ -27,6 +27,8 @@ final readonly class BunnyEventOutbox implements EventOutbox
     public function publish(Event $event): void
     {
         $exchangeName = str_replace('\\', '.', $event::class);
+        $this->channel->exchangeDeclare($exchangeName, exchangeType: 'fanout', durable: true);
+
         $payload = $this->serializer->serialize($event, 'json');
         $context = MessageContext::fromScope($this->scopeSource->current());
         $this->channel->publish($payload, $context->headersWithMessageId((string) EventId::random()), $exchangeName);

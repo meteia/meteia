@@ -1,0 +1,75 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Meteia\AdvancedMessageQueuing;
+
+use Bunny\Channel;
+use Meteia\Application\Accepted;
+use Meteia\Bootstrap\ApplicationNamespace;
+use Meteia\Bootstrap\ApplicationPath;
+use Meteia\CommandEndpoints\Debug\Ping as PingEndpoint;
+use Meteia\CommandLine\PayloadParser;
+use Meteia\Commands\Command as DomainCommand;
+use Meteia\Commands\Debug\Ping;
+use Meteia\DependencyInjection\Container;
+use Meteia\DependencyInjection\ContainerBuilder;
+use Meteia\Events\Debug\Pong;
+use Meteia\Events\EventOutbox;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+
+final class DebugCommandEventTest extends TestCase
+{
+    public function testPayloadParserResolvesCommandsDebugPing(): void
+    {
+        $parser = new PayloadParser();
+        $namespace = new ApplicationNamespace('Meteia');
+
+        $fqcn = $parser->resolve('Commands.Debug.Ping', $namespace, DomainCommand::class);
+
+        static::assertSame(Ping::class, $fqcn);
+    }
+
+    public function testPingDenormalizesWithReplyTo(): void
+    {
+        $serializer = $this->getContainer()->get(SerializerInterface::class);
+
+        $ping = $serializer->denormalize(['replyTo' => 'amq.gen-test-123'], Ping::class);
+
+        static::assertInstanceOf(Ping::class, $ping);
+        static::assertSame('amq.gen-test-123', $ping->replyTo);
+    }
+
+    public function testPingEndpointPublishesReplyDirectlyWhenReplyToPresent(): void
+    {
+        $channel = $this->createMock(Channel::class);
+        $channel->expects($this->once())->method('publish');
+
+        $eventOutbox = $this->createMock(EventOutbox::class);
+        $eventOutbox->expects($this->once())->method('publish');
+
+        $serializer = $this->getContainer()->get(SerializerInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $endpoint = new PingEndpoint($channel, $serializer, $eventOutbox, $logger);
+
+        $pingWithReply = new Ping(replyTo: 'amq.gen-test-123');
+        $result = $endpoint->handle($pingWithReply);
+
+        static::assertInstanceOf(Accepted::class, $result);
+    }
+
+    private function getContainer(): Container
+    {
+        // Minimal container for serializer (reuses the framework DI)
+        static $container = null;
+
+        if ($container === null) {
+            $container = ContainerBuilder::build(new ApplicationPath('.'), new ApplicationNamespace('Meteia'), []);
+        }
+
+        return $container;
+    }
+}

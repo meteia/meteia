@@ -22,6 +22,8 @@ ambiguous-function-call = { enabled = false }
 literal-named-argument = { enabled = false }
 halstead = { effort-threshold = 7000 }
 no-fully-qualified-global-class-like = { enabled = true }
+cyclomatic-complexity = { threshold = 30 }
+excessive-parameter-list = { threshold = 10 }
 
 [analyzer]
 plugins = []
