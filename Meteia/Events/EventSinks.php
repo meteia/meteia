@@ -27,7 +27,11 @@ final readonly class EventSinks implements IteratorAggregate
     #[Override]
     public function getIterator(): Traversable
     {
-        $regex = ['.+', 'EventSinks', '.*\.php'];
+        // Support grouped layout EventSinks/<SourceContext>/<EventName>/<Handler>.php
+        // under any reacting context (e.g. Counters/EventSinks/Counters/CounterDecremented/...
+        // or future Users/EventSinks/Timers/TimerExpired/...). The .* before EventSinks
+        // absorbs the reacting context dir; the .* \.php after absorbs SourceContext + EventName + file.
+        $regex = ['.*', 'EventSinks', '.*\.php'];
 
         yield from new ClassesImplementing(
             new MergedClasses(
