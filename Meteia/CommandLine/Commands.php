@@ -43,17 +43,21 @@ final readonly class Commands implements IteratorAggregate
         );
         $commandClassnames = new ClassesImplementing($classes, Command::class);
         foreach ($commandClassnames as $commandClassname) {
-            \assert(\is_string($commandClassname) && is_subclass_of($commandClassname, Command::class));
+            \assert(
+                \is_string($commandClassname) && is_subclass_of($commandClassname, Command::class),
+                'commandClassname must be string and implement Command',
+            );
             $commandName = $this->commandName($commandClassname);
             $command = new SymfonyCommand($commandName);
             $command->setDefinition($commandClassname::inputDefinition());
+            $command->ignoreValidationErrors();
             $command->setDescription($commandClassname::description());
             $command->setCode(function (InputInterface $input, OutputInterface $output) use ($commandClassname): void {
                 try {
                     $this->container->set(InputInterface::class, $input);
                     $this->container->set(OutputInterface::class, $output);
                     $command = $this->container->get($commandClassname);
-                    \assert(\is_object($command));
+                    \assert(\is_object($command), 'resolved command must be object');
                     if (!method_exists($command, 'execute')) {
                         throw new Exception('Command is missing required execute() method');
                     }

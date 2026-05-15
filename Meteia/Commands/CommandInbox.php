@@ -9,4 +9,6 @@ interface CommandInbox
     public function subscribe(string $commandClassName, CommandSink $sink): void;
 
     public function run(): void;
+
+    public function runOnce(): void;
 }

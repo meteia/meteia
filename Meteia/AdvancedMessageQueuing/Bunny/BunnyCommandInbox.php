@@ -19,18 +19,23 @@ use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
 use Override;
 use Psr\Log\LoggerInterface;
+use stdClass;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
 final readonly class BunnyCommandInbox implements CommandInbox
 {
+    private stdClass $runState;
+
     public function __construct(
         private LoggerInterface $log,
         private CommandsExchangeName $exchangeName,
         private SerializerInterface $serializer,
         private BunnyMessageLoop $loop,
         private AmbientMessageScopeSource $scopeSource,
-    ) {}
+    ) {
+        $this->runState = (object) ['maxMessages' => 0, 'processed' => 0];
+    }
 
     #[Override]
     public function subscribe(string $commandClassName, CommandSink $sink): void
@@ -55,7 +60,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
 
             try {
                 $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
-                \assert($command instanceof Command);
+                \assert($command instanceof Command, 'deserialized command must implement Command');
                 $this->scopeSource->using($scope, function () use (
                     $sink,
                     $command,
@@ -70,6 +75,15 @@ final readonly class BunnyCommandInbox implements CommandInbox
                     $sink->drain($command, $scope);
                 });
                 $channel->ack($message);
+
+                $this->runState->processed++;
+                if ($this->runState->maxMessages > 0 && $this->runState->processed >= $this->runState->maxMessages) {
+                    $this->log->info('Once mode: disconnecting after processing one message', [
+                        'queueName' => $queueName,
+                    ]);
+                    $bunny->disconnect();
+                    exit(0);
+                }
             } catch (Throwable $t) {
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), ['queueName' => $queueName]);
@@ -80,6 +94,16 @@ final readonly class BunnyCommandInbox implements CommandInbox
     #[Override]
     public function run(): void
     {
+        $this->runState->maxMessages = 0;
+        $this->runState->processed = 0;
+        $this->loop->runUntilShutdown('CommandWorkers.Shutdown');
+    }
+
+    #[Override]
+    public function runOnce(): void
+    {
+        $this->runState->maxMessages = 1;
+        $this->runState->processed = 0;
         $this->loop->runUntilShutdown('CommandWorkers.Shutdown');
     }
 }

@@ -9,4 +9,6 @@ interface EventInbox
     public function subscribe(string $eventClassName, string $sinkClassName, EventSink $sink): void;
 
     public function run(): void;
+
+    public function runOnce(): void;
 }
