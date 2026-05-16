@@ -6,6 +6,7 @@ namespace Meteia\AdvancedMessageQueuing\Bunny;
 
 use Bunny\Channel;
 use DateTimeImmutable;
+use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\AdvancedMessageQueuing\Configuration\DelayedCommandsExchangeName;
 use Meteia\AdvancedMessageQueuing\MessageContext;
 use Meteia\Commands\Command;
@@ -18,20 +19,17 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Publishes a command to a RabbitMQ `x-delayed-message` exchange with an
- * `x-delay` header set to the milliseconds remaining until `$when`. The
- * broker withholds the message and then routes it to the same per-command
- * queue that the standard commands worker is already consuming, so no
- * per-context worker is required.
- *
- * The exchange and queue binding are declared idempotently on every publish.
- * Requires the broker's `rabbitmq_delayed_message_exchange` plugin.
+ * Publishes a command through a TTL queue that dead-letters into the standard
+ * command exchange when the requested delay has elapsed.
  */
 final readonly class BunnyDelayedCommandOutbox implements DelayedCommandOutbox
 {
+    private const int DELAY_QUEUE_CLEANUP_MS = 86_400_000;
+
     public function __construct(
         private Channel $channel,
         private LoggerInterface $log,
+        private CommandsExchangeName $commandsExchangeName,
         private DelayedCommandsExchangeName $exchangeName,
         private SerializerInterface $serializer,
         private MessageScopeSource $scopeSource,
@@ -41,21 +39,24 @@ final readonly class BunnyDelayedCommandOutbox implements DelayedCommandOutbox
     #[Override]
     public function publishAt(Command $command, DateTimeImmutable $when): void
     {
-        $exchange = (string) $this->exchangeName;
-        $this->channel->exchangeDeclare($exchange, exchangeType: 'x-delayed-message', durable: true, arguments: [
-            'x-delayed-type' => 'direct',
-        ]);
         $queueName = str_replace('\\', '.', $command::class);
-        $this->channel->queueDeclare($queueName, durable: true);
-        $this->channel->queueBind(exchange: $exchange, queue: $queueName, routingKey: $queueName);
-
         $delayMs = $this->delayMs($when);
         $payload = $this->serializer->serialize($command, 'json');
         $context = MessageContext::fromScope($this->scopeSource->current());
         $headers = $context->headersWithMessageId((string) CommandId::random());
-        $headers['x-delay'] = $delayMs;
 
-        $this->channel->publish($payload, $headers, $exchange, $queueName);
+        $this->declareCommandTarget($queueName);
+
+        $exchange = (string) $this->commandsExchangeName;
+        $routingKey = $queueName;
+        if ($delayMs > 0) {
+            $delayQueueName = $this->delayQueueName($queueName, $delayMs);
+            $this->declareDelayQueue($queueName, $delayQueueName, $delayMs);
+            $exchange = (string) $this->exchangeName;
+            $routingKey = $delayQueueName;
+        }
+
+        $this->channel->publish($payload, $headers, $exchange, $routingKey);
 
         $this->log->info('Published Delayed Command', [
             'command' => $command::class,
@@ -77,5 +78,38 @@ final readonly class BunnyDelayedCommandOutbox implements DelayedCommandOutbox
                 - (($now->getTimestamp() * 1000) + intdiv((int) $now->format('u'), 1000))
             ),
         );
+    }
+
+    private function declareCommandTarget(string $queueName): void
+    {
+        $this->channel->exchangeDeclare((string) $this->commandsExchangeName, durable: true);
+        $this->channel->queueDeclare($queueName, durable: true);
+        $this->channel->queueBind(
+            exchange: (string) $this->commandsExchangeName,
+            queue: $queueName,
+            routingKey: $queueName,
+        );
+    }
+
+    private function declareDelayQueue(string $commandQueueName, string $delayQueueName, int $delayMs): void
+    {
+        $this->channel->exchangeDeclare((string) $this->exchangeName, durable: true);
+        $this->channel->queueDeclare($delayQueueName, durable: true, arguments: [
+            'x-message-ttl' => $delayMs,
+            'x-dead-letter-exchange' => (string) $this->commandsExchangeName,
+            'x-dead-letter-routing-key' => $commandQueueName,
+            'x-queue-type' => 'quorum',
+            'x-expires' => $delayMs + self::DELAY_QUEUE_CLEANUP_MS,
+        ]);
+        $this->channel->queueBind(
+            exchange: (string) $this->exchangeName,
+            queue: $delayQueueName,
+            routingKey: $delayQueueName,
+        );
+    }
+
+    private function delayQueueName(string $commandQueueName, int $delayMs): string
+    {
+        return $commandQueueName . '.Delayed.' . $delayMs . 'ms';
     }
 }
