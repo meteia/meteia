@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Events\Debug;
+namespace Meteia\Debug\Events;
 
 use Meteia\Events\Event;
 

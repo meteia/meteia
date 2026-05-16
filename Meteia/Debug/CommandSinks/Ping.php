@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Meteia\CommandSinks\Debug;
+namespace Meteia\Debug\CommandSinks;
 
 use Bunny\Channel;
 use Meteia\Application\Accepted;
 use Meteia\Application\Command;
 use Meteia\Application\CommandEndpoint;
 use Meteia\Application\CommandResult;
-use Meteia\Commands\Debug\Ping as DebugPing;
-use Meteia\Events\Debug\Pong;
+use Meteia\Debug\Commands\Ping as DebugPing;
+use Meteia\Debug\Events\Pong;
 use Meteia\Events\EventOutbox;
 use Override;
 use Psr\Log\LoggerInterface;
