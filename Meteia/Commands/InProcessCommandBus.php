@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Commands;
 
 use Override;
 
 final readonly class InProcessCommandBus implements CommandBus
 {
     public function __construct(
-        private CommandEndpointRegistry $endpoints,
+        private CommandEndpoints $endpoints,
     ) {}
 
     #[Override]

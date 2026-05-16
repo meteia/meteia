@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Commands;
 
-interface CommandEndpointRegistry
+interface CommandEndpoints
 {
     /**
      * @param class-string<Command> $commandClass

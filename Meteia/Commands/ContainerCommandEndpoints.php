@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Commands;
 
-use Meteia\Application\Exceptions\UnknownCommandEndpoint;
+use Meteia\Commands\Exceptions\UnknownCommandEndpoint;
 use Meteia\DependencyInjection\Container;
 use Override;
 
 /**
- * Resolves a `CommandEndpoint` by container lookup, using a configurable name-derivation rule.
+ * Container-backed command endpoints.
  * Default convention swaps `\Commands\Foo` in the command class name with `\CommandSinks\Foo`.
  */
-final readonly class ContainerCommandEndpointRegistry implements CommandEndpointRegistry
+final readonly class ContainerCommandEndpoints implements CommandEndpoints
 {
     public function __construct(
         private Container $container,

@@ -42,7 +42,7 @@ final readonly class Send implements Command
     public static function inputDefinition(): InputDefinition
     {
         return new InputDefinition([
-            new InputArgument('target', InputArgument::REQUIRED, 'Dotted class name, e.g. Commands.Debug.Ping'),
+            new InputArgument('target', InputArgument::REQUIRED, 'Dotted class name, e.g. Debug.Commands.Ping'),
             new InputOption(
                 'username',
                 null,

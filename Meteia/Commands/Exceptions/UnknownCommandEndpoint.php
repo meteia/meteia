@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application\Exceptions;
+namespace Meteia\Commands\Exceptions;
 
 use RuntimeException;
 

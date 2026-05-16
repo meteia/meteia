@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Meteia\Debug\CommandSinks;
 
 use Bunny\Channel;
-use Meteia\Application\Accepted;
-use Meteia\Application\Command;
-use Meteia\Application\CommandEndpoint;
-use Meteia\Application\CommandResult;
+use Meteia\Commands\Accepted;
+use Meteia\Commands\Command;
+use Meteia\Commands\CommandEndpoint;
+use Meteia\Commands\CommandResult;
 use Meteia\Debug\Commands\Ping as DebugPing;
 use Meteia\Debug\Events\Pong;
 use Meteia\Events\EventOutbox;
@@ -39,7 +39,7 @@ final readonly class Ping implements CommandEndpoint
             ]);
         }
 
-        // Also publish via the normal event path so Events.Debug.Pong is a real observable event
+        // Also publish via the normal event path so Debug.Events.Pong is a real observable event
         $this->eventOutbox->publish(new Pong());
 
         return new Accepted();

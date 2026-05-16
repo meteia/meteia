@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Commands;
 
-use Meteia\Application\Exceptions\UnknownCommandEndpoint;
+use Meteia\Commands\Exceptions\UnknownCommandEndpoint;
+use Meteia\Commands\Fixtures\ExampleCommand;
+use Meteia\Commands\Fixtures\RecordingCommandEndpoint;
 use Override;
 use PHPUnit\Framework\TestCase;
 
@@ -15,8 +17,8 @@ final class InProcessCommandBusTest extends TestCase
 {
     public function testDispatchHandsCommandToTheRegisteredEndpoint(): void
     {
-        $endpoint = new RecordingEndpoint();
-        $registry = new class($endpoint) implements CommandEndpointRegistry {
+        $endpoint = new RecordingCommandEndpoint();
+        $endpoints = new class($endpoint) implements CommandEndpoints {
             public function __construct(
                 private readonly CommandEndpoint $endpoint,
             ) {}
@@ -27,9 +29,9 @@ final class InProcessCommandBusTest extends TestCase
                 return $this->endpoint;
             }
         };
-        $bus = new InProcessCommandBus($registry);
+        $bus = new InProcessCommandBus($endpoints);
 
-        $result = $bus->dispatch(new ExampleApplicationCommand());
+        $result = $bus->dispatch(new ExampleCommand());
 
         static::assertInstanceOf(Accepted::class, $result);
         static::assertCount(1, $endpoint->received);
@@ -37,40 +39,16 @@ final class InProcessCommandBusTest extends TestCase
 
     public function testDispatchPropagatesEndpointResolutionErrors(): void
     {
-        $registry = new class implements CommandEndpointRegistry {
+        $endpoints = new class implements CommandEndpoints {
             #[Override]
             public function endpointFor(string $commandClass): CommandEndpoint
             {
                 throw new UnknownCommandEndpoint($commandClass);
             }
         };
-        $bus = new InProcessCommandBus($registry);
+        $bus = new InProcessCommandBus($endpoints);
 
         $this->expectException(UnknownCommandEndpoint::class);
-        $bus->dispatch(new ExampleApplicationCommand());
-    }
-}
-
-/**
- * @internal
- */
-final readonly class ExampleApplicationCommand implements Command {}
-
-/**
- * @internal
- *
- * @implements CommandEndpoint<ExampleApplicationCommand>
- */
-final class RecordingEndpoint implements CommandEndpoint
-{
-    /** @var list<Command> */
-    public array $received = [];
-
-    #[Override]
-    public function handle(Command $command): CommandResult
-    {
-        $this->received[] = $command;
-
-        return new Accepted();
+        $bus->dispatch(new ExampleCommand());
     }
 }

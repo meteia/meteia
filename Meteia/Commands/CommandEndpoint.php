@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Meteia\Application;
+namespace Meteia\Commands;
 
 /**
  * Where a command arrives to be processed. Implementing classes are use
- * cases — one per command. Named "Endpoint" not "Handler" per CLAUDE.md.
+ * cases — one per command. Named "Endpoint" not "Handler" per AGENTS.md.
  *
  * @template TCommand of Command
  */

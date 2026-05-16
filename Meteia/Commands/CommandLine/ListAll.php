@@ -8,13 +8,11 @@ use Meteia\CommandLine\Command;
 use Meteia\Commands\Commands as DomainCommands;
 use Override;
 use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final readonly class ListAll implements Command
 {
     public function __construct(
-        private InputInterface $input,
         private OutputInterface $output,
         private DomainCommands $commands,
     ) {}
@@ -45,6 +43,5 @@ final readonly class ListAll implements Command
         foreach ($dotted as $name) {
             $this->output->writeln('  ' . $name);
         }
-        $this->output->writeln(sprintf('<comment>%d total</comment>', \count($dotted)));
     }
 }

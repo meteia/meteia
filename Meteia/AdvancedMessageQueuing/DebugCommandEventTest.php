@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Meteia\AdvancedMessageQueuing;
 
 use Bunny\Channel;
-use Meteia\Application\Accepted;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\CommandLine\PayloadParser;
+use Meteia\Commands\Accepted;
 use Meteia\Commands\Command as DomainCommand;
 use Meteia\Debug\Commands\Ping;
 use Meteia\Debug\CommandSinks\Ping as PingEndpoint;
@@ -26,7 +26,7 @@ final class DebugCommandEventTest extends TestCase
         $parser = new PayloadParser();
         $namespace = new ApplicationNamespace('Meteia');
 
-        $fqcn = $parser->resolve('Commands.Debug.Ping', $namespace, DomainCommand::class);
+        $fqcn = $parser->resolve('Debug.Commands.Ping', $namespace, DomainCommand::class);
 
         DebugCommandEventTest::assertSame(Ping::class, $fqcn);
     }
@@ -50,7 +50,7 @@ final class DebugCommandEventTest extends TestCase
         $eventOutbox->expects($this->once())->method('publish');
 
         $serializer = $this->getContainer()->get(SerializerInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
         $endpoint = new PingEndpoint($channel, $serializer, $eventOutbox, $logger);
 

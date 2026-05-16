@@ -42,7 +42,7 @@ final readonly class RunWorker implements Command
                 'only',
                 '',
                 InputOption::VALUE_REQUIRED,
-                'Only subscribe to the specified dotted event class, e.g. App.Events.UserRegistered',
+                'Only subscribe to the specified dotted event class, e.g. App.Users.Events.UserRegistered',
             ),
             new InputOption(
                 'once',

@@ -58,21 +58,18 @@ behavior or extract a `Middlewares` interface used by
 - Make the snapshot policy explicit (current 15ms+25ev threshold is
   opaque magic).
 
-## Wire `Meteia\Application\CommandBus` to AMQP
-**Files:** `Meteia/Application/CommandBus.php`,
+## Wire `Meteia\Commands\CommandBus` to AMQP
+**Files:** `Meteia/Commands/CommandBus.php`,
 `Meteia/Commands/CommandOutbox.php`,
 `Meteia/AdvancedMessageQueuing/Bunny/`.
 
-- `Meteia\Commands\Command` is the AMQP-published transport marker
-  (existing implementers); leave it.
-- Add `InProcessCommandBus` (DI-resolved `CommandEndpoint<T>`,
+- `Meteia\Commands\Command` is the user-facing command marker and the
+  AMQP-published transport marker.
+- Keep `InProcessCommandBus` (DI-resolved `CommandEndpoint<T>`,
   invoke synchronously).
-- Add `AmqpCommandBus` / `OutboxedCommandBus` that serialises
-  `Application\Command` to the existing `CommandOutbox`. Receiving
-  worker invokes the matching `CommandEndpoint`.
-- Decide whether to rename `Meteia\Commands\Command` (e.g. to
-  `TransportEnvelope`) so `Application\Command` owns the user-facing
-  name.
+- Keep `OutboxedCommandBus` that serializes `Command` to the existing
+  `CommandOutbox`. Receiving worker invokes the matching
+  `CommandEndpoint`.
 
 ## Mago lint primitive for nominal subtypes
 When mago supports "subclass of X declares no new methods/properties",

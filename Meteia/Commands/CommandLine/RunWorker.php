@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace Meteia\Commands\CommandLine;
 
 use InvalidArgumentException;
-use Meteia\Application\Command as ApplicationCommand;
-use Meteia\Application\CommandBus;
-use Meteia\Application\Rejected;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Bootstrap\ApplicationPublicDir;
 use Meteia\CommandLine\Command as CLICommand;
 use Meteia\CommandLine\PayloadParser;
 use Meteia\Commands\Command;
+use Meteia\Commands\CommandBus;
 use Meteia\Commands\CommandInbox;
 use Meteia\Commands\Commands;
 use Meteia\Commands\CommandSink;
+use Meteia\Commands\Rejected;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Override;
 use Psr\Log\LoggerInterface;
+use stdClass;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -54,7 +54,7 @@ final readonly class RunWorker implements CLICommand, CommandSink
                 'only',
                 '',
                 InputOption::VALUE_REQUIRED,
-                'Only subscribe to the specified dotted command class, e.g. App.Commands.CreateUser',
+                'Only subscribe to the specified dotted command class, e.g. App.Users.Commands.CreateUser',
             ),
             new InputOption(
                 'once',
@@ -128,11 +128,6 @@ final readonly class RunWorker implements CLICommand, CommandSink
     public function drain(Command $command, MessageScope $scope): void
     {
         try {
-            \assert($command instanceof ApplicationCommand, sprintf(
-                'Queued command %s must also implement %s',
-                $command::class,
-                ApplicationCommand::class,
-            ));
             $bus = $this->appContainer()->get(CommandBus::class);
             \assert($bus instanceof CommandBus, 'CommandBus must be resolvable from app container');
             $result = $bus->dispatch($command);
