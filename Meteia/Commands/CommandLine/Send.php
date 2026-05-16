@@ -35,7 +35,7 @@ final readonly class Send implements Command
     #[Override]
     public static function description(): string
     {
-        return 'Send a domain command (Meteia\Commands\Command) to the outbox. Target: dotted class name. Payload via --dotted=val or @json.file. Use --wait-for-reply to auto-generate a private queue and wait for a response (replyTo carried inside the command). Supports --username/--password or RABBITMQ_* env vars for auth.';
+        return 'Send a domain command to the outbox.';
     }
 
     #[Override]

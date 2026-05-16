@@ -22,7 +22,7 @@ final readonly class ListAll implements Command
     #[Override]
     public static function description(): string
     {
-        return 'List all domain commands (Meteia\Commands\Command) available for commands:send. Use dotted names.';
+        return 'List all domain commands available for commands:send.';
     }
 
     #[Override]

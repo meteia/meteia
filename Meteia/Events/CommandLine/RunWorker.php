@@ -31,7 +31,7 @@ final readonly class RunWorker implements Command
     #[Override]
     public static function description(): string
     {
-        return 'Run the event worker queue. Supports --only <Dotted.Event> and --once for targeted single handling.';
+        return 'Run the event worker queue.';
     }
 
     #[Override]

@@ -32,7 +32,7 @@ final readonly class Send implements Command
     #[Override]
     public static function description(): string
     {
-        return 'Send a domain event (Meteia\Events\Event) to the outbox. Target: dotted class name. Payload via --dotted=val or @json.file. Supports --username/--password or RABBITMQ_* env vars for RabbitMQ auth (same connection path as web client).';
+        return 'Send a domain event to the outbox.';
     }
 
     #[Override]

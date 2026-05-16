@@ -22,7 +22,7 @@ final readonly class ListAll implements Command
     #[Override]
     public static function description(): string
     {
-        return 'List all domain events (Meteia\Events\Event) available for events:send. Use dotted names.';
+        return 'List all domain events available for events:send.';
     }
 
     #[Override]

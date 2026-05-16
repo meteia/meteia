@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Meteia\Bootstrap\RepositoryPath;
 use Meteia\Configuration\Configuration;
 use Meteia\Http\Configuration\CookieHost;
@@ -64,4 +66,5 @@ return [
         Configuration $configuration,
         RepositoryPath $repositoryPath,
     ): LogPath => new LogPath($configuration->string('METEIA_LOG_PATH', (string) $repositoryPath)),
+    ClientInterface::class => static fn(): ClientInterface => new Client(),
 ];

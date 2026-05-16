@@ -43,7 +43,7 @@ final readonly class RunWorker implements CLICommand, CommandSink
     #[Override]
     public static function description(): string
     {
-        return 'Run the command worker queue. Supports --only <Dotted.Command> and --once for targeted single handling.';
+        return 'Run the command worker queue.';
     }
 
     #[Override]
