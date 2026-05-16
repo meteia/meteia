@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Meteia\CommandEndpoints\Debug;
+namespace Meteia\CommandSinks\Debug;
 
 use Bunny\Channel;
 use Meteia\Application\Accepted;

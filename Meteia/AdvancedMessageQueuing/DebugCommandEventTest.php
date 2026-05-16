@@ -8,7 +8,7 @@ use Bunny\Channel;
 use Meteia\Application\Accepted;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
-use Meteia\CommandEndpoints\Debug\Ping as PingEndpoint;
+use Meteia\CommandSinks\Debug\Ping as PingEndpoint;
 use Meteia\CommandLine\PayloadParser;
 use Meteia\Commands\Command as DomainCommand;
 use Meteia\Commands\Debug\Ping;

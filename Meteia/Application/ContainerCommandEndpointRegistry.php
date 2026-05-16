@@ -10,7 +10,7 @@ use Override;
 
 /**
  * Resolves a `CommandEndpoint` by container lookup, using a configurable name-derivation rule.
- * Default convention swaps `\Commands\Foo` in the command class name with `\CommandEndpoints\Foo`.
+ * Default convention swaps `\Commands\Foo` in the command class name with `\CommandSinks\Foo`.
  */
 final readonly class ContainerCommandEndpointRegistry implements CommandEndpointRegistry
 {
@@ -41,6 +41,6 @@ final readonly class ContainerCommandEndpointRegistry implements CommandEndpoint
             return $commandClass;
         }
 
-        return $segments[0] . '\\CommandEndpoints\\' . $segments[1];
+        return $segments[0] . '\\CommandSinks\\' . $segments[1];
     }
 }
