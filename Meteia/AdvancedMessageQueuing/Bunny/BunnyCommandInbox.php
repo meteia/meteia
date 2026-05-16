@@ -19,13 +19,13 @@ use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
 use Override;
 use Psr\Log\LoggerInterface;
-use stdClass;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
+use UnexpectedValueException;
 
 final readonly class BunnyCommandInbox implements CommandInbox
 {
-    private stdClass $runState;
+    private BunnyInboxConsumption $consumption;
 
     public function __construct(
         private LoggerInterface $log,
@@ -34,7 +34,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
         private BunnyMessageLoop $loop,
         private AmbientMessageScopeSource $scopeSource,
     ) {
-        $this->runState = (object) ['maxMessages' => 0, 'processed' => 0];
+        $this->consumption = new BunnyInboxConsumption();
     }
 
     #[Override]
@@ -53,9 +53,9 @@ final readonly class BunnyCommandInbox implements CommandInbox
             $queueName,
             $sink,
         ): void {
-            $commandId = CommandId::fromToken((string) $message->headers['message-id']);
-            $correlationId = CorrelationId::fromToken((string) $message->headers['correlation-id']);
-            $processId = ProcessId::fromToken((string) $message->headers['process-id']);
+            $commandId = CommandId::fromToken($this->header($message, 'message-id'));
+            $correlationId = CorrelationId::fromToken($this->header($message, 'correlation-id'));
+            $processId = ProcessId::fromToken($this->header($message, 'process-id'));
             $scope = new MessageScope($correlationId, CausationId::fromHex($commandId->hex()), $processId);
 
             try {
@@ -76,8 +76,8 @@ final readonly class BunnyCommandInbox implements CommandInbox
                 });
                 $channel->ack($message);
 
-                $this->runState->processed++;
-                if ($this->runState->maxMessages > 0 && $this->runState->processed >= $this->runState->maxMessages) {
+                $this->consumption->recordHandledMessage();
+                if ($this->consumption->isSatisfied()) {
                     $this->log->info('Once mode: disconnecting after processing one message', [
                         'queueName' => $queueName,
                     ]);
@@ -94,16 +94,23 @@ final readonly class BunnyCommandInbox implements CommandInbox
     #[Override]
     public function run(): void
     {
-        $this->runState->maxMessages = 0;
-        $this->runState->processed = 0;
+        $this->consumption->untilShutdown();
         $this->loop->runUntilShutdown('CommandWorkers.Shutdown');
     }
 
     #[Override]
     public function runOnce(): void
     {
-        $this->runState->maxMessages = 1;
-        $this->runState->processed = 0;
+        $this->consumption->oneMessage();
         $this->loop->runUntilShutdown('CommandWorkers.Shutdown');
+    }
+
+    private function header(Message $message, string $name): string
+    {
+        if (!\is_scalar($message->headers[$name] ?? null)) {
+            throw new UnexpectedValueException('Command message header must be scalar: ' . $name);
+        }
+
+        return (string) $message->headers[$name];
     }
 }

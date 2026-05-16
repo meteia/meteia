@@ -24,12 +24,11 @@ use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
+use UnexpectedValueException;
 
-final class BunnyEventInbox implements EventInbox
+final readonly class BunnyEventInbox implements EventInbox
 {
-    private int $maxMessages;
-
-    private int $processed;
+    private BunnyInboxConsumption $consumption;
 
     public function __construct(
         private LoggerInterface $log,
@@ -37,8 +36,7 @@ final class BunnyEventInbox implements EventInbox
         private BunnyMessageLoop $loop,
         private AmbientMessageScopeSource $scopeSource,
     ) {
-        $this->maxMessages = 0;
-        $this->processed = 0;
+        $this->consumption = new BunnyInboxConsumption();
     }
 
     #[Override]
@@ -92,8 +90,8 @@ final class BunnyEventInbox implements EventInbox
                 );
                 $channel->ack($message);
 
-                $this->processed++;
-                if ($this->maxMessages > 0 && $this->processed >= $this->maxMessages) {
+                $this->consumption->recordHandledMessage();
+                if ($this->consumption->isSatisfied()) {
                     $this->log->info('Once mode: disconnecting after processing one message', [
                         'queueName' => $queueName,
                     ]);
@@ -110,24 +108,23 @@ final class BunnyEventInbox implements EventInbox
     #[Override]
     public function run(): void
     {
-        $this->maxMessages = 0;
-        $this->processed = 0;
+        $this->consumption->untilShutdown();
         $this->loop->runUntilShutdown('EventWorkers.Shutdown');
     }
 
     #[Override]
     public function runOnce(): void
     {
-        $this->maxMessages = 1;
-        $this->processed = 0;
+        $this->consumption->oneMessage();
         $this->loop->runUntilShutdown('EventWorkers.Shutdown');
     }
 
     private function header(Message $message, string $name): string
     {
-        $value = $message->headers[$name] ?? null;
-        \assert(is_scalar($value), 'message header must be scalar');
+        if (!\is_scalar($message->headers[$name] ?? null)) {
+            throw new UnexpectedValueException('Event message header must be scalar: ' . $name);
+        }
 
-        return (string) $value;
+        return (string) $message->headers[$name];
     }
 }
