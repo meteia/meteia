@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
-use Bunny\Client as BunnyClient;
 use DateTimeImmutable;
 use Meteia\Commands\CommandOutbox;
 use Meteia\DependencyInjection\Container;
@@ -25,9 +24,9 @@ use Throwable;
 /**
  * Collects domain events and commands during a request and flushes them
  * after the HTTP response has been sent. Infrastructure dependencies
- * (event store, Bunny outboxes) are resolved lazily via the
+ * (event store, outboxes) are resolved lazily via the
  * container so a request with nothing buffered — for example a GraphQL
- * read query — never opens a RabbitMQ connection.
+ * read query — never opens transport connections.
  */
 final class DeferredUnitOfWork implements UnitOfWork
 {
@@ -67,7 +66,6 @@ final class DeferredUnitOfWork implements UnitOfWork
         } finally {
             $this->pendingEvents = new PendingEvents();
             $this->pendingCommands = new PendingCommands();
-            $this->disconnectBunny();
         }
     }
 
@@ -126,24 +124,6 @@ final class DeferredUnitOfWork implements UnitOfWork
             } catch (Throwable) {
                 // @mago-expect lint:no-empty-catch-clause -- outbox publish is best-effort side effect
             }
-        }
-    }
-
-    private function disconnectBunny(): void
-    {
-        if (!$this->container->has(BunnyClient::class)) {
-            return;
-        }
-
-        try {
-            /** @var BunnyClient $client */
-            $client = $this->container->get(BunnyClient::class);
-            if ($client->isConnected()) {
-                $client->disconnect();
-            }
-
-            // @mago-expect lint:no-empty-catch-clause -- disconnecting is best-effort; heartbeat will reap.
-        } catch (Throwable) {
         }
     }
 }
