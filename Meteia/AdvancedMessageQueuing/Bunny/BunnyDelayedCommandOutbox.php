@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final readonly class BunnyDelayedCommandOutbox implements DelayedCommandOutbox
 {
+    private const int DELAY_QUEUE_BUCKET_MS = 1_000;
     private const int DELAY_QUEUE_CLEANUP_MS = 86_400_000;
 
     public function __construct(
@@ -50,8 +51,9 @@ final readonly class BunnyDelayedCommandOutbox implements DelayedCommandOutbox
         $exchange = (string) $this->commandsExchangeName;
         $routingKey = $queueName;
         if ($delayMs > 0) {
-            $delayQueueName = $this->delayQueueName($queueName, $delayMs);
-            $this->declareDelayQueue($queueName, $delayQueueName, $delayMs);
+            $delayQueueTtlMs = $this->delayQueueTtlMs($delayMs);
+            $delayQueueName = $this->delayQueueName($queueName, $delayQueueTtlMs);
+            $this->declareDelayQueue($queueName, $delayQueueName, $delayQueueTtlMs);
             $exchange = (string) $this->exchangeName;
             $routingKey = $delayQueueName;
         }
@@ -78,6 +80,11 @@ final readonly class BunnyDelayedCommandOutbox implements DelayedCommandOutbox
                 - (($now->getTimestamp() * 1000) + intdiv((int) $now->format('u'), 1000))
             ),
         );
+    }
+
+    private function delayQueueTtlMs(int $delayMs): int
+    {
+        return self::DELAY_QUEUE_BUCKET_MS * (int) ceil($delayMs / self::DELAY_QUEUE_BUCKET_MS);
     }
 
     private function declareCommandTarget(string $queueName): void

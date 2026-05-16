@@ -72,6 +72,41 @@ final class BunnyDelayedCommandOutboxTest extends TestCase
         static::assertMatchesRegularExpression('/^cmd_/', (string) ($message['headers']['message-id'] ?? ''));
     }
 
+    public function testBucketsDelayQueuesByFullSeconds(): void
+    {
+        $exchanges = [];
+        $queues = [];
+        $bindings = [];
+        $published = [];
+        $channel = $this->capturingChannel($exchanges, $queues, $bindings, $published);
+
+        $this->outbox(
+            $channel,
+            new FrozenClock(new DateTimeImmutable('2026-05-16 10:00:00.000000')),
+        )->publishAt(
+            new ExampleCommand(),
+            new DateTimeImmutable('2026-05-16 10:00:04.086000'),
+        );
+
+        static::assertSame([
+            ['Meteia.Commands.Fixtures.ExampleCommand', true, []],
+            [
+                'Meteia.Commands.Fixtures.ExampleCommand.Delayed.5000ms',
+                true,
+                [
+                    'x-message-ttl' => 5000,
+                    'x-dead-letter-exchange' => 'Meteia.Commands',
+                    'x-dead-letter-routing-key' => 'Meteia.Commands.Fixtures.ExampleCommand',
+                    'x-queue-type' => 'quorum',
+                    'x-expires' => 86_405_000,
+                ],
+            ],
+        ], $queues);
+
+        $message = $this->publishedMessage($published);
+        static::assertSame('Meteia.Commands.Fixtures.ExampleCommand.Delayed.5000ms', $message['routingKey']);
+    }
+
     public function testPublishesPastCommandDirectlyToCommandExchange(): void
     {
         $exchanges = [];
