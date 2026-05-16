@@ -10,6 +10,8 @@ use Meteia\CommandLine\Command;
 use Meteia\CommandLine\PayloadParser;
 use Meteia\DependencyInjection\Container;
 use Meteia\Domain\Contracts\DomainEvent;
+use Meteia\Domain\Contracts\UnitOfWork;
+use Meteia\Events\CompletingEventSink;
 use Meteia\Events\EventInbox;
 use Meteia\Events\EventSink;
 use Meteia\Events\EventSinks;
@@ -108,7 +110,10 @@ final readonly class RunWorker implements Command
 
     private function eventSink(string $sinkClass): EventSink
     {
-        return $this->resolvedEventSink($this->container->get($sinkClass));
+        return new CompletingEventSink(
+            $this->resolvedEventSink($this->container->get($sinkClass)),
+            $this->resolvedUnitOfWork($this->container->get(UnitOfWork::class)),
+        );
     }
 
     private function optionalString(mixed $value): ?string
@@ -127,5 +132,14 @@ final readonly class RunWorker implements Command
         }
 
         throw new UnexpectedValueException('event sink class must resolve to an EventSink');
+    }
+
+    private function resolvedUnitOfWork(mixed $unitOfWork): UnitOfWork
+    {
+        if ($unitOfWork instanceof UnitOfWork) {
+            return $unitOfWork;
+        }
+
+        throw new UnexpectedValueException('UnitOfWork binding must resolve to a UnitOfWork');
     }
 }

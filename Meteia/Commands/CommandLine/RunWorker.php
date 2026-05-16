@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\Commands\CommandLine;
 
 use InvalidArgumentException;
+use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Bootstrap\ApplicationPublicDir;
@@ -17,13 +18,13 @@ use Meteia\Commands\Commands;
 use Meteia\Commands\CommandSink;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
+use Meteia\Domain\Contracts\UnitOfWork;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Throwable;
 
 final class RunWorker implements CLICommand, CommandSink
 {
@@ -66,17 +67,21 @@ final class RunWorker implements CLICommand, CommandSink
     #[Override]
     public function execute(): void
     {
+        /** @var InputInterface $input */
         $input = $this->container->get(InputInterface::class);
         \assert($input instanceof InputInterface, 'console input must be available in the command worker container');
+        /** @var ApplicationNamespace $namespace */
         $namespace = $this->container->get(ApplicationNamespace::class);
         \assert($namespace instanceof ApplicationNamespace, 'application namespace must be available in the command worker container');
 
+        /** @var string|null $only */
         $only = $input->getOption('only');
-        $once = (bool) $input->getOption('once');
+        /** @var bool $once */
+        $once = $input->getOption('once');
 
         $targetCommand = null;
         if ($only !== null) {
-            $target = (string) $only;
+            $target = $only;
             $parser = new PayloadParser();
             $targetCommand = $parser->resolve($target, $namespace, Command::class);
             if ($targetCommand === null) {
@@ -109,10 +114,13 @@ final class RunWorker implements CLICommand, CommandSink
     private function appContainer(): Container
     {
         if ($this->appContainer === null) {
+            /** @var ApplicationPath $path */
             $path = $this->container->get(ApplicationPath::class);
             \assert($path instanceof ApplicationPath, 'application path must be available in the command worker container');
+            /** @var ApplicationNamespace $namespace */
             $namespace = $this->container->get(ApplicationNamespace::class);
             \assert($namespace instanceof ApplicationNamespace, 'application namespace must be available in the command worker container');
+            /** @var ApplicationPublicDir $publicDir */
             $publicDir = $this->container->get(ApplicationPublicDir::class);
             \assert($publicDir instanceof ApplicationPublicDir, 'application public dir must be available in the command worker container');
             $applicationDefinitions = [
@@ -130,13 +138,26 @@ final class RunWorker implements CLICommand, CommandSink
     public function drain(Command $command, MessageScope $scope): void
     {
         try {
-            $bus = $this->appContainer()->get(CommandBus::class);
-            \assert($bus instanceof CommandBus, 'CommandBus must be resolvable from app container');
-            $bus->dispatch($command);
-        } catch (Throwable $e) {
-            $this->log->error('Command failed', ['exception' => $e]);
-        }
+            $container = $this->appContainer();
+            $container->set(MessageScope::class, $scope);
 
-        gc_collect_cycles();
+            /** @var AmbientMessageScopeSource $scopeSource */
+            $scopeSource = $container->get(AmbientMessageScopeSource::class);
+            \assert($scopeSource instanceof AmbientMessageScopeSource, 'AmbientMessageScopeSource must be resolvable from app container');
+
+            $scopeSource->using($scope, static function () use ($container, $command, $scope): void {
+                /** @var CommandBus $bus */
+                $bus = $container->get(CommandBus::class);
+                \assert($bus instanceof CommandBus, 'CommandBus must be resolvable from app container');
+                $bus->dispatch($command);
+
+                /** @var UnitOfWork $unitOfWork */
+                $unitOfWork = $container->get(UnitOfWork::class);
+                \assert($unitOfWork instanceof UnitOfWork, 'UnitOfWork must be resolvable from app container');
+                $unitOfWork->complete($scope);
+            });
+        } finally {
+            gc_collect_cycles();
+        }
     }
 }

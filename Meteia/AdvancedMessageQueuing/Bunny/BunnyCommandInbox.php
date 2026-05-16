@@ -89,7 +89,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
                     exit(0);
                 }
             } catch (Throwable $t) {
-                $channel->nack($message, false, false);
+                $channel->nack($message, requeue: true);
                 $this->log->error($t->getMessage(), ['queueName' => $queueName]);
             }
         }));
