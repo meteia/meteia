@@ -47,7 +47,7 @@ final readonly class BunnyDelayedCommandOutbox implements DelayedCommandOutbox
         ]);
         $queueName = str_replace('\\', '.', $command::class);
         $this->channel->queueDeclare($queueName, durable: true);
-        $this->channel->queueBind($queueName, $exchange, $queueName);
+        $this->channel->queueBind(exchange: $exchange, queue: $queueName, routingKey: $queueName);
 
         $delayMs = $this->delayMs($when);
         $payload = $this->serializer->serialize($command, 'json');

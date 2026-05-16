@@ -67,7 +67,7 @@ final readonly class PsrEventSinks implements EventSinks
     private function normalizedEvent(string $className): string
     {
         $parts = explode('\\', $className);
-        array_splice($parts, 2, 1);
+        $parts = array_values(array_filter($parts, static fn(string $part): bool => $part !== 'Events'));
 
         return implode('.', $parts);
     }
@@ -79,7 +79,7 @@ final readonly class PsrEventSinks implements EventSinks
     {
         $parts = explode('\\', $className);
         array_pop($parts);
-        array_splice($parts, 1, 2);
+        $parts = array_values(array_filter($parts, static fn(string $part): bool => $part !== 'EventSinks'));
 
         return implode('.', $parts);
     }

@@ -53,7 +53,7 @@ final readonly class BunnyEventInbox implements EventInbox
 
         $channel->exchangeDeclare($exchangeName, exchangeType: 'fanout', durable: true);
         $channel->queueDeclare($queueName, durable: true);
-        $channel->queueBind($queueName, $exchangeName);
+        $channel->queueBind(exchange: $exchangeName, queue: $queueName);
 
         $channel->consume(function (Message $message, Channel $channel, Client $bunny) use (
             $eventClassName,
