@@ -40,14 +40,14 @@ return [
         ApplicationNamespace $applicationNamespace,
     ): CommandsExchangeName => new CommandsExchangeName($configuration->string(
         'METEIA_AMQ_COMMANDS_EXCHANGE_NAME',
-        $applicationNamespace . '.Commands',
+        (string) $applicationNamespace . '.Commands',
     )),
     DelayedCommandsExchangeName::class => static fn(
         Configuration $configuration,
         ApplicationNamespace $applicationNamespace,
     ): DelayedCommandsExchangeName => new DelayedCommandsExchangeName($configuration->string(
         'METEIA_AMQ_DELAYED_COMMANDS_EXCHANGE_NAME',
-        $applicationNamespace . '.DelayedCommands',
+        (string) $applicationNamespace . '.DelayedCommands',
     )),
     AmbientMessageScopeSource::class =>
         static fn(MessageScope $scope): AmbientMessageScopeSource => new AmbientMessageScopeSource($scope),
@@ -56,5 +56,5 @@ return [
         $config->string('RABBITMQ_VIRTUALHOST', '/'),
     ),
     RabbitMqManagement::class =>
-        static fn(ChannelInterface $channel): RabbitMqManagement => new BunnyRabbitMqManagement($channel),
+        static fn(Configuration $config): RabbitMqManagement => new BunnyRabbitMqManagement($connectionOptions($config)),
 ];

@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use UnexpectedValueException;
 
 final readonly class RunWorker implements Command
 {
@@ -26,6 +27,8 @@ final readonly class RunWorker implements Command
         private LoggerInterface $log,
         private Container $container,
         private EventSinks $eventSinks,
+        private InputInterface $input,
+        private ApplicationNamespace $namespace,
     ) {}
 
     #[Override]
@@ -56,19 +59,14 @@ final readonly class RunWorker implements Command
     #[Override]
     public function execute(): void
     {
-        $input = $this->container->get(InputInterface::class);
-        \assert($input instanceof InputInterface, 'console input must be available in the event worker container');
-        $namespace = $this->container->get(ApplicationNamespace::class);
-        \assert($namespace instanceof ApplicationNamespace, 'application namespace must be available in the event worker container');
-
-        $only = $input->getOption('only');
-        $once = (bool) $input->getOption('once');
+        $only = $this->onlyOption();
+        $once = $this->onceOption();
 
         $targetEvent = null;
         if ($only !== null) {
-            $target = (string) $only;
+            $target = $only;
             $parser = new PayloadParser();
-            $targetEvent = $parser->resolve($target, $namespace, DomainEvent::class);
+            $targetEvent = $parser->resolve($target, $this->namespace, DomainEvent::class);
             if ($targetEvent === null) {
                 throw new InvalidArgumentException(sprintf(
                     'Target "%s" must resolve to a class implementing %s',
@@ -85,9 +83,7 @@ final readonly class RunWorker implements Command
             $suffix = $targetEvent !== null ? ' (only)' : '';
             foreach ($sinks as $sinkClass) {
                 $this->log->info('Registering event sink' . $suffix, ['event' => $event, 'sink' => $sinkClass]);
-                $sink = $this->container->get($sinkClass);
-                \assert($sink instanceof EventSink, 'event sink class must resolve to an EventSink');
-                $this->eventInbox->subscribe($event, $sinkClass, $sink);
+                $this->eventInbox->subscribe($event, $sinkClass, $this->eventSink($sinkClass));
             }
         }
 
@@ -98,5 +94,38 @@ final readonly class RunWorker implements Command
             return;
         }
         $this->eventInbox->run();
+    }
+
+    private function onlyOption(): ?string
+    {
+        return $this->optionalString($this->input->getOption('only'));
+    }
+
+    private function onceOption(): bool
+    {
+        return $this->input->getOption('once') === true;
+    }
+
+    private function eventSink(string $sinkClass): EventSink
+    {
+        return $this->resolvedEventSink($this->container->get($sinkClass));
+    }
+
+    private function optionalString(mixed $value): ?string
+    {
+        if ($value === null || \is_string($value)) {
+            return $value;
+        }
+
+        throw new UnexpectedValueException('event worker only option must be a string when provided');
+    }
+
+    private function resolvedEventSink(mixed $sink): EventSink
+    {
+        if ($sink instanceof EventSink) {
+            return $sink;
+        }
+
+        throw new UnexpectedValueException('event sink class must resolve to an EventSink');
     }
 }

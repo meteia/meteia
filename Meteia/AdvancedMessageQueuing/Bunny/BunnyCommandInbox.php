@@ -22,10 +22,13 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 use UnexpectedValueException;
+use function React\Async\async;
 
 final readonly class BunnyCommandInbox implements CommandInbox
 {
     private BunnyInboxConsumption $consumption;
+
+    private BunnyInboxConsumers $consumers;
 
     public function __construct(
         private LoggerInterface $log,
@@ -35,6 +38,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
         private AmbientMessageScopeSource $scopeSource,
     ) {
         $this->consumption = new BunnyInboxConsumption();
+        $this->consumers = new BunnyInboxConsumers();
     }
 
     #[Override]
@@ -48,7 +52,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
         $channel->queueDeclare(queue: $queueName, durable: true);
         $channel->queueBind(exchange: (string) $this->exchangeName, queue: $queueName, routingKey: $queueName);
 
-        $channel->consume(function (Message $message, Channel $channel, Client $bunny) use (
+        $this->consumers->add($queueName, async(function (Message $message, Channel $channel, Client $bunny) use (
             $commandClassName,
             $queueName,
             $sink,
@@ -88,13 +92,14 @@ final readonly class BunnyCommandInbox implements CommandInbox
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), ['queueName' => $queueName]);
             }
-        }, $queueName);
+        }));
     }
 
     #[Override]
     public function run(): void
     {
         $this->consumption->untilShutdown();
+        $this->consumers->subscribe($this->loop->channel());
         $this->loop->runUntilShutdown('CommandWorkers.Shutdown');
     }
 
@@ -102,6 +107,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
     public function runOnce(): void
     {
         $this->consumption->oneMessage();
+        $this->consumers->subscribe($this->loop->channel());
         $this->loop->runUntilShutdown('CommandWorkers.Shutdown');
     }
 

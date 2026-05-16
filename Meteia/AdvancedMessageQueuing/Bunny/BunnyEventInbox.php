@@ -25,10 +25,13 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 use UnexpectedValueException;
+use function React\Async\async;
 
 final readonly class BunnyEventInbox implements EventInbox
 {
     private BunnyInboxConsumption $consumption;
+
+    private BunnyInboxConsumers $consumers;
 
     public function __construct(
         private LoggerInterface $log,
@@ -37,6 +40,7 @@ final readonly class BunnyEventInbox implements EventInbox
         private AmbientMessageScopeSource $scopeSource,
     ) {
         $this->consumption = new BunnyInboxConsumption();
+        $this->consumers = new BunnyInboxConsumers();
     }
 
     #[Override]
@@ -55,7 +59,7 @@ final readonly class BunnyEventInbox implements EventInbox
         $channel->queueDeclare($queueName, durable: true);
         $channel->queueBind(exchange: $exchangeName, queue: $queueName);
 
-        $channel->consume(function (Message $message, Channel $channel, Client $bunny) use (
+        $this->consumers->add($queueName, async(function (Message $message, Channel $channel, Client $bunny) use (
             $eventClassName,
             $queueName,
             $sink,
@@ -102,13 +106,14 @@ final readonly class BunnyEventInbox implements EventInbox
                 $channel->nack($message, false, false);
                 $this->log->error($t->getMessage(), ['queueName' => $queueName]);
             }
-        }, $queueName);
+        }));
     }
 
     #[Override]
     public function run(): void
     {
         $this->consumption->untilShutdown();
+        $this->consumers->subscribe($this->loop->channel());
         $this->loop->runUntilShutdown('EventWorkers.Shutdown');
     }
 
@@ -116,6 +121,7 @@ final readonly class BunnyEventInbox implements EventInbox
     public function runOnce(): void
     {
         $this->consumption->oneMessage();
+        $this->consumers->subscribe($this->loop->channel());
         $this->loop->runUntilShutdown('EventWorkers.Shutdown');
     }
 
