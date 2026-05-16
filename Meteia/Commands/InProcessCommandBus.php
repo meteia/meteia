@@ -9,12 +9,12 @@ use Override;
 final readonly class InProcessCommandBus implements CommandBus
 {
     public function __construct(
-        private CommandEndpoints $endpoints,
+        private CommandHandlers $handlers,
     ) {}
 
     #[Override]
-    public function dispatch(Command $command): CommandResult
+    public function dispatch(Command $command): void
     {
-        return $this->endpoints->endpointFor($command::class)->handle($command);
+        $this->handlers->handlerFor($command)->handle($command);
     }
 }

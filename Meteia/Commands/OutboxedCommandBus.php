@@ -16,10 +16,8 @@ final readonly class OutboxedCommandBus implements CommandBus
     ) {}
 
     #[Override]
-    public function dispatch(Command $command): CommandResult
+    public function dispatch(Command $command): void
     {
         $this->outbox->publish($command);
-
-        return new Accepted();
     }
 }

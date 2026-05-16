@@ -3,11 +3,17 @@
 declare(strict_types=1);
 
 use Meteia\AdvancedMessageQueuing\Bunny\BunnyEventInbox;
-use Meteia\AdvancedMessageQueuing\Bunny\BunnyEventOutbox;
+use Meteia\AdvancedMessageQueuing\Bunny\BunnyPublishedEvents;
+use Meteia\Events\Events;
 use Meteia\Events\EventInbox;
-use Meteia\Events\EventOutbox;
+use Meteia\Events\EventSinks;
+use Meteia\Events\PsrEvents;
+use Meteia\Events\PsrEventSinks;
+use Meteia\Events\PublishedEvents;
 
 return [
-    EventOutbox::class => BunnyEventOutbox::class,
+    Events::class => PsrEvents::class,
+    EventSinks::class => PsrEventSinks::class,
+    PublishedEvents::class => BunnyPublishedEvents::class,
     EventInbox::class => BunnyEventInbox::class,
 ];

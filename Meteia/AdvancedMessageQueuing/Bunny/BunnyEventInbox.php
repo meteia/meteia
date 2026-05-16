@@ -7,24 +7,29 @@ namespace Meteia\AdvancedMessageQueuing\Bunny;
 use Bunny\Channel;
 use Bunny\Client;
 use Bunny\Message;
+use DateTimeImmutable;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
-use Meteia\Events\Event;
+use Meteia\Domain\Contracts\DomainEvent;
+use Meteia\EventSourcing\StreamId;
+use Meteia\EventSourcing\StreamVersion;
 use Meteia\Events\EventId;
 use Meteia\Events\EventInbox;
 use Meteia\Events\EventSink;
+use Meteia\Events\PublishedEvent;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\ProcessId;
 use Override;
 use Psr\Log\LoggerInterface;
-use stdClass;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
-final readonly class BunnyEventInbox implements EventInbox
+final class BunnyEventInbox implements EventInbox
 {
-    private stdClass $runState;
+    private int $maxMessages;
+
+    private int $processed;
 
     public function __construct(
         private LoggerInterface $log,
@@ -32,7 +37,8 @@ final readonly class BunnyEventInbox implements EventInbox
         private BunnyMessageLoop $loop,
         private AmbientMessageScopeSource $scopeSource,
     ) {
-        $this->runState = (object) ['maxMessages' => 0, 'processed' => 0];
+        $this->maxMessages = 0;
+        $this->processed = 0;
     }
 
     #[Override]
@@ -56,25 +62,38 @@ final readonly class BunnyEventInbox implements EventInbox
             $queueName,
             $sink,
         ): void {
-            $eventId = EventId::fromToken((string) $message->headers['message-id']);
-            $correlationId = CorrelationId::fromToken((string) $message->headers['correlation-id']);
-            $processId = ProcessId::fromToken((string) $message->headers['process-id']);
+            $eventId = EventId::fromToken($this->header($message, 'message-id'));
+            $correlationId = CorrelationId::fromToken($this->header($message, 'correlation-id'));
+            $processId = ProcessId::fromToken($this->header($message, 'process-id'));
             $scope = new MessageScope($correlationId, CausationId::fromHex($eventId->hex()), $processId);
 
             try {
                 $event = $this->serializer->deserialize($message->content, $eventClassName, 'json');
-                \assert($event instanceof Event, 'deserialized event must implement Event');
-                $this->scopeSource->using($scope, function () use ($sink, $event, $scope, $queueName, $eventId): void {
-                    $this->log->info('Received Event', [
-                        'queueName' => $queueName,
-                        'eventId' => $eventId,
-                    ]);
-                    $sink->drain($event, $scope);
-                });
+                \assert($event instanceof DomainEvent, 'deserialized event must implement DomainEvent');
+                $published = PublishedEvent::fromMessage(
+                    StreamId::fromToken($this->header($message, 'stream-id')),
+                    new StreamVersion((int) $this->header($message, 'stream-version')),
+                    $event,
+                    CausationId::fromToken($this->header($message, 'causation-id')),
+                    $correlationId,
+                    new DateTimeImmutable($this->header($message, 'occurred-at')),
+                );
+                $this->scopeSource->using(
+                    $scope,
+                    function () use ($sink, $published, $scope, $queueName, $eventId): void {
+                        $this->log->info('Received Event', [
+                            'queueName' => $queueName,
+                            'eventId' => $eventId,
+                            'streamId' => $published->streamId(),
+                            'streamVersion' => $published->version(),
+                        ]);
+                        $sink->drain($published, $scope);
+                    },
+                );
                 $channel->ack($message);
 
-                $this->runState->processed++;
-                if ($this->runState->maxMessages > 0 && $this->runState->processed >= $this->runState->maxMessages) {
+                $this->processed++;
+                if ($this->maxMessages > 0 && $this->processed >= $this->maxMessages) {
                     $this->log->info('Once mode: disconnecting after processing one message', [
                         'queueName' => $queueName,
                     ]);
@@ -91,16 +110,24 @@ final readonly class BunnyEventInbox implements EventInbox
     #[Override]
     public function run(): void
     {
-        $this->runState->maxMessages = 0;
-        $this->runState->processed = 0;
+        $this->maxMessages = 0;
+        $this->processed = 0;
         $this->loop->runUntilShutdown('EventWorkers.Shutdown');
     }
 
     #[Override]
     public function runOnce(): void
     {
-        $this->runState->maxMessages = 1;
-        $this->runState->processed = 0;
+        $this->maxMessages = 1;
+        $this->processed = 0;
         $this->loop->runUntilShutdown('EventWorkers.Shutdown');
+    }
+
+    private function header(Message $message, string $name): string
+    {
+        $value = $message->headers[$name] ?? null;
+        \assert(is_scalar($value), 'message header must be scalar');
+
+        return (string) $value;
     }
 }

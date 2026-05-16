@@ -15,21 +15,19 @@ use Meteia\Commands\CommandBus;
 use Meteia\Commands\CommandInbox;
 use Meteia\Commands\Commands;
 use Meteia\Commands\CommandSink;
-use Meteia\Commands\Rejected;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Override;
 use Psr\Log\LoggerInterface;
-use stdClass;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
 
-final readonly class RunWorker implements CLICommand, CommandSink
+final class RunWorker implements CLICommand, CommandSink
 {
-    private stdClass $state;
+    private ?Container $appContainer;
 
     public function __construct(
         private Commands $commands,
@@ -37,7 +35,7 @@ final readonly class RunWorker implements CLICommand, CommandSink
         private CommandInbox $commandInbox,
         private Container $container,
     ) {
-        $this->state = (object) ['appContainer' => null];
+        $this->appContainer = null;
     }
 
     #[Override]
@@ -69,7 +67,9 @@ final readonly class RunWorker implements CLICommand, CommandSink
     public function execute(): void
     {
         $input = $this->container->get(InputInterface::class);
+        \assert($input instanceof InputInterface, 'console input must be available in the command worker container');
         $namespace = $this->container->get(ApplicationNamespace::class);
+        \assert($namespace instanceof ApplicationNamespace, 'application namespace must be available in the command worker container');
 
         $only = $input->getOption('only');
         $once = (bool) $input->getOption('once');
@@ -89,7 +89,6 @@ final readonly class RunWorker implements CLICommand, CommandSink
         }
 
         foreach ($this->commands as $command) {
-            \assert(\is_string($command), 'command from Commands must be class string');
             if ($targetCommand !== null && $command !== $targetCommand) {
                 continue;
             }
@@ -109,19 +108,22 @@ final readonly class RunWorker implements CLICommand, CommandSink
 
     private function appContainer(): Container
     {
-        if ($this->state->appContainer === null) {
+        if ($this->appContainer === null) {
             $path = $this->container->get(ApplicationPath::class);
+            \assert($path instanceof ApplicationPath, 'application path must be available in the command worker container');
             $namespace = $this->container->get(ApplicationNamespace::class);
+            \assert($namespace instanceof ApplicationNamespace, 'application namespace must be available in the command worker container');
             $publicDir = $this->container->get(ApplicationPublicDir::class);
+            \assert($publicDir instanceof ApplicationPublicDir, 'application public dir must be available in the command worker container');
             $applicationDefinitions = [
                 ApplicationNamespace::class => $namespace,
                 ApplicationPath::class => $path,
                 ApplicationPublicDir::class => $publicDir,
             ];
-            $this->state->appContainer = ContainerBuilder::build($path, $namespace, $applicationDefinitions);
+            $this->appContainer = ContainerBuilder::build($path, $namespace, $applicationDefinitions);
         }
 
-        return $this->state->appContainer;
+        return $this->appContainer;
     }
 
     #[Override]
@@ -130,13 +132,7 @@ final readonly class RunWorker implements CLICommand, CommandSink
         try {
             $bus = $this->appContainer()->get(CommandBus::class);
             \assert($bus instanceof CommandBus, 'CommandBus must be resolvable from app container');
-            $result = $bus->dispatch($command);
-            if ($result instanceof Rejected) {
-                $this->log->error('Command rejected', [
-                    'command' => $command::class,
-                    'reason' => $result->reason(),
-                ]);
-            }
+            $bus->dispatch($command);
         } catch (Throwable $e) {
             $this->log->error('Command failed', ['exception' => $e]);
         }

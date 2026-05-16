@@ -8,15 +8,14 @@ use Bunny\Channel;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\CommandLine\PayloadParser;
-use Meteia\Commands\Accepted;
 use Meteia\Commands\Command as DomainCommand;
 use Meteia\Debug\Commands\Ping;
-use Meteia\Debug\CommandSinks\Ping as PingEndpoint;
+use Meteia\Debug\CommandHandlers\Ping as PingHandler;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
-use Meteia\Events\EventOutbox;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class DebugCommandEventTest extends TestCase
@@ -34,6 +33,8 @@ final class DebugCommandEventTest extends TestCase
     public function testPingDenormalizesWithReplyTo(): void
     {
         $serializer = $this->getContainer()->get(SerializerInterface::class);
+        \assert($serializer instanceof SerializerInterface, 'test container must provide the serializer');
+        \assert($serializer instanceof DenormalizerInterface, 'test container serializer must denormalize payloads');
 
         $ping = $serializer->denormalize(['replyTo' => 'amq.gen-test-123'], Ping::class);
 
@@ -41,23 +42,19 @@ final class DebugCommandEventTest extends TestCase
         DebugCommandEventTest::assertSame('amq.gen-test-123', $ping->replyTo);
     }
 
-    public function testPingEndpointPublishesReplyDirectlyWhenReplyToPresent(): void
+    public function testPingHandlerPublishesReplyDirectlyWhenReplyToPresent(): void
     {
         $channel = $this->createMock(Channel::class);
         $channel->expects($this->once())->method('publish');
 
-        $eventOutbox = $this->createMock(EventOutbox::class);
-        $eventOutbox->expects($this->once())->method('publish');
-
         $serializer = $this->getContainer()->get(SerializerInterface::class);
+        \assert($serializer instanceof SerializerInterface, 'test container must provide the serializer');
         $logger = $this->createStub(LoggerInterface::class);
 
-        $endpoint = new PingEndpoint($channel, $serializer, $eventOutbox, $logger);
+        $handler = new PingHandler($channel, $serializer, $logger);
 
         $pingWithReply = new Ping(replyTo: 'amq.gen-test-123');
-        $result = $endpoint->handle($pingWithReply);
-
-        DebugCommandEventTest::assertInstanceOf(Accepted::class, $result);
+        $handler->handle($pingWithReply);
     }
 
     private function getContainer(): Container

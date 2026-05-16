@@ -8,7 +8,8 @@ use DateTimeImmutable;
 use Meteia\Commands\CommandOutbox;
 use Meteia\Domain\Contracts\IssuedCommands;
 use Meteia\Domain\Contracts\UnitOfWork;
-use Meteia\Events\EventOutbox;
+use Meteia\Events\PublishedEvent;
+use Meteia\Events\PublishedEvents;
 use Meteia\EventSourcing\AnyVersion;
 use Meteia\EventSourcing\Contracts\EventStream;
 use Meteia\EventSourcing\PendingEvent;
@@ -26,7 +27,7 @@ class ImmediateUnitOfWork implements UnitOfWork
     public function __construct(
         private EventStream $eventStream,
         private IssuedCommands $issuedCommands,
-        private EventOutbox $eventOutbox,
+        private PublishedEvents $publishedEvents,
         private CommandOutbox $commandOutbox,
     ) {
         $this->pendingEvents = new PendingEvents();
@@ -60,7 +61,7 @@ class ImmediateUnitOfWork implements UnitOfWork
             $first = $recorded[0];
             $this->eventStream->append($first->streamId(), new AnyVersion(), ...$recorded);
             foreach ($recorded as $event) {
-                $this->eventOutbox->publish($event->event());
+                $this->publishedEvents->publish(PublishedEvent::fromRecorded($event));
             }
         }
         $this->pendingEvents = new PendingEvents();

@@ -18,9 +18,8 @@ final class OutboxedCommandBusTest extends TestCase
         $outbox = new RecordingCommandOutbox();
         $bus = new OutboxedCommandBus($outbox);
 
-        $result = $bus->dispatch(new ExampleOutboxedCommand());
+        $bus->dispatch(new ExampleOutboxedCommand());
 
-        static::assertInstanceOf(Accepted::class, $result);
         static::assertCount(1, $outbox->published);
     }
 }

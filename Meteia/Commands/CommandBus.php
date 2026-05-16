@@ -6,5 +6,5 @@ namespace Meteia\Commands;
 
 interface CommandBus
 {
-    public function dispatch(Command $command): CommandResult;
+    public function dispatch(Command $command): void;
 }

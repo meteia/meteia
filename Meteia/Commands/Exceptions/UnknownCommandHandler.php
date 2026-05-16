@@ -6,10 +6,10 @@ namespace Meteia\Commands\Exceptions;
 
 use RuntimeException;
 
-final class UnknownCommandEndpoint extends RuntimeException
+final class UnknownCommandHandler extends RuntimeException
 {
     public function __construct(string $commandClass)
     {
-        parent::__construct(\sprintf('No CommandEndpoint registered for `%s`.', $commandClass));
+        parent::__construct(\sprintf('No CommandHandler registered for `%s`.', $commandClass));
     }
 }

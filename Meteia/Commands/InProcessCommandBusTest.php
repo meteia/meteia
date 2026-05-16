@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Meteia\Commands;
 
-use Meteia\Commands\Exceptions\UnknownCommandEndpoint;
+use Meteia\Commands\Exceptions\UnknownCommandHandler;
 use Meteia\Commands\Fixtures\ExampleCommand;
-use Meteia\Commands\Fixtures\RecordingCommandEndpoint;
+use Meteia\Commands\Fixtures\RecordingCommandHandler;
 use Override;
 use PHPUnit\Framework\TestCase;
 
@@ -17,38 +17,37 @@ final class InProcessCommandBusTest extends TestCase
 {
     public function testDispatchHandsCommandToTheRegisteredEndpoint(): void
     {
-        $endpoint = new RecordingCommandEndpoint();
-        $endpoints = new class($endpoint) implements CommandEndpoints {
+        $handler = new RecordingCommandHandler();
+        $handlers = new class($handler) implements CommandHandlers {
             public function __construct(
-                private readonly CommandEndpoint $endpoint,
+                private readonly CommandHandler $handler,
             ) {}
 
             #[Override]
-            public function endpointFor(string $commandClass): CommandEndpoint
+            public function handlerFor(Command $command): CommandHandler
             {
-                return $this->endpoint;
+                return $this->handler;
             }
         };
-        $bus = new InProcessCommandBus($endpoints);
+        $bus = new InProcessCommandBus($handlers);
 
-        $result = $bus->dispatch(new ExampleCommand());
+        $bus->dispatch(new ExampleCommand());
 
-        static::assertInstanceOf(Accepted::class, $result);
-        static::assertCount(1, $endpoint->received);
+        static::assertCount(1, $handler->received);
     }
 
-    public function testDispatchPropagatesEndpointResolutionErrors(): void
+    public function testDispatchPropagatesHandlerResolutionErrors(): void
     {
-        $endpoints = new class implements CommandEndpoints {
+        $handlers = new class implements CommandHandlers {
             #[Override]
-            public function endpointFor(string $commandClass): CommandEndpoint
+            public function handlerFor(Command $command): CommandHandler
             {
-                throw new UnknownCommandEndpoint($commandClass);
+                throw new UnknownCommandHandler($command::class);
             }
         };
-        $bus = new InProcessCommandBus($endpoints);
+        $bus = new InProcessCommandBus($handlers);
 
-        $this->expectException(UnknownCommandEndpoint::class);
+        $this->expectException(UnknownCommandHandler::class);
         $bus->dispatch(new ExampleCommand());
     }
 }

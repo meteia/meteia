@@ -8,5 +8,5 @@ use Meteia\ValueObjects\Identity\MessageScope;
 
 interface EventSink
 {
-    public function drain(Event $event, MessageScope $scope): void;
+    public function drain(PublishedEvent $event, MessageScope $scope): void;
 }

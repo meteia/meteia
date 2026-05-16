@@ -216,6 +216,12 @@ Commands and queries never share a handler, model, or return type.
 - Never call a query handler from inside a command handler.
 - If a command needs information, that information belongs in the command payload, aggregate state, or a
   domain/application policy designed for the command side.
+- Interfaces describe roles. Concrete classes describe implementation strategy. Anything inferred from PSR-4 path
+  conventions must be implemented by a concrete `Psr...` class. Domain/application ports must not hide path convention
+  magic behind generic names. Current command/event conventions are `PsrCommands` for `*/Commands/*.php`,
+  `PsrCommandHandlers` for `Context\Commands\Foo` to `Context\CommandHandlers\Foo`, `PsrEvents` for replayable
+  `*/Events/*.php` domain events, and `PsrEventSinks` for
+  `ReactingContext\EventSinks\SourceContext\EventName\Action`.
 
 ## Forbidden
 

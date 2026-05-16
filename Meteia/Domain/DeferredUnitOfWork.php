@@ -10,7 +10,8 @@ use Meteia\Commands\CommandOutbox;
 use Meteia\DependencyInjection\Container;
 use Meteia\Domain\Contracts\IssuedCommands;
 use Meteia\Domain\Contracts\UnitOfWork;
-use Meteia\Events\EventOutbox;
+use Meteia\Events\PublishedEvent;
+use Meteia\Events\PublishedEvents;
 use Meteia\EventSourcing\AnyVersion;
 use Meteia\EventSourcing\Contracts\EventStream;
 use Meteia\EventSourcing\PendingEvent;
@@ -78,8 +79,8 @@ final class DeferredUnitOfWork implements UnitOfWork
 
         /** @var EventStream $eventStream */
         $eventStream = $this->container->get(EventStream::class);
-        /** @var EventOutbox $eventOutbox */
-        $eventOutbox = $this->container->get(EventOutbox::class);
+        /** @var PublishedEvents $publishedEvents */
+        $publishedEvents = $this->container->get(PublishedEvents::class);
 
         $occurredAt = new DateTimeImmutable();
         /** @var array<string, array{StreamId, list<RecordedEvent>}> $byStream */
@@ -96,7 +97,7 @@ final class DeferredUnitOfWork implements UnitOfWork
             $eventStream->append($streamId, new AnyVersion(), ...$recorded);
             foreach ($recorded as $event) {
                 try {
-                    $eventOutbox->publish($event->event());
+                    $publishedEvents->publish(PublishedEvent::fromRecorded($event));
                 } catch (Throwable) {
                     // @mago-expect lint:no-empty-catch-clause -- outbox publish is best-effort side effect for eventual reactors/sinks; pdo append is the source of truth
                 }

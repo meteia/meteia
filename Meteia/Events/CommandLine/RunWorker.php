@@ -9,10 +9,10 @@ use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\CommandLine\Command;
 use Meteia\CommandLine\PayloadParser;
 use Meteia\DependencyInjection\Container;
-use Meteia\Events\Event;
+use Meteia\Domain\Contracts\DomainEvent;
 use Meteia\Events\EventInbox;
 use Meteia\Events\EventSink;
-use Meteia\Events\EventToEventSinksMap;
+use Meteia\Events\EventSinks;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -25,7 +25,7 @@ final readonly class RunWorker implements Command
         private EventInbox $eventInbox,
         private LoggerInterface $log,
         private Container $container,
-        private EventToEventSinksMap $eventToEventSinksMap,
+        private EventSinks $eventSinks,
     ) {}
 
     #[Override]
@@ -57,7 +57,9 @@ final readonly class RunWorker implements Command
     public function execute(): void
     {
         $input = $this->container->get(InputInterface::class);
+        \assert($input instanceof InputInterface, 'console input must be available in the event worker container');
         $namespace = $this->container->get(ApplicationNamespace::class);
+        \assert($namespace instanceof ApplicationNamespace, 'application namespace must be available in the event worker container');
 
         $only = $input->getOption('only');
         $once = (bool) $input->getOption('once');
@@ -66,25 +68,25 @@ final readonly class RunWorker implements Command
         if ($only !== null) {
             $target = (string) $only;
             $parser = new PayloadParser();
-            $targetEvent = $parser->resolve($target, $namespace, Event::class);
+            $targetEvent = $parser->resolve($target, $namespace, DomainEvent::class);
             if ($targetEvent === null) {
                 throw new InvalidArgumentException(sprintf(
                     'Target "%s" must resolve to a class implementing %s',
                     $target,
-                    Event::class,
+                    DomainEvent::class,
                 ));
             }
         }
 
-        foreach ($this->eventToEventSinksMap as $event => $sinks) {
+        foreach ($this->eventSinks as $event => $sinks) {
             if ($targetEvent !== null && $event !== $targetEvent) {
                 continue;
             }
             $suffix = $targetEvent !== null ? ' (only)' : '';
             foreach ($sinks as $sinkClass) {
                 $this->log->info('Registering event sink' . $suffix, ['event' => $event, 'sink' => $sinkClass]);
-                /** @var EventSink $sink */
                 $sink = $this->container->get($sinkClass);
+                \assert($sink instanceof EventSink, 'event sink class must resolve to an EventSink');
                 $this->eventInbox->subscribe($event, $sinkClass, $sink);
             }
         }
