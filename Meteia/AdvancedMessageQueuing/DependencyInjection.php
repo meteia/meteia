@@ -8,7 +8,6 @@ use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
 use Meteia\AdvancedMessageQueuing\Bunny\BunnyRequestResources;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
-use Meteia\AdvancedMessageQueuing\Configuration\DelayedCommandsExchangeName;
 use Meteia\AdvancedMessageQueuing\Management\BunnyRabbitMqManagement;
 use Meteia\AdvancedMessageQueuing\Management\RabbitMqManagement;
 use Meteia\AdvancedMessageQueuing\Management\VHostName;
@@ -40,13 +39,6 @@ return [
     ): CommandsExchangeName => new CommandsExchangeName($configuration->string(
         'METEIA_AMQ_COMMANDS_EXCHANGE_NAME',
         (string) $applicationNamespace . '.Commands',
-    )),
-    DelayedCommandsExchangeName::class => static fn(
-        Configuration $configuration,
-        ApplicationNamespace $applicationNamespace,
-    ): DelayedCommandsExchangeName => new DelayedCommandsExchangeName($configuration->string(
-        'METEIA_AMQ_DELAYED_COMMANDS_EXCHANGE_NAME',
-        (string) $applicationNamespace . '.DelayedCommands',
     )),
     AmbientMessageScopeSource::class =>
         static fn(MessageScope $scope): AmbientMessageScopeSource => new AmbientMessageScopeSource($scope),

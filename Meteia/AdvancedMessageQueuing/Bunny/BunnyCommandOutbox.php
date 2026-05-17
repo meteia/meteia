@@ -8,6 +8,8 @@ use Bunny\Channel;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\AdvancedMessageQueuing\MessageContext;
 use Meteia\Commands\Command;
+use Meteia\Commands\CommandDeliveries;
+use Meteia\Commands\CommandDelivery;
 use Meteia\Commands\CommandId;
 use Meteia\Commands\CommandOutbox;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
@@ -15,7 +17,7 @@ use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final readonly class BunnyCommandOutbox implements CommandOutbox
+final readonly class BunnyCommandOutbox implements CommandOutbox, CommandDeliveries
 {
     public function __construct(
         private Channel $channel,
@@ -28,13 +30,24 @@ final readonly class BunnyCommandOutbox implements CommandOutbox
     #[Override]
     public function publish(Command $command): void
     {
+        $this->publishDelivery(new CommandDelivery(
+            CommandId::random(),
+            $command,
+            $this->scopeSource->current(),
+        ));
+    }
+
+    #[Override]
+    public function publishDelivery(CommandDelivery $delivery): void
+    {
         $this->channel->exchangeDeclare((string) $this->exchangeName, durable: true);
+        $command = $delivery->command();
         $queueName = str_replace('\\', '.', $command::class);
         $payload = $this->serializer->serialize($command, 'json');
-        $context = MessageContext::fromScope($this->scopeSource->current());
+        $context = MessageContext::fromScope($delivery->scope());
         $this->channel->publish(
             $payload,
-            $context->headersWithMessageId((string) CommandId::random()),
+            $context->headersWithMessageId((string) $delivery->commandId()),
             (string) $this->exchangeName,
             $queueName,
         );
