@@ -23,6 +23,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
+use UnexpectedValueException;
 
 final readonly class MeteiaKernel implements Kernel
 {
@@ -38,28 +39,44 @@ final readonly class MeteiaKernel implements Kernel
     {
         $container = $this->container();
 
-        $requestHandler = $this->requestHandler($container, $middleware);
-        $serverRequest = $container->get(ServerRequestInterface::class);
-        \assert($serverRequest instanceof ServerRequestInterface, 'ServerRequestInterface is bound at request boundary');
-        $response = $requestHandler->handle($serverRequest);
+        try {
+            $requestHandler = $this->requestHandler($container, $middleware);
+            $serverRequest = $this->resolved(
+                $container->get(ServerRequestInterface::class),
+                ServerRequestInterface::class,
+                'ServerRequestInterface is bound at request boundary',
+            );
+            $response = $requestHandler->handle($serverRequest);
 
-        $this->sink->send($response);
+            $this->sink->send($response);
 
-        $this->flushUnitOfWork($container);
+            $this->flushUnitOfWork($container);
+        } finally {
+            $this->releaseRequestResources($container);
+        }
     }
 
     private function flushUnitOfWork(Container $container): void
     {
         try {
-            $unitOfWork = $container->get(UnitOfWork::class);
-            \assert($unitOfWork instanceof UnitOfWork, 'UnitOfWork binding resolves to UnitOfWork instance');
-            $scope = $container->get(MessageScope::class);
-            \assert($scope instanceof MessageScope, 'MessageScope is seeded by SeedMessageScope middleware');
+            $unitOfWork = $this->resolved(
+                $container->get(UnitOfWork::class),
+                UnitOfWork::class,
+                'UnitOfWork binding resolves to UnitOfWork instance',
+            );
+            $scope = $this->resolved(
+                $container->get(MessageScope::class),
+                MessageScope::class,
+                'MessageScope is seeded by SeedMessageScope middleware',
+            );
             $unitOfWork->complete($scope);
         } catch (Throwable $error) {
             try {
-                $log = $container->get(LoggerInterface::class);
-                \assert($log instanceof LoggerInterface, 'LoggerInterface is bound by Logging DependencyInjection');
+                $log = $this->resolved(
+                    $container->get(LoggerInterface::class),
+                    LoggerInterface::class,
+                    'LoggerInterface is bound by Logging DependencyInjection',
+                );
                 $log->error('UnitOfWork flush failed after response', [
                     'exception' => $error::class,
                     'message' => $error->getMessage(),
@@ -83,14 +100,18 @@ final readonly class MeteiaKernel implements Kernel
             ...$definitions,
         ];
 
-        /** @var Container $container */
-        $container = $timings->measure('di.init', fn() => ContainerBuilder::build(
-            $this->path,
-            $this->namespace,
-            $applicationDefinitions,
-        ));
-
-        return new TimedContainer($timings, $container);
+        return new TimedContainer(
+            $timings,
+            $this->resolved(
+                $timings->measure('di.init', fn() => ContainerBuilder::build(
+                    $this->path,
+                    $this->namespace,
+                    $applicationDefinitions,
+                )),
+                Container::class,
+                'ContainerBuilder must return a Container',
+            ),
+        );
     }
 
     #[Override]
@@ -98,8 +119,11 @@ final readonly class MeteiaKernel implements Kernel
         Container $container,
         MiddlewareList $middleware = new MiddlewareList(),
     ): RequestHandlerInterface {
-        /** @var RequestHandler $requestHandler */
-        $requestHandler = $container->get(RequestHandlerInterface::class);
+        $requestHandler = $this->resolved(
+            $container->get(RequestHandlerInterface::class),
+            RequestHandler::class,
+            'RequestHandlerInterface binding must resolve to RequestHandler',
+        );
 
         $requestHandler->append(SeedMessageScope::class);
         $requestHandler->append(new CatchAndReportErrors($this));
@@ -109,5 +133,34 @@ final readonly class MeteiaKernel implements Kernel
         $requestHandler->append(PsrEndpoints::class);
 
         return $requestHandler;
+    }
+
+    private function releaseRequestResources(Container $container): void
+    {
+        try {
+            $this->resolved(
+                $container->get(RequestResources::class),
+                RequestResources::class,
+                'RequestResources binding must resolve to RequestResources',
+            )->release();
+        } catch (Throwable) {
+            return;
+        }
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $type
+     *
+     * @return T
+     */
+    private function resolved(mixed $value, string $type, string $message): object
+    {
+        if ($value instanceof $type) {
+            return $value;
+        }
+
+        throw new UnexpectedValueException($message);
     }
 }

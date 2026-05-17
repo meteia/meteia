@@ -6,12 +6,14 @@ use Bunny\Channel;
 use Bunny\ChannelInterface;
 use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
+use Meteia\AdvancedMessageQueuing\Bunny\BunnyRequestResources;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\AdvancedMessageQueuing\Configuration\DelayedCommandsExchangeName;
 use Meteia\AdvancedMessageQueuing\Management\BunnyRabbitMqManagement;
 use Meteia\AdvancedMessageQueuing\Management\RabbitMqManagement;
 use Meteia\AdvancedMessageQueuing\Management\VHostName;
 use Meteia\Bootstrap\ApplicationNamespace;
+use Meteia\Bootstrap\RequestResources;
 use Meteia\Configuration\Configuration;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Meteia\ValueObjects\Identity\MessageScopeSource;
@@ -29,12 +31,9 @@ $connectionOptions = static fn(Configuration $config): array => [
 
 return [
     Client::class => static fn(Configuration $config): Client => new Client($connectionOptions($config)),
-    Channel::class => static function (Client $client): ChannelInterface {
-        $client->connect();
-
-        return $client->channel();
-    },
+    Channel::class => static fn(Client $client): ChannelInterface => $client->channel(),
     ChannelInterface::class => static fn(Channel $channel): ChannelInterface => $channel,
+    RequestResources::class => static fn(Client $client): RequestResources => new BunnyRequestResources($client),
     CommandsExchangeName::class => static fn(
         Configuration $configuration,
         ApplicationNamespace $applicationNamespace,
@@ -56,5 +55,5 @@ return [
         $config->string('RABBITMQ_VIRTUALHOST', '/'),
     ),
     RabbitMqManagement::class =>
-        static fn(Configuration $config): RabbitMqManagement => new BunnyRabbitMqManagement($connectionOptions($config)),
+        static fn(Client $client): RabbitMqManagement => new BunnyRabbitMqManagement($client),
 ];
