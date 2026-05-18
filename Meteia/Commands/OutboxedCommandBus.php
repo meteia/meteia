@@ -15,6 +15,9 @@ final readonly class OutboxedCommandBus implements CommandBus
         private CommandOutbox $outbox,
     ) {}
 
+    /**
+     * @param Command<mixed> $command
+     */
     #[Override]
     public function dispatch(Command $command): void
     {

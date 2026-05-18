@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * @implements CommandHandler<DebugPing>
+ * @implements CommandHandler<DebugPing, void>
  */
 final readonly class Ping implements CommandHandler
 {

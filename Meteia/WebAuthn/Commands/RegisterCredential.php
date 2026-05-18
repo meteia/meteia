@@ -8,6 +8,9 @@ use Meteia\Commands\Command;
 use Webauthn\CredentialRecord;
 use Webauthn\PublicKeyCredentialUserEntity;
 
+/**
+ * @implements Command<void>
+ */
 readonly class RegisterCredential implements Command
 {
     public function __construct(

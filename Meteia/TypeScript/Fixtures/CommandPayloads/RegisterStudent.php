@@ -6,6 +6,9 @@ namespace Meteia\TypeScript\Fixtures\CommandPayloads;
 
 use Meteia\Commands\Command;
 
+/**
+ * @implements Command<void>
+ */
 final readonly class RegisterStudent implements Command
 {
     public function __construct(

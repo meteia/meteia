@@ -7,6 +7,9 @@ namespace Meteia\WebAuthn\Commands;
 use Meteia\Commands\Command;
 use Webauthn\CredentialRecord;
 
+/**
+ * @implements Command<void>
+ */
 readonly class RecordSuccessfulAuthentication implements Command
 {
     public function __construct(

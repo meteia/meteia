@@ -9,6 +9,9 @@ use Meteia\Commands\Command;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\Uri;
 
+/**
+ * @implements Command<void>
+ */
 final readonly class ScheduleLesson implements Command
 {
     public function __construct(

@@ -9,11 +9,11 @@ use Meteia\Commands\CommandHandler;
 use Override;
 
 /**
- * @implements CommandHandler<ExampleCommand>
+ * @implements CommandHandler<ExampleCommand, void>
  */
 final class RecordingCommandHandler implements CommandHandler
 {
-    /** @var list<Command> */
+    /** @var list<Command<void>> */
     public array $received = [];
 
     #[Override]

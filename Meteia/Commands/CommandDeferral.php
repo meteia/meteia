@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Meteia\Commands;
 
-interface CommandBus
+interface CommandDeferral
 {
     /**
      * @param Command<mixed> $command
      */
-    public function dispatch(Command $command): void;
+    public function defer(Command $command): DeferredCommand;
 }

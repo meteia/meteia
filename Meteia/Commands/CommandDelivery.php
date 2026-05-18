@@ -8,6 +8,9 @@ use Meteia\ValueObjects\Identity\MessageScope;
 
 final readonly class CommandDelivery
 {
+    /**
+     * @param Command<mixed> $command
+     */
     public function __construct(
         private CommandId $commandId,
         private Command $command,
@@ -19,6 +22,9 @@ final readonly class CommandDelivery
         return $this->commandId;
     }
 
+    /**
+     * @return Command<mixed>
+     */
     public function command(): Command
     {
         return $this->command;

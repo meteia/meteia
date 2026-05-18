@@ -10,7 +10,7 @@ use Meteia\PsrConvention\Commands\ExamplePsrCommand as CommandFixture;
 use Override;
 
 /**
- * @implements CommandHandler<CommandFixture>
+ * @implements CommandHandler<CommandFixture, void>
  */
 final class ExamplePsrCommand implements CommandHandler
 {

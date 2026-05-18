@@ -7,6 +7,6 @@ namespace Meteia\Commands\Fixtures;
 use Meteia\Commands\Command;
 
 /**
- * @implements Command<void>
+ * @implements Command<string>
  */
-final readonly class ExampleOutboxedCommand implements Command {}
+final readonly class ResultCommand implements Command {}

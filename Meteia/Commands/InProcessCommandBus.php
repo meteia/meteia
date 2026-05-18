@@ -12,6 +12,9 @@ final readonly class InProcessCommandBus implements CommandBus
         private CommandHandlers $handlers,
     ) {}
 
+    /**
+     * @param Command<mixed> $command
+     */
     #[Override]
     public function dispatch(Command $command): void
     {

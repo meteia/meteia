@@ -6,5 +6,8 @@ namespace Meteia\Commands;
 
 interface CommandOutbox
 {
+    /**
+     * @param Command<mixed> $command
+     */
     public function publish(Command $command): void;
 }
