@@ -30,7 +30,7 @@ function common_prefix_length(array $strings): int
     }
     sort($strings);
 
-    $s1 = (string) array_shift($strings);
+    $s1 = array_shift($strings);
     $s2 = (string) array_pop($strings);
     $len = min(\strlen($s1), \strlen($s2));
 

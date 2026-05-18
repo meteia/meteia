@@ -27,7 +27,7 @@ readonly class EnvironmentConfiguration implements Configuration
                     return Dotenv::parse($contents);
                 },
                 array_filter(
-                    explode(',', (string) $_ENV['APP_ENV_FILES']),
+                    explode(',', $_ENV['APP_ENV_FILES']),
                     static fn(string $file) => file_exists($file) && is_readable($file),
                 ),
             )),
