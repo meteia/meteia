@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\DependencyInjection;
 
+use Closure;
 use Exception;
 use Override;
 use ReflectionClass;
@@ -104,7 +105,7 @@ class ReflectionContainer implements Container
         if (\is_array($callable)) {
             \assert((\is_object($callable[0]) || \is_string($callable[0])) && \is_string($callable[1]));
             $rm = new ReflectionMethod($callable[0], $callable[1]);
-        } elseif (\is_object($callable) && !$callable instanceof \Closure) {
+        } elseif (\is_object($callable) && !$callable instanceof Closure) {
             $rm = new ReflectionMethod($callable, '__invoke');
         }
 
@@ -154,7 +155,7 @@ class ReflectionContainer implements Container
      */
     private function resolveFunctionParameters(callable $callable, array $parameters = []): array
     {
-        \assert($callable instanceof \Closure || \is_string($callable));
+        \assert($callable instanceof Closure || \is_string($callable));
         $rm = new ReflectionFunction($callable);
 
         return array_values(array_map(fn($param) => $this->resolveParameter(

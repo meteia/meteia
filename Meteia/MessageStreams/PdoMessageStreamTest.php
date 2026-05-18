@@ -33,7 +33,7 @@ final class PdoMessageStreamTest extends TestCase
         $messages = $stream->read($streamId);
         static::assertCount(1, $messages);
         $first = $messages[0];
-        \assert($first instanceof \Meteia\MessageStreams\RecordedMessage);
+        \assert($first instanceof RecordedMessage);
         static::assertSame((string) $causation, (string) $first->causedBy());
         static::assertSame((string) $correlation, (string) $first->correlatedTo());
     }

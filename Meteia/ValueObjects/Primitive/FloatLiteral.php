@@ -36,22 +36,22 @@ abstract class FloatLiteral extends PrimitiveValueObject implements Stringable
         return (float) parent::toNative();
     }
 
-    public function add(string|float|int|\Stringable $amount): static
+    public function add(string|float|int|Stringable $amount): static
     {
         return new static(bcadd(self::numericString($this), self::numericString($amount), static::PRECISION));
     }
 
-    public function subtract(string|float|int|\Stringable $amount): static
+    public function subtract(string|float|int|Stringable $amount): static
     {
         return new static(bcsub(self::numericString($this), self::numericString($amount), static::PRECISION));
     }
 
-    public function multiply(string|float|int|\Stringable $by): static
+    public function multiply(string|float|int|Stringable $by): static
     {
         return new static(bcmul(self::numericString($this), self::numericString($by), static::PRECISION));
     }
 
-    public function divide(string|float|int|\Stringable $by): static
+    public function divide(string|float|int|Stringable $by): static
     {
         return new static(bcdiv(self::numericString($this), self::numericString($by), static::PRECISION));
     }
@@ -59,7 +59,7 @@ abstract class FloatLiteral extends PrimitiveValueObject implements Stringable
     /**
      * @return numeric-string
      */
-    private static function numericString(string|float|int|\Stringable $value): string
+    private static function numericString(string|float|int|Stringable $value): string
     {
         $string = (string) $value;
         \assert(is_numeric($string));

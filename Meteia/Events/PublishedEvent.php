@@ -14,7 +14,6 @@ use Meteia\EventSourcing\StreamVersion;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 
-// @mago-expect lint:too-many-methods -- published events intentionally expose the recorded fact plus durable message identity for idempotent sinks
 final readonly class PublishedEvent
 {
     public function __construct(
@@ -34,12 +33,9 @@ final readonly class PublishedEvent
         CorrelationId $correlationId,
         DateTimeImmutable $occurredAt,
     ): self {
-        return new self(new RecordedEvent(
-            new PendingEvent($streamId, $version, $event),
-            $causationId,
-            $correlationId,
-            $occurredAt,
-        ));
+        return new self(
+            new RecordedEvent(new PendingEvent($streamId, $version, $event), $causationId, $correlationId, $occurredAt),
+        );
     }
 
     public function recorded(): RecordedEvent

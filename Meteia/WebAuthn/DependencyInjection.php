@@ -16,13 +16,11 @@ use Meteia\WebAuthn\Database\PdoCredentialSourceRepository;
 use Meteia\WebAuthn\Database\PdoUserEntityRepository;
 use Meteia\WebAuthn\NullEventDispatcher;
 use Meteia\WebAuthn\RelyingParty;
-use Symfony\Component\Serializer\SerializerInterface;
 use Webauthn\AttestationStatement\AttestationStatementSupportManager;
 use Webauthn\AttestationStatement\NoneAttestationStatementSupport;
 use Webauthn\AuthenticatorAssertionResponseValidator;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
-use Webauthn\Denormalizer\WebauthnSerializerFactory;
 
 return [
     RelyingPartyName::class =>

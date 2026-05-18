@@ -42,9 +42,7 @@ abstract class ConnectionField extends ObjectType
         ], $this->argsWith());
 
         /** @var array<string, mixed> $filtered */
-        $filtered = array_filter($args);
-
-        return $filtered;
+        return array_filter($args);
     }
 
     public function argsWith(array $args = []): array

@@ -10,6 +10,7 @@ use Meteia\Domain\Contracts\PrimitiveValueObject;
 use Meteia\ValueObjects\Errors\ObjectMutationProhibited;
 use Meteia\ValueObjects\Errors\ValueObjectInvalid;
 use Override;
+use Stringable;
 use Traversable;
 
 abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObject, ArrayValueObject
@@ -28,7 +29,7 @@ abstract readonly class ImmutableArrayValueObject implements PrimitiveValueObjec
     #[Override]
     public function __toString(): string
     {
-        return implode(', ', array_map(static fn(object $v): string => $v instanceof \Stringable
+        return implode(', ', array_map(static fn(object $v): string => $v instanceof Stringable
             ? (string) $v
             : $v::class, $this->values));
     }

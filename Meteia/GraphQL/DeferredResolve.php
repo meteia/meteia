@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\GraphQL;
 
 use Exception;
+use Stringable;
 
 trait DeferredResolve
 {
@@ -26,7 +27,7 @@ trait DeferredResolve
     /**
      * @param array<string, mixed> $args
      */
-    public function defer(string|\Stringable $id, array $args = []): void
+    public function defer(string|Stringable $id, array $args = []): void
     {
         $id = (string) $id;
         if (isset($this->fetched[$id])) {
@@ -37,7 +38,7 @@ trait DeferredResolve
         $this->deferred[] = $id;
     }
 
-    public function fetch(string|\Stringable $id): mixed
+    public function fetch(string|Stringable $id): mixed
     {
         $id = (string) $id;
         if (isset($this->fetched[$id])) {

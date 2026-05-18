@@ -20,8 +20,6 @@ final readonly class ViteFileManifestSource implements ManifestSource
     public function entries(): array
     {
         /** @var array<string, array{file?: string, imports?: list<string>, css?: list<string>}> $entries */
-        $entries = $this->cache->entriesAt($this->path);
-
-        return $entries;
+        return $this->cache->entriesAt($this->path);
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Html;
 
+use Stringable;
+
 trait DataAttributes
 {
     public function attrs(...$names): string
@@ -20,7 +22,7 @@ trait DataAttributes
                     return 'data-' . $k;
                 }
 
-                \assert(\is_scalar($v) || $v === null || $v instanceof \Stringable);
+                \assert(\is_scalar($v) || $v === null || $v instanceof Stringable);
 
                 return sprintf('data-%s="%s"', $k, (string) $v);
             },

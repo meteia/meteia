@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\ValueObjects\Geography;
 
 use Meteia\ValueObjects\Primitive\ComplexStringLiteral as StringLiteral;
+use Stringable;
 
 class CountryCodeName
 {
@@ -263,7 +264,7 @@ class CountryCodeName
         return new StringLiteral($name);
     }
 
-    public static function getTwoLetterCode(string|\Stringable $name): StringLiteral
+    public static function getTwoLetterCode(string|Stringable $name): StringLiteral
     {
         $name = (string) $name;
         foreach (self::$names as $code => $countryName) {

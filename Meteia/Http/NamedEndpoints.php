@@ -27,7 +27,7 @@ class NamedEndpoints
             ),
         );
         /** @var array<string, class-string<NamedEndpoint>> $mapped */
-        $mapped = array_map_assoc(fn(int $idx, string $endpoint) => [
+        $mapped = array_map_assoc(static fn(int $idx, string $endpoint) => [
             (string) new ClassBasedName($endpoint) => $endpoint,
         ], $endpoints);
         $this->endpoints = $mapped;

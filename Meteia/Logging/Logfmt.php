@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Meteia\Logging;
 
+use Stringable;
+
 final readonly class Logfmt
 {
     /**
@@ -30,7 +32,7 @@ final readonly class Logfmt
                 $formatted[] = $key . '=' . round($value, 4);
                 continue;
             }
-            $stringValue = \is_scalar($value) || $value instanceof \Stringable ? (string) $value : '';
+            $stringValue = \is_scalar($value) || $value instanceof Stringable ? (string) $value : '';
             if (preg_match('/[ "]/', $stringValue) === 1) {
                 $formatted[] = sprintf('%s="%s"', $key, $stringValue);
                 continue;

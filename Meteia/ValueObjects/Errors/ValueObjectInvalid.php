@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Meteia\ValueObjects\Errors;
 
 use InvalidArgumentException;
+use Stringable;
 
 class ValueObjectInvalid extends InvalidArgumentException
 {
@@ -15,7 +16,7 @@ class ValueObjectInvalid extends InvalidArgumentException
     {
         $message = sprintf(
             '"%s" is not one of the valid types ("%s") for this value object.',
-            \is_scalar($value) || $value instanceof \Stringable ? (string) $value : get_debug_type($value),
+            \is_scalar($value) || $value instanceof Stringable ? (string) $value : get_debug_type($value),
             implode(', ', $allowed_types),
         );
         parent::__construct($message);
