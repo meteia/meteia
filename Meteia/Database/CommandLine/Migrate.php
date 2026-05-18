@@ -90,13 +90,14 @@ readonly class Migrate implements Command
         /** @var \SplFileInfo $file */
         foreach ($allMigrationFiles as $file) {
             $filename = $file->getBasename('.sql');
-            if (!preg_match('/^(?<id>\d{14})\.(?<type>i|ni)\.(?<name>.+)$/', $filename, $matches)) {
+            $matches = [];
+            if (preg_match('/^(?<id>\d{14})\.(?<type>i|ni)\.(?<name>.+)$/', $filename, $matches) !== 1) {
                 throw new RuntimeException('Invalid migration filename: ' . $file->getBasename());
             }
 
-            $id = $matches['id'];
-            $type = $matches['type'];
-            $name = $matches['name'];
+            $id = $matches['id'] ?? throw new RuntimeException('Invalid migration filename: ' . $file->getBasename());
+            $type = $matches['type'] ?? throw new RuntimeException('Invalid migration filename: ' . $file->getBasename());
+            $name = $matches['name'] ?? throw new RuntimeException('Invalid migration filename: ' . $file->getBasename());
             if (\in_array($id, $migrationIds, true)) {
                 $this->output->writeln(\sprintf('existing : %s', $filename));
 

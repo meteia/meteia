@@ -39,6 +39,8 @@ final readonly class PayloadParser
     }
 
     /**
+     * @param array<string, mixed> $overrides
+     *
      * @return array<string, mixed>
      */
     public function load(?string $jsonFile, array $overrides): array
@@ -53,13 +55,24 @@ final readonly class PayloadParser
                 throw new RuntimeException('Cannot read JSON payload file: ' . $jsonFile);
             }
             $decoded = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-            $data = is_array($decoded) ? $decoded : [];
+            if (!is_array($decoded)) {
+                throw new RuntimeException('JSON payload file must contain an object: ' . $jsonFile);
+            }
+
+            foreach ($decoded as $key => $value) {
+                if (!is_string($key)) {
+                    throw new RuntimeException('JSON payload file must contain an object: ' . $jsonFile);
+                }
+
+                $data[$key] = $value;
+            }
         }
 
         foreach ($overrides as $path => $value) {
             Dot::set($data, $path, $value);
         }
 
+        /** @var array<string, mixed> $data */
         return $data;
     }
 

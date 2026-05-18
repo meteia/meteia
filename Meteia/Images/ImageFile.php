@@ -39,7 +39,6 @@ readonly class ImageFile implements Image
             ImageFormat::GIF => imagecreatefromgif((string) $this->path),
             ImageFormat::WEBP => imagecreatefromwebp((string) $this->path),
             ImageFormat::AVIF => imagecreatefromavif((string) $this->path),
-            default => throw new Exception("Unexpected match value {$imageFormat->value}."),
         };
         if (!$src) {
             throw new Exception('Failed to read source.');

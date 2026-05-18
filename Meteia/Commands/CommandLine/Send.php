@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Meteia\Commands\CommandLine;
 
 use Bunny\Channel;
-use Bunny\Client;
 use InvalidArgumentException;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\CommandLine\Command;
 use Meteia\CommandLine\PayloadParser;
-use Meteia\CommandLine\PendingReply;
 use Meteia\Commands\Command as DomainCommand;
 use Meteia\Commands\CommandOutbox;
 use Meteia\DependencyInjection\Container;
@@ -20,6 +18,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
@@ -86,23 +85,23 @@ final readonly class Send implements Command
         $parsed = $parser->parseTokens($tokens);
         $data = $parser->load($parsed['jsonFile'], $parsed['overrides']);
 
-        $waitForReply = (bool) $this->input->getOption('wait-for-reply');
+        $waitForReply = $this->input->getOption('wait-for-reply') === true;
         $replyQueue = null;
 
         try {
             $serializer = $this->container->get(SerializerInterface::class);
+            \assert($serializer instanceof SerializerInterface, 'Container must provide a serializer.');
+            \assert($serializer instanceof DenormalizerInterface, 'Container serializer must denormalize commands.');
+
             $outbox = $this->container->get(CommandOutbox::class);
+            \assert($outbox instanceof CommandOutbox, 'Container must provide a command outbox.');
 
             $channelForReply = null;
-            $clientForReply = null;
 
             if ($waitForReply) {
-                /** @var Channel $channelForReply */
                 $channelForReply = $this->container->get(Channel::class);
-                /** @var Client $clientForReply */
-                $clientForReply = $this->container->get(Client::class);
+                \assert($channelForReply instanceof Channel, 'Container must provide a RabbitMQ channel.');
 
-                /** @var \Bunny\Protocol\MethodQueueDeclareOkFrame $result */
                 $result = $channelForReply->queueDeclare(queue: '', exclusive: true, autoDelete: true);
                 $replyQueue = $result->queue;
 
@@ -112,11 +111,13 @@ final readonly class Send implements Command
             }
 
             $command = $serializer->denormalize($data, $fqcn);
+            \assert($command instanceof DomainCommand, 'Serializer must denormalize command payloads into domain commands.');
+
             $outbox->publish($command);
             $this->output->writeln('<info>Sent ' . $fqcn . '</info>');
 
-            if ($waitForReply && $replyQueue !== null && $channelForReply !== null && $clientForReply !== null) {
-                $this->waitForReply($replyQueue, $channelForReply, $clientForReply, $serializer, $fqcn);
+            if ($waitForReply && $replyQueue !== null && $channelForReply !== null) {
+                $this->waitForReply($replyQueue, $channelForReply, $serializer, $fqcn);
             }
         } catch (Throwable $throwable) {
             $this->output->writeln('<error>Send failed: ' . $throwable->getMessage() . '</error>');
@@ -140,11 +141,10 @@ final readonly class Send implements Command
     private function waitForReply(
         string $replyQueue,
         Channel $channel,
-        Client $client,
         SerializerInterface $serializer,
         string $target,
     ): void {
-        $pendingReply = new PendingReply($replyQueue, $channel, $client, $serializer, $this->output);
+        $pendingReply = new PendingReply($replyQueue, $channel, $serializer, $this->output);
 
         $reply = $pendingReply->await();
 

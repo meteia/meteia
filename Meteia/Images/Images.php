@@ -28,8 +28,14 @@ readonly class Images
             $row = [];
             for ($x = 0; $x < $width; ++$x) {
                 $index = imagecolorat($img, $x, $y);
-                \assert($index !== false);
+                \assert($index !== false, 'Image pixel color index must be readable.');
                 $colors = imagecolorsforindex($img, $index);
+                \assert(
+                    array_key_exists('red', $colors)
+                    && array_key_exists('green', $colors)
+                    && array_key_exists('blue', $colors),
+                    'Image color components must include RGB channels.',
+                );
 
                 $row[] = [$colors['red'], $colors['green'], $colors['blue']];
             }
@@ -57,18 +63,16 @@ readonly class Images
         $sourceHeight = imagesy($src);
 
         $dst = imagecreatetruecolor($canvasWidth, $canvasHeight);
-        \assert($dst !== false);
+        \assert($dst !== false, 'Destination image canvas must be created.');
         $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-        \assert($transparent !== false);
+        \assert($transparent !== false, 'Transparent image color must be allocated.');
         imagefill($dst, 0, 0, $transparent);
         imagealphablending($dst, true);
         imagesavealpha($dst, true);
         imagecopyresampled($dst, $src, 0, 0, 0, 0, $canvasWidth, $canvasHeight, $sourceWidth, $sourceHeight);
 
-        $quality = match ($pixelDensity) {
-            1 => 65,
-            2 => 55,
-            3 => 45,
+        match ($pixelDensity) {
+            1, 2, 3 => null,
             default => throw new Exception('Unsupported pixel density.'),
         };
 
@@ -79,7 +83,6 @@ readonly class Images
             ImageFormat::GIF => imagegif($dst, $resizedPath),
             ImageFormat::WEBP => imagewebp($dst, $resizedPath, $quality),
             ImageFormat::AVIF => imageavif($dst, $resizedPath, $quality),
-            default => throw new Exception("Unsupported output image type {$format->value}."),
         };
 
         return new ImageFile(new FilesystemPath($resizedPath));

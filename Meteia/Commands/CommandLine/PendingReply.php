@@ -19,22 +19,23 @@ final readonly class PendingReply
     public function __construct(
         private string $replyQueue,
         private Channel $channel,
-        private Client $client,
         private SerializerInterface $serializer,
         private OutputInterface $output,
     ) {}
 
-    public function await(?string $expectedType = null): object
+    public function await(?string $expectedType = null): object|string
     {
         $this->output->writeln('<info>Waiting for reply on auto-generated queue ' . $this->replyQueue . ' ...</info>');
 
+        /** @var object|string|null $received */
         $received = null;
         $type = $expectedType ?? stdClass::class;
 
         $this->channel->consume(
             function (Message $message, Channel $ch, Client $bunny) use (&$received, $type): void {
                 try {
-                    $received = $this->serializer->deserialize($message->content, $type, 'json');
+                    $reply = $this->serializer->deserialize($message->content, $type, 'json');
+                    $received = is_object($reply) ? $reply : $message->content;
                     $this->output->writeln(
                         '<info>Received reply ('
                         . (is_object($received) ? $received::class : gettype($received))

@@ -7,6 +7,8 @@ namespace Meteia\GraphQL;
 use ErrorException;
 use Exception;
 use Meteia\GraphQL\Types\ConnectionField;
+use stdClass;
+use Stringable;
 use Tuupola\Base62;
 
 use function Meteia\Polyfills\without_prefix;
@@ -23,22 +25,26 @@ trait ConnectionResolver
      */
     protected function processedRows(array $rows, array $args, array $cursorColumns): object
     {
-        if (!$args || !\count($args)) {
+        if ($args === []) {
             throw new Exception(
                 'A type that has ' . static::class . ' as a field is likely not passing through default arguments.',
             );
         }
         $hasNextPage = $this->hasNextPage(\count($rows), $args);
-        if (isset($args[ConnectionField::ARG_FIRST])) {
-            $rows = \array_slice($rows, 0, (int) $args[ConnectionField::ARG_FIRST]);
+        $firstArgument = $args[ConnectionField::ARG_FIRST] ?? null;
+        if ($firstArgument !== null) {
+            $first = (int) $firstArgument;
+            $rows = \array_slice($rows, 0, $first);
         }
 
         $hasPreviousPage = $this->hasPreviousPage(\count($rows), $args);
-        if (isset($args[ConnectionField::ARG_LAST])) {
-            if (\count($rows) > (int) $args[ConnectionField::ARG_LAST]) {
+        $lastArgument = $args[ConnectionField::ARG_LAST] ?? null;
+        if ($lastArgument !== null) {
+            $last = (int) $lastArgument;
+            if (\count($rows) > $last) {
                 array_pop($rows);
             }
-            $rows = \array_slice($rows, 0, (int) $args[ConnectionField::ARG_LAST]);
+            $rows = \array_slice($rows, 0, $last);
             $rows = array_reverse($rows);
         }
 
@@ -47,14 +53,14 @@ trait ConnectionResolver
         $lastEdge = end($edges);
 
         $encoded = json_encode($args);
-        \assert($encoded !== false);
+        \assert($encoded !== false, 'Connection arguments must encode to JSON.');
 
         return (object) [
             'id' => base64_encode(hash('sha1', $encoded, true)),
             'edges' => $edges,
             'pageInfo' => [
                 'startCursor' => $firstEdge->cursor ?? null,
-                'endCursor' => $lastEdge instanceof \stdClass ? $lastEdge->cursor ?? null : null,
+                'endCursor' => $lastEdge instanceof stdClass ? $lastEdge->cursor ?? null : null,
                 'hasNextPage' => $hasNextPage,
                 'hasPreviousPage' => $hasPreviousPage,
             ],
@@ -66,13 +72,14 @@ trait ConnectionResolver
      */
     protected function hasNextPage(int $count, array $args): bool
     {
-        if (isset($args[ConnectionField::ARG_FIRST])) {
-            if ($count > (int) $args[ConnectionField::ARG_FIRST]) {
+        $firstArgument = $args[ConnectionField::ARG_FIRST] ?? null;
+        if ($firstArgument !== null) {
+            if ($count > (int) $firstArgument) {
                 return true;
             }
         }
 
-        if (isset($args[ConnectionField::ARG_BEFORE])) {
+        if (($args[ConnectionField::ARG_BEFORE] ?? null) !== null) {
             return true;
         }
 
@@ -84,13 +91,14 @@ trait ConnectionResolver
      */
     protected function hasPreviousPage(int $count, array $args): bool
     {
-        if (isset($args[ConnectionField::ARG_LAST])) {
-            if ($count > (int) $args[ConnectionField::ARG_LAST]) {
+        $lastArgument = $args[ConnectionField::ARG_LAST] ?? null;
+        if ($lastArgument !== null) {
+            if ($count > (int) $lastArgument) {
                 return true;
             }
         }
 
-        if (isset($args[ConnectionField::ARG_AFTER])) {
+        if (($args[ConnectionField::ARG_AFTER] ?? null) !== null) {
             return true;
         }
 
@@ -117,11 +125,11 @@ trait ConnectionResolver
     {
         $cursorValues = [];
         foreach ($cursorColumns as $cursorColumn) {
-            if (!isset($row->{$cursorColumn})) {
+            if (!property_exists($row, $cursorColumn)) {
                 throw new ErrorException(sprintf('Row is missing the required field: %s', $cursorColumn));
             }
             $value = $row->{$cursorColumn};
-            \assert(\is_scalar($value) || $value === null || $value instanceof \Stringable);
+            \assert(\is_scalar($value) || $value === null || $value instanceof Stringable, 'Cursor fields must be scalar values.');
             $cursorValues[] = (string) $value;
         }
 

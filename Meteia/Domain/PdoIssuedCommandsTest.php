@@ -76,7 +76,7 @@ final class PdoIssuedCommandsTest extends TestCase
             public function unserialize(string $value): mixed
             {
                 $decoded = base64_decode($value, true);
-                \assert($decoded !== false);
+                \assert($decoded !== false, 'Serialized command payload must be base64 encoded.');
 
                 return unserialize($decoded, ['allowed_classes' => true]);
             }
@@ -117,5 +117,7 @@ final readonly class SampleAggregateRootId extends AggregateRootId
 
 /**
  * @internal
+ *
+ * @implements Command<void>
  */
 final readonly class SampleCommand implements Command {}

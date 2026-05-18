@@ -127,15 +127,12 @@ function array_to_object(array $array): array|stdClass
 function array_first(array $array, ?callable $callback = null, mixed $default = null): mixed
 {
     if ($callback === null) {
-        if (empty($array)) {
+        $key = array_key_first($array);
+        if ($key === null) {
             return $default;
         }
 
-        foreach ($array as $item) {
-            return $item;
-        }
-
-        return $default;
+        return $array[$key];
     }
 
     foreach ($array as $key => $value) {
