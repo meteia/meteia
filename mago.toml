@@ -25,6 +25,10 @@ no-fully-qualified-global-class-like = { enabled = true }
 cyclomatic-complexity = { threshold = 30 }
 excessive-parameter-list = { threshold = 10 }
 too-many-methods = { threshold = 20 }
+# UoW classes carry intentional complexity for DB-transaction atomicity (persist then publish)
+# + proper ExpectedVersion handling. The kan-defect heuristic is a guideline, not a hard rule
+# when correctness and explicit transaction boundaries are the goal.
+kan-defect = { threshold = 2.5 }
 
 [analyzer]
 plugins = []

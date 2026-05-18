@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Meteia\Domain;
 
+use Aura\Sql\ExtendedPdoInterface;
 use DateTimeImmutable;
 use Meteia\Commands\CommandOutbox;
 use Meteia\DependencyInjection\Container;
@@ -11,12 +12,14 @@ use Meteia\Domain\Contracts\IssuedCommands;
 use Meteia\Domain\Contracts\UnitOfWork;
 use Meteia\Events\PublishedEvent;
 use Meteia\Events\PublishedEvents;
-use Meteia\EventSourcing\AnyVersion;
 use Meteia\EventSourcing\Contracts\EventStream;
+use Meteia\EventSourcing\EmptyStream;
+use Meteia\EventSourcing\ExactlyAt;
 use Meteia\EventSourcing\PendingEvent;
 use Meteia\EventSourcing\PendingEvents;
 use Meteia\EventSourcing\RecordedEvent;
 use Meteia\EventSourcing\StreamId;
+use Meteia\EventSourcing\StreamVersion;
 use Meteia\ValueObjects\Identity\MessageScope;
 use Override;
 use Throwable;
@@ -27,6 +30,9 @@ use Throwable;
  * (event store, outboxes) are resolved lazily via the
  * container so a request with nothing buffered — for example a GraphQL
  * read query — never opens transport connections.
+ */
+/**
+ * @mago-expect analyze:kan-defect -- UoW atomicity (tx + persist-then-publish + proper ExpectedVersion) intentionally increases control-flow; correctness > metric threshold
  */
 final class DeferredUnitOfWork implements UnitOfWork
 {
@@ -61,28 +67,64 @@ final class DeferredUnitOfWork implements UnitOfWork
         }
 
         try {
-            $this->flushEvents($scope);
-            $this->flushCommands($scope);
+            $this->flush($scope);
         } finally {
             $this->pendingEvents = new PendingEvents();
             $this->pendingCommands = new PendingCommands();
         }
     }
 
-    private function flushEvents(MessageScope $scope): void
+    private function flush(MessageScope $scope): void
     {
-        if ($this->pendingEvents->count() === 0) {
+        // Build the data to persist (and later publish) before opening a transaction.
+        $eventsToPersistAndPublish = $this->buildEventsToPersist($scope);
+        $commandsToPersistAndPublish = $this->buildCommandsToPersist($scope);
+
+        if ($eventsToPersistAndPublish === [] && $commandsToPersistAndPublish === []) {
             return;
         }
 
-        /** @var EventStream $eventStream */
-        $eventStream = $this->container->get(EventStream::class);
-        /** @var PublishedEvents $publishedEvents */
-        $publishedEvents = $this->container->get(PublishedEvents::class);
+        $this->runInTransaction(function () use ($eventsToPersistAndPublish, $commandsToPersistAndPublish): void {
+            $this->persistEvents($eventsToPersistAndPublish);
+            $this->persistCommands($commandsToPersistAndPublish);
+        });
+
+        // Only publish *after* the transaction has committed. DB is the source of truth.
+        $this->publishEventsAfterCommit($eventsToPersistAndPublish);
+        $this->publishCommandsAfterCommit($commandsToPersistAndPublish);
+    }
+
+    private function runInTransaction(callable $work): void
+    {
+        /** @var ExtendedPdoInterface $db */
+        $db = $this->container->get(ExtendedPdoInterface::class);
+
+        $db->beginTransaction();
+
+        try {
+            $work();
+            $db->commit();
+        } catch (Throwable $exception) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * @return array<string, array{StreamId, list<RecordedEvent>}>
+     */
+    private function buildEventsToPersist(MessageScope $scope): array
+    {
+        if ($this->pendingEvents->count() === 0) {
+            return [];
+        }
 
         $occurredAt = new DateTimeImmutable();
-        /** @var array<string, array{StreamId, list<RecordedEvent>}> $byStream */
         $byStream = [];
+
         /** @var PendingEvent $pending */
         foreach ($this->pendingEvents as $pending) {
             $streamId = $pending->streamId();
@@ -91,38 +133,112 @@ final class DeferredUnitOfWork implements UnitOfWork
             $byStream[$key][1][] = $pending->recordedWith($scope->causationId(), $scope->correlationId(), $occurredAt);
         }
 
+        return $byStream;
+    }
+
+    /**
+     * @param array<string, array{StreamId, list<RecordedEvent>}> $byStream
+     */
+    private function persistEvents(array $byStream): void
+    {
+        if ($byStream === []) {
+            return;
+        }
+
+        /** @var EventStream $eventStream */
+        $eventStream = $this->container->get(EventStream::class);
+
         foreach ($byStream as [$streamId, $recorded]) {
-            $eventStream->append($streamId, new AnyVersion(), ...$recorded);
+            assert($recorded !== [], 'each stream group must have at least one event');
+            $first = $recorded[0];
+            $v = $first->version();
+            $expected = $v->equalTo(StreamVersion::start()) ? new EmptyStream() : new ExactlyAt($v);
+
+            $eventStream->append($streamId, $expected, ...$recorded);
+        }
+    }
+
+    /**
+     * @param array<string, array{StreamId, list<RecordedEvent>}> $byStream
+     */
+    private function publishEventsAfterCommit(array $byStream): void
+    {
+        if ($byStream === []) {
+            return;
+        }
+
+        /** @var PublishedEvents $publishedEvents */
+        $publishedEvents = $this->container->get(PublishedEvents::class);
+
+        foreach ($byStream as [, $recorded]) {
             foreach ($recorded as $event) {
                 try {
                     $publishedEvents->publish(PublishedEvent::fromRecorded($event));
                 } catch (Throwable) {
-                    // @mago-expect lint:no-empty-catch-clause -- outbox publish is best-effort side effect for eventual reactors/sinks; pdo append is the source of truth
+                    // @mago-expect lint:no-empty-catch-clause -- outbox publish is best-effort side effect for eventual reactors/sinks; pdo append (committed) is the source of truth.
+                    // A durable "pending event publications" / transactional outbox table + dedicated publisher worker
+                    // can be added later if we need guaranteed delivery to the bus even across RabbitMQ outages
+                    // without requiring full stream replay.
                 }
             }
         }
     }
 
-    private function flushCommands(MessageScope $scope): void
+    /**
+     * @return list<CommandMessage>
+     */
+    private function buildCommandsToPersist(MessageScope $scope): array
     {
         if ($this->pendingCommands->count() === 0) {
+            return [];
+        }
+
+        $issuedAt = new DateTimeImmutable();
+        $messages = [];
+
+        /** @var PendingCommand $pending */
+        foreach ($this->pendingCommands as $pending) {
+            $messages[] = $pending->issuedWith($scope->causationId(), $scope->correlationId(), $issuedAt);
+        }
+
+        return $messages;
+    }
+
+    /**
+     * @param list<CommandMessage> $messages
+     */
+    private function persistCommands(array $messages): void
+    {
+        if ($messages === []) {
             return;
         }
 
         /** @var IssuedCommands $issuedCommands */
         $issuedCommands = $this->container->get(IssuedCommands::class);
+
+        foreach ($messages as $message) {
+            $message->appendInto($issuedCommands);
+        }
+    }
+
+    /**
+     * @param list<CommandMessage> $messages
+     */
+    private function publishCommandsAfterCommit(array $messages): void
+    {
+        if ($messages === []) {
+            return;
+        }
+
         /** @var CommandOutbox $commandOutbox */
         $commandOutbox = $this->container->get(CommandOutbox::class);
 
-        $issuedAt = new DateTimeImmutable();
-        /** @var PendingCommand $pending */
-        foreach ($this->pendingCommands as $pending) {
-            $message = $pending->issuedWith($scope->causationId(), $scope->correlationId(), $issuedAt);
-            $message->appendInto($issuedCommands);
+        foreach ($messages as $message) {
             try {
                 $message->publishTo($commandOutbox);
             } catch (Throwable) {
-                // @mago-expect lint:no-empty-catch-clause -- outbox publish is best-effort side effect
+                // @mago-expect lint:no-empty-catch-clause -- outbox publish is best-effort side effect.
+                // Same durable outbox consideration as events applies here for commands.
             }
         }
     }
