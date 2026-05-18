@@ -10,6 +10,7 @@ use Meteia\Commands\CommandOutbox;
 use Meteia\DependencyInjection\Container;
 use Meteia\Domain\Contracts\IssuedCommands;
 use Meteia\Domain\Contracts\UnitOfWork;
+use Meteia\Events\EventOutbox;
 use Meteia\Events\PublishedEvent;
 use Meteia\Events\PublishedEvents;
 use Meteia\EventSourcing\Contracts\EventStream;
@@ -42,6 +43,9 @@ final class DeferredUnitOfWork implements UnitOfWork
 
     public function __construct(
         private readonly Container $container,
+        private readonly ?PublishedEvents $publishedEvents = null,
+        private readonly ?CommandOutbox $commandOutbox = null,
+        private readonly ?EventOutbox $eventOutbox = null,
     ) {
         $this->pendingEvents = new PendingEvents();
         $this->pendingCommands = new PendingCommands();
@@ -84,9 +88,11 @@ final class DeferredUnitOfWork implements UnitOfWork
             return;
         }
 
-        $this->runInTransaction(function () use ($eventsToPersistAndPublish, $commandsToPersistAndPublish): void {
+        $this->runInTransaction(function () use ($scope, $eventsToPersistAndPublish, $commandsToPersistAndPublish): void {
             $this->persistEvents($eventsToPersistAndPublish);
             $this->persistCommands($commandsToPersistAndPublish);
+
+            $this->afterSuccessfulPersist($scope, $eventsToPersistAndPublish, $commandsToPersistAndPublish);
         });
 
         // Only publish *after* the transaction has committed. DB is the source of truth.
@@ -94,7 +100,7 @@ final class DeferredUnitOfWork implements UnitOfWork
         $this->publishCommandsAfterCommit($commandsToPersistAndPublish);
     }
 
-    private function runInTransaction(callable $work): void
+    protected function runInTransaction(callable $work): void
     {
         /** @var ExtendedPdoInterface $db */
         $db = $this->container->get(ExtendedPdoInterface::class);
@@ -111,6 +117,26 @@ final class DeferredUnitOfWork implements UnitOfWork
 
             throw $exception;
         }
+    }
+
+    /**
+     * Hook called inside the active transaction, after all domain events and
+     * issued commands have been durably written, but before the transaction
+     * is committed.
+     *
+     * This is the correct place to record additional durable work that must
+     * succeed or fail atomically with the domain facts (e.g. transactional
+     * outbox rows for bus delivery).
+     *
+     * @param array<string, array{StreamId, list<RecordedEvent>}> $eventGroups
+     * @param list<CommandMessage> $commandMessages
+     */
+    protected function afterSuccessfulPersist(
+        MessageScope $scope,
+        array $eventGroups,
+        array $_commandMessages
+    ): void {
+        $this->eventOutbox?->record($scope, $eventGroups);
     }
 
     /**
@@ -161,14 +187,14 @@ final class DeferredUnitOfWork implements UnitOfWork
     /**
      * @param array<string, array{StreamId, list<RecordedEvent>}> $byStream
      */
-    private function publishEventsAfterCommit(array $byStream): void
+    protected function publishEventsAfterCommit(array $byStream): void
     {
         if ($byStream === []) {
             return;
         }
 
         /** @var PublishedEvents $publishedEvents */
-        $publishedEvents = $this->container->get(PublishedEvents::class);
+        $publishedEvents = $this->publishedEvents ?? $this->container->get(PublishedEvents::class);
 
         foreach ($byStream as [, $recorded]) {
             foreach ($recorded as $event) {
@@ -224,14 +250,14 @@ final class DeferredUnitOfWork implements UnitOfWork
     /**
      * @param list<CommandMessage> $messages
      */
-    private function publishCommandsAfterCommit(array $messages): void
+    protected function publishCommandsAfterCommit(array $messages): void
     {
         if ($messages === []) {
             return;
         }
 
         /** @var CommandOutbox $commandOutbox */
-        $commandOutbox = $this->container->get(CommandOutbox::class);
+        $commandOutbox = $this->commandOutbox ?? $this->container->get(CommandOutbox::class);
 
         foreach ($messages as $message) {
             try {
