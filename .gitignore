@@ -1,11 +1,8 @@
 *.cache
 .zed/settings.json
-.graphqlconfig
-.task
-/.idea/
+.task/
+.idea/
 /node_modules/
 /vendor/
-composer.lock
-package-lock.json
 Taskfile.yml
 lefthook.yml
