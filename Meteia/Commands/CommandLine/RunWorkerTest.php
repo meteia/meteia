@@ -8,12 +8,14 @@ use Bunny\Channel;
 use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
 use Meteia\Bootstrap\ApplicationNamespace;
+use Meteia\Commands\AmbientReplyDestinationSource;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Bootstrap\ApplicationPublicDir;
 use Meteia\Commands\Command;
 use Meteia\Commands\CommandBus;
 use Meteia\Commands\CommandInbox;
 use Meteia\Commands\Commands;
+use Meteia\Commands\ReplyDestination;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ReflectionContainer;
 use Meteia\Domain\Contracts\UnitOfWork;
@@ -75,11 +77,15 @@ final class RunWorkerTest extends TestCase
         $defaultScope = self::scope();
         $incomingScope = self::scope();
         $scopeSource = new AmbientMessageScopeSource($defaultScope);
+        $replyDestinationSource = new AmbientReplyDestinationSource();
+        $replyDestination = new ReplyDestination('/reply-queue/amq.gen-test');
         $completedScope = null;
         $dispatchedAmbientScope = null;
         $dispatchedContainerScope = null;
+        $dispatchedReplyDestination = null;
         $values = [
             AmbientMessageScopeSource::class => $scopeSource,
+            AmbientReplyDestinationSource::class => $replyDestinationSource,
         ];
 
         $container = $this->createStub(Container::class);
@@ -92,8 +98,16 @@ final class RunWorkerTest extends TestCase
 
         $commandBus = $this->createStub(CommandBus::class);
         $commandBus->method('dispatch')->willReturnCallback(
-            static function () use ($scopeSource, $container, &$dispatchedAmbientScope, &$dispatchedContainerScope): void {
+            static function () use (
+                $scopeSource,
+                $replyDestinationSource,
+                $container,
+                &$dispatchedAmbientScope,
+                &$dispatchedContainerScope,
+                &$dispatchedReplyDestination,
+            ): void {
                 $dispatchedAmbientScope = $scopeSource->current();
+                $dispatchedReplyDestination = $replyDestinationSource->current();
                 /** @var MessageScope $containerScope */
                 $containerScope = $container->get(MessageScope::class);
                 $dispatchedContainerScope = $containerScope;
@@ -118,10 +132,11 @@ final class RunWorkerTest extends TestCase
         $appContainer = new ReflectionProperty(RunWorker::class, 'appContainer');
         $appContainer->setValue($worker, $container);
 
-        $worker->drain($this->createStub(Command::class), $incomingScope);
+        $worker->drain($this->createStub(Command::class), $incomingScope, $replyDestination);
 
         static::assertSame($incomingScope, $dispatchedAmbientScope);
         static::assertSame($incomingScope, $dispatchedContainerScope);
+        static::assertSame($replyDestination, $dispatchedReplyDestination);
         static::assertSame($incomingScope, $completedScope);
         static::assertSame($defaultScope, $scopeSource->current());
     }

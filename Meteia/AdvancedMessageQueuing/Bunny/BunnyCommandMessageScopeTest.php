@@ -66,4 +66,17 @@ final class BunnyCommandMessageScopeTest extends TestCase
             'The minted causation id should be derived from the minted command id.',
         );
     }
+
+    public function testReadsReplyDestinationFromMessageHeaders(): void
+    {
+        $scope = new BunnyCommandMessageScope(new Message(null, null, null, '', '', [
+            'reply-to' => '/reply-queue/amq.gen-live-view',
+        ], '{}'));
+
+        static::assertSame(
+            'amq.gen-live-view',
+            $scope->replyDestination()?->queueName(),
+            'The reply destination should expose the queue name behind RabbitMQ STOMP reply-queue destinations.',
+        );
+    }
 }

@@ -6,6 +6,7 @@ namespace Meteia\AdvancedMessageQueuing\Bunny;
 
 use Bunny\Message;
 use Meteia\Commands\CommandId;
+use Meteia\Commands\ReplyDestination;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\MessageScope;
@@ -37,6 +38,17 @@ final readonly class BunnyCommandMessageScope
     public function scope(): MessageScope
     {
         return $this->scope;
+    }
+
+    public function replyDestination(): ?ReplyDestination
+    {
+        foreach ($this->headers('reply-to') as $candidate) {
+            if ($candidate !== '') {
+                return new ReplyDestination($candidate);
+            }
+        }
+
+        return null;
     }
 
     private function commandIdFromHeaders(): CommandId

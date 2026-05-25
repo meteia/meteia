@@ -15,8 +15,10 @@ use Meteia\CommandLine\PayloadParser;
 use Meteia\Commands\Command;
 use Meteia\Commands\CommandBus;
 use Meteia\Commands\CommandInbox;
+use Meteia\Commands\AmbientReplyDestinationSource;
 use Meteia\Commands\Commands;
 use Meteia\Commands\CommandSink;
+use Meteia\Commands\ReplyDestination;
 use Meteia\DependencyInjection\Container;
 use Meteia\DependencyInjection\ContainerBuilder;
 use Meteia\Domain\Contracts\UnitOfWork;
@@ -140,7 +142,7 @@ final class RunWorker implements CLICommand, CommandSink
     }
 
     #[Override]
-    public function drain(Command $command, MessageScope $scope): void
+    public function drain(Command $command, MessageScope $scope, ?ReplyDestination $replyDestination = null): void
     {
         try {
             $container = $this->appContainer();
@@ -150,7 +152,11 @@ final class RunWorker implements CLICommand, CommandSink
             $scopeSource = $container->get(AmbientMessageScopeSource::class);
             \assert($scopeSource instanceof AmbientMessageScopeSource, 'AmbientMessageScopeSource must be resolvable from app container');
 
-            $scopeSource->using($scope, static function () use ($container, $command, $scope): void {
+            /** @var AmbientReplyDestinationSource $replyDestinationSource */
+            $replyDestinationSource = $container->get(AmbientReplyDestinationSource::class);
+            \assert($replyDestinationSource instanceof AmbientReplyDestinationSource, 'AmbientReplyDestinationSource must be resolvable from app container');
+
+            $dispatch = static function () use ($container, $command, $scope): void {
                 /** @var CommandBus $bus */
                 $bus = $container->get(CommandBus::class);
                 \assert($bus instanceof CommandBus, 'CommandBus must be resolvable from app container');
@@ -160,6 +166,16 @@ final class RunWorker implements CLICommand, CommandSink
                 $unitOfWork = $container->get(UnitOfWork::class);
                 \assert($unitOfWork instanceof UnitOfWork, 'UnitOfWork must be resolvable from app container');
                 $unitOfWork->complete($scope);
+            };
+
+            $scopeSource->using($scope, static function () use ($replyDestinationSource, $replyDestination, $dispatch): void {
+                if ($replyDestination === null) {
+                    $dispatch();
+
+                    return;
+                }
+
+                $replyDestinationSource->using($replyDestination, $dispatch);
             });
         } finally {
             gc_collect_cycles();

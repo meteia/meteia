@@ -14,6 +14,8 @@ use Meteia\AdvancedMessageQueuing\Management\IsolatedBunnyRabbitMqManagement;
 use Meteia\AdvancedMessageQueuing\Management\RabbitMqManagement;
 use Meteia\AdvancedMessageQueuing\Management\VHostName;
 use Meteia\Bootstrap\ApplicationNamespace;
+use Meteia\Commands\AmbientReplyDestinationSource;
+use Meteia\Commands\ReplyDestinationSource;
 use Meteia\Bootstrap\RequestResources;
 use Meteia\Configuration\Configuration;
 use Meteia\ValueObjects\Identity\MessageScope;
@@ -35,6 +37,9 @@ return [
     AmbientMessageScopeSource::class =>
         static fn(MessageScope $scope): AmbientMessageScopeSource => new AmbientMessageScopeSource($scope),
     MessageScopeSource::class => static fn(AmbientMessageScopeSource $source): MessageScopeSource => $source,
+    AmbientReplyDestinationSource::class => static fn(): AmbientReplyDestinationSource => new AmbientReplyDestinationSource(),
+    ReplyDestinationSource::class =>
+        static fn(AmbientReplyDestinationSource $source): ReplyDestinationSource => $source,
     VHostName::class => static fn(Configuration $config): VHostName => new VHostName(
         $config->string('RABBITMQ_VIRTUALHOST', '/'),
     ),

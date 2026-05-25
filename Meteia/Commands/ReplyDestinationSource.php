@@ -1,0 +1,10 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Meteia\Commands;
+
+interface ReplyDestinationSource
+{
+    public function current(): ReplyDestination;
+}

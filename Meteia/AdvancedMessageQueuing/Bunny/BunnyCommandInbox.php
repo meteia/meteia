@@ -57,6 +57,7 @@ final readonly class BunnyCommandInbox implements CommandInbox
                     $messageScope = new BunnyCommandMessageScope($message);
                     $commandId = $messageScope->commandId();
                     $scope = $messageScope->scope();
+                    $replyDestination = $messageScope->replyDestination();
                     $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
                     \assert($command instanceof Command, 'deserialized command must implement Command');
                     $this->scopeSource->using($scope, function () use (
@@ -65,12 +66,13 @@ final readonly class BunnyCommandInbox implements CommandInbox
                         $scope,
                         $queueName,
                         $commandId,
+                        $replyDestination,
                     ): void {
                         $this->log->info('Received Command', [
                             'queueName' => $queueName,
                             'commandId' => $commandId,
                         ]);
-                        $sink->drain($command, $scope);
+                        $sink->drain($command, $scope, $replyDestination);
                     });
                     $channel->ack($message);
 

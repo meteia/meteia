@@ -8,5 +8,5 @@ use Meteia\ValueObjects\Identity\MessageScope;
 
 interface CommandSink
 {
-    public function drain(Command $command, MessageScope $scope): void;
+    public function drain(Command $command, MessageScope $scope, ?ReplyDestination $replyDestination = null): void;
 }
