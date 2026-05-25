@@ -10,18 +10,12 @@ use Bunny\Message;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\Commands\Command;
-use Meteia\Commands\CommandId;
 use Meteia\Commands\CommandInbox;
 use Meteia\Commands\CommandSink;
-use Meteia\ValueObjects\Identity\CausationId;
-use Meteia\ValueObjects\Identity\CorrelationId;
-use Meteia\ValueObjects\Identity\MessageScope;
-use Meteia\ValueObjects\Identity\ProcessId;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
-use UnexpectedValueException;
 use function React\Async\async;
 
 final readonly class BunnyCommandInbox implements CommandInbox
@@ -44,79 +38,88 @@ final readonly class BunnyCommandInbox implements CommandInbox
     #[Override]
     public function subscribe(string $commandClassName, CommandSink $sink): void
     {
-        $channel = $this->loop->channel();
-        $channel->exchangeDeclare((string) $this->exchangeName, durable: true);
         $queueName = str_replace('\\', '.', $commandClassName);
         $this->log->info('Subscribing Command Sink', ['queue' => $queueName]);
 
-        $channel->queueDeclare(queue: $queueName, durable: true);
-        $channel->queueBind(exchange: (string) $this->exchangeName, queue: $queueName, routingKey: $queueName);
-
-        $this->consumers->add($queueName, async(function (Message $message, Channel $channel, Client $bunny) use (
-            $commandClassName,
+        $this->consumers->add(
             $queueName,
-            $sink,
-        ): void {
-            $commandId = CommandId::fromToken($this->header($message, 'message-id'));
-            $correlationId = CorrelationId::fromToken($this->header($message, 'correlation-id'));
-            $processId = ProcessId::fromToken($this->header($message, 'process-id'));
-            $scope = new MessageScope($correlationId, CausationId::fromHex($commandId->hex()), $processId);
+            function (Channel $channel) use ($queueName): void {
+                $channel->exchangeDeclare((string) $this->exchangeName, durable: true);
+                $channel->queueDeclare(queue: $queueName, durable: true);
+                $channel->queueBind(exchange: (string) $this->exchangeName, queue: $queueName, routingKey: $queueName);
+            },
+            async(function (Message $message, Channel $channel, Client $bunny) use (
+                $commandClassName,
+                $queueName,
+                $sink,
+            ): void {
+                try {
+                    $messageScope = new BunnyCommandMessageScope($message);
+                    $commandId = $messageScope->commandId();
+                    $scope = $messageScope->scope();
+                    $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
+                    \assert($command instanceof Command, 'deserialized command must implement Command');
+                    $this->scopeSource->using($scope, function () use (
+                        $sink,
+                        $command,
+                        $scope,
+                        $queueName,
+                        $commandId,
+                    ): void {
+                        $this->log->info('Received Command', [
+                            'queueName' => $queueName,
+                            'commandId' => $commandId,
+                        ]);
+                        $sink->drain($command, $scope);
+                    });
+                    $channel->ack($message);
 
-            try {
-                $command = $this->serializer->deserialize($message->content, $commandClassName, 'json');
-                \assert($command instanceof Command, 'deserialized command must implement Command');
-                $this->scopeSource->using($scope, function () use (
-                    $sink,
-                    $command,
-                    $scope,
-                    $queueName,
-                    $commandId,
-                ): void {
-                    $this->log->info('Received Command', [
-                        'queueName' => $queueName,
-                        'commandId' => $commandId,
-                    ]);
-                    $sink->drain($command, $scope);
-                });
-                $channel->ack($message);
-
-                $this->consumption->recordHandledMessage();
-                if ($this->consumption->isSatisfied()) {
-                    $this->log->info('Once mode: disconnecting after processing one message', [
-                        'queueName' => $queueName,
-                    ]);
-                    $bunny->disconnect();
-                    exit(0);
+                    $this->consumption->recordHandledMessage();
+                    if ($this->consumption->isSatisfied()) {
+                        $this->log->info('Once mode: disconnecting after processing one message', [
+                            'queueName' => $queueName,
+                        ]);
+                        $bunny->disconnect();
+                        exit(0);
+                    }
+                } catch (Throwable $t) {
+                    $channel->nack($message, requeue: true);
+                    $this->log->error($t->getMessage(), ['queueName' => $queueName]);
                 }
-            } catch (Throwable $t) {
-                $channel->nack($message, requeue: true);
-                $this->log->error($t->getMessage(), ['queueName' => $queueName]);
-            }
-        }));
+            }),
+        );
     }
 
     #[Override]
     public function run(): void
     {
         $this->consumption->untilShutdown();
-        $this->consumers->subscribe($this->loop->channel());
-        $this->loop->runUntilShutdown('CommandWorkers.Shutdown');
+        $this->runUntilShutdown('CommandWorkers.Shutdown');
     }
 
     #[Override]
     public function runOnce(): void
     {
         $this->consumption->oneMessage();
-        $this->consumers->subscribe($this->loop->channel());
-        $this->loop->runUntilShutdown('CommandWorkers.Shutdown');
+        $this->runUntilShutdown('CommandWorkers.Shutdown');
     }
 
-    private function header(Message $message, string $name): string
+    private function runUntilShutdown(string $shutdownExchangeName): void
     {
-        if (!\is_scalar($message->headers[$name] ?? null)) {
-            throw new UnexpectedValueException('Command message header must be scalar: ' . $name);
-        }
+        while (true) {
+            try {
+                $channel = $this->loop->channel();
+                $this->consumers->subscribe($channel);
+                $this->loop->runUntilShutdown($channel, $shutdownExchangeName);
+                $this->log->warning('Command worker message loop stopped without a shutdown message; restarting');
+            } catch (Throwable $throwable) {
+                $this->log->error('Command worker AMQP failure; restarting', [
+                    'exception' => $throwable,
+                ]);
+            }
 
-        return (string) $message->headers[$name];
+            $this->loop->reset();
+            sleep(1);
+        }
     }
 }

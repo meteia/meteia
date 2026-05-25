@@ -46,7 +46,6 @@ final readonly class BunnyEventInbox implements EventInbox
     #[Override]
     public function subscribe(string $eventClassName, string $sinkClassName, EventSink $sink): void
     {
-        $channel = $this->loop->channel();
         $exchangeName = str_replace('\\', '.', $eventClassName);
         $queueName = str_replace('\\', '.', $sinkClassName);
         $this->log->info('Subscribing Event Sink', [
@@ -55,74 +54,95 @@ final readonly class BunnyEventInbox implements EventInbox
             'queue' => $queueName,
         ]);
 
-        $channel->exchangeDeclare($exchangeName, exchangeType: 'fanout', durable: true);
-        $channel->queueDeclare($queueName, durable: true);
-        $channel->queueBind(exchange: $exchangeName, queue: $queueName);
-
-        $this->consumers->add($queueName, async(function (Message $message, Channel $channel, Client $bunny) use (
-            $eventClassName,
+        $this->consumers->add(
             $queueName,
-            $sink,
-        ): void {
-            $eventId = EventId::fromToken($this->header($message, 'message-id'));
-            $correlationId = CorrelationId::fromToken($this->header($message, 'correlation-id'));
-            $processId = ProcessId::fromToken($this->header($message, 'process-id'));
-            $scope = new MessageScope($correlationId, CausationId::fromHex($eventId->hex()), $processId);
+            static function (Channel $channel) use ($exchangeName, $queueName): void {
+                $channel->exchangeDeclare($exchangeName, exchangeType: 'fanout', durable: true);
+                $channel->queueDeclare($queueName, durable: true);
+                $channel->queueBind(exchange: $exchangeName, queue: $queueName);
+            },
+            async(function (Message $message, Channel $channel, Client $bunny) use (
+                $eventClassName,
+                $queueName,
+                $sink,
+            ): void {
+                $eventId = EventId::fromToken($this->header($message, 'message-id'));
+                $correlationId = CorrelationId::fromToken($this->header($message, 'correlation-id'));
+                $processId = ProcessId::fromToken($this->header($message, 'process-id'));
+                $scope = new MessageScope($correlationId, CausationId::fromHex($eventId->hex()), $processId);
 
-            try {
-                $event = $this->serializer->deserialize($message->content, $eventClassName, 'json');
-                \assert($event instanceof DomainEvent, 'deserialized event must implement DomainEvent');
-                $published = PublishedEvent::fromMessage(
-                    StreamId::fromToken($this->header($message, 'stream-id')),
-                    new StreamVersion((int) $this->header($message, 'stream-version')),
-                    $event,
-                    CausationId::fromToken($this->header($message, 'causation-id')),
-                    $correlationId,
-                    new DateTimeImmutable($this->header($message, 'occurred-at')),
-                );
-                $this->scopeSource->using(
-                    $scope,
-                    function () use ($sink, $published, $scope, $queueName, $eventId): void {
-                        $this->log->info('Received Event', [
+                try {
+                    $event = $this->serializer->deserialize($message->content, $eventClassName, 'json');
+                    \assert($event instanceof DomainEvent, 'deserialized event must implement DomainEvent');
+                    $published = PublishedEvent::fromMessage(
+                        StreamId::fromToken($this->header($message, 'stream-id')),
+                        new StreamVersion((int) $this->header($message, 'stream-version')),
+                        $event,
+                        CausationId::fromToken($this->header($message, 'causation-id')),
+                        $correlationId,
+                        new DateTimeImmutable($this->header($message, 'occurred-at')),
+                    );
+                    $this->scopeSource->using(
+                        $scope,
+                        function () use ($sink, $published, $scope, $queueName, $eventId): void {
+                            $this->log->info('Received Event', [
+                                'queueName' => $queueName,
+                                'eventId' => $eventId,
+                                'streamId' => $published->streamId(),
+                                'streamVersion' => $published->version(),
+                            ]);
+                            $sink->drain($published, $scope);
+                        },
+                    );
+                    $channel->ack($message);
+
+                    $this->consumption->recordHandledMessage();
+                    if ($this->consumption->isSatisfied()) {
+                        $this->log->info('Once mode: disconnecting after processing one message', [
                             'queueName' => $queueName,
-                            'eventId' => $eventId,
-                            'streamId' => $published->streamId(),
-                            'streamVersion' => $published->version(),
                         ]);
-                        $sink->drain($published, $scope);
-                    },
-                );
-                $channel->ack($message);
-
-                $this->consumption->recordHandledMessage();
-                if ($this->consumption->isSatisfied()) {
-                    $this->log->info('Once mode: disconnecting after processing one message', [
-                        'queueName' => $queueName,
-                    ]);
-                    $bunny->disconnect();
-                    exit(0);
+                        $bunny->disconnect();
+                        exit(0);
+                    }
+                } catch (Throwable $t) {
+                    $channel->nack($message, false, false);
+                    $this->log->error($t->getMessage(), ['queueName' => $queueName]);
                 }
-            } catch (Throwable $t) {
-                $channel->nack($message, false, false);
-                $this->log->error($t->getMessage(), ['queueName' => $queueName]);
-            }
-        }));
+            }),
+        );
     }
 
     #[Override]
     public function run(): void
     {
         $this->consumption->untilShutdown();
-        $this->consumers->subscribe($this->loop->channel());
-        $this->loop->runUntilShutdown('EventWorkers.Shutdown');
+        $this->runUntilShutdown('EventWorkers.Shutdown');
     }
 
     #[Override]
     public function runOnce(): void
     {
         $this->consumption->oneMessage();
-        $this->consumers->subscribe($this->loop->channel());
-        $this->loop->runUntilShutdown('EventWorkers.Shutdown');
+        $this->runUntilShutdown('EventWorkers.Shutdown');
+    }
+
+    private function runUntilShutdown(string $shutdownExchangeName): void
+    {
+        while (true) {
+            try {
+                $channel = $this->loop->channel();
+                $this->consumers->subscribe($channel);
+                $this->loop->runUntilShutdown($channel, $shutdownExchangeName);
+                $this->log->warning('Event worker message loop stopped without a shutdown message; restarting');
+            } catch (Throwable $throwable) {
+                $this->log->error('Event worker AMQP failure; restarting', [
+                    'exception' => $throwable,
+                ]);
+            }
+
+            $this->loop->reset();
+            sleep(1);
+        }
     }
 
     private function header(Message $message, string $name): string
