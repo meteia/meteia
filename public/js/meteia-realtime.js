@@ -15,7 +15,7 @@
       this.buffer = '';
       this.options = optionsFrom(url);
       this.subscriptionReceipt = 'meteia-live-view-subscribe';
-      this.openReceipt = 'meteia-live-view-open';
+      this.openReplyDestination = '/temp-queue/meteia-live-view-open';
 
       const socketUrl = new URL(url, window.location.href);
       socketUrl.search = '';
@@ -24,6 +24,7 @@
       this.socket.onmessage = (event) => this.receive(String(event.data));
       this.socket.onerror = () => console.error('Realtime connection failed.');
       this.socket.onclose = (event) => {
+        this.stopHeartbeat();
         this.readyState = this.CLOSED;
         this.dispatch('close', closeEvent(event));
       };
@@ -58,7 +59,7 @@
         host: this.options.vhost,
         login: this.options.username,
         passcode: this.options.password,
-        'heart-beat': '0,0',
+        'heart-beat': '25000,25000',
       }, ''));
     }
 
@@ -84,13 +85,17 @@
       const command = lines[0];
 
       if (command === 'CONNECTED') {
-        this.subscribe();
-        this.readyState = this.OPEN;
-        this.dispatch('open', new Event('open'));
+        this.startHeartbeat(lines);
+        this.open();
         return;
       }
 
       if (command === 'MESSAGE') {
+        if (this.readyState !== this.OPEN) {
+          this.receiveOpenReply(body);
+          return;
+        }
+
         this.dispatch('message', new MessageEvent('message', {data: body}));
         return;
       }
@@ -98,12 +103,9 @@
       if (command === 'RECEIPT') {
         const receiptId = stompHeader(lines, 'receipt-id');
         if (receiptId === this.subscriptionReceipt) {
-          this.open();
+          this.readyState = this.OPEN;
+          this.dispatch('open', new Event('open'));
           return;
-        }
-
-        if (receiptId === this.openReceipt) {
-          console.debug('Realtime session opened.');
         }
 
         return;
@@ -112,21 +114,68 @@
       if (command === 'ERROR') {
         const message = stompErrorMessage(lines, body);
         console.error('Realtime connection rejected:', message);
-        if (message.includes("no queue '" + this.options.replyQueue + "'")) {
-          window.location.reload();
-        }
         this.close();
       }
     }
 
-    subscribe() {
+    startHeartbeat(lines) {
+      this.stopHeartbeat();
+
+      const serverHeartbeat = stompHeader(lines, 'heart-beat') || '0,0';
+      const [, serverWantsIncoming] = serverHeartbeat.split(',').map((value) => Number.parseInt(value, 10) || 0);
+      const interval = Math.max(25000, serverWantsIncoming);
+      if (interval <= 0) {
+        return;
+      }
+
+      this.heartbeat = window.setInterval(() => {
+        if (this.socket.readyState === WebSocket.OPEN) {
+          this.socket.send('\n');
+        }
+      }, interval);
+    }
+
+    stopHeartbeat() {
+      if (this.heartbeat !== undefined) {
+        window.clearInterval(this.heartbeat);
+        this.heartbeat = undefined;
+      }
+    }
+
+    receiveOpenReply(body) {
+      let payload;
+      try {
+        payload = JSON.parse(body);
+      } catch (error) {
+        console.error('Realtime open response was not valid JSON.', error);
+        this.close();
+        return;
+      }
+
+      if (typeof payload.error === 'string') {
+        console.error('Realtime connection rejected:', payload.error);
+        this.close();
+        return;
+      }
+
+      if (typeof payload.destination === 'string' && payload.destination !== '') {
+        this.subscribe(payload.destination);
+        return;
+      }
+
+      if (typeof payload.queue === 'string' && payload.queue !== '') {
+        this.subscribe('/amq/queue/' + payload.queue);
+        return;
+      }
+
+      console.error('Realtime open response did not include a queue destination.');
+      this.close();
+    }
+
+    subscribe(destination) {
       this.socket.send(frame('SUBSCRIBE', {
         id: 'meteia-live-view',
-        destination: '/queue/' + this.options.replyQueue,
-        ack: 'auto',
-        durable: 'false',
-        'auto-delete': 'true',
-        exclusive: 'false',
+        destination: destination,
         receipt: this.subscriptionReceipt,
       }, ''));
     }
@@ -134,16 +183,9 @@
     open() {
       this.socket.send(frame('SEND', {
         destination: this.options.openDestination,
-        'content-type': 'application/json',
-        receipt: this.openReceipt,
-        expiration: '5000',
-        'x-meteia-command-id': this.options.commandId,
-        'x-meteia-correlation-id': this.options.correlationId,
-        'x-meteia-process-id': this.options.processId,
+        'reply-to': this.openReplyDestination,
       }, JSON.stringify({
         token: this.options.token,
-        replyQueue: this.options.replyQueue,
-        topics: this.options.topics,
       })));
     }
 
@@ -204,15 +246,10 @@
 
     return {
       token: required(params, 'token'),
-      replyQueue: required(params, 'reply'),
       openDestination: required(params, 'open'),
-      commandId: required(params, 'command_id'),
-      correlationId: required(params, 'correlation_id'),
-      processId: required(params, 'process_id'),
       username: required(params, 'stomp_user'),
       password: required(params, 'stomp_passcode'),
       vhost: required(params, 'stomp_vhost'),
-      topics: required(params, 'topics').split(',').filter((topic) => topic !== ''),
     };
   }
 
