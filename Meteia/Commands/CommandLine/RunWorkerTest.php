@@ -7,6 +7,7 @@ namespace Meteia\Commands\CommandLine;
 use Bunny\Channel;
 use Bunny\Client;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
+use Meteia\AdvancedMessageQueuing\Bunny\BunnyChannels;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Commands\AmbientReplyDestinationSource;
 use Meteia\Bootstrap\ApplicationPath;
@@ -40,12 +41,14 @@ final class RunWorkerTest extends TestCase
         $namespace = new ApplicationNamespace('App');
         $publicDir = new ApplicationPublicDir('public');
         $client = new Client();
+        $channels = new BunnyChannels($client, $this->createStub(LoggerInterface::class));
         $workerChannel = $this->createStub(Channel::class);
         $values = [
             ApplicationPath::class => $path,
             ApplicationNamespace::class => $namespace,
             ApplicationPublicDir::class => $publicDir,
             Client::class => $client,
+            BunnyChannels::class => $channels,
             Channel::class => $workerChannel,
         ];
 
@@ -69,6 +72,7 @@ final class RunWorkerTest extends TestCase
         $definitions = $appContainer->internals()['definitions'];
 
         static::assertSame($client, $definitions[Client::class] ?? null);
+        static::assertSame($channels, $definitions[BunnyChannels::class] ?? null);
         static::assertNotSame($workerChannel, $definitions[Channel::class] ?? null);
     }
 

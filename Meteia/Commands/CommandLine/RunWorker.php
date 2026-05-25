@@ -7,6 +7,7 @@ namespace Meteia\Commands\CommandLine;
 use Bunny\Client;
 use InvalidArgumentException;
 use Meteia\AdvancedMessageQueuing\AmbientMessageScopeSource;
+use Meteia\AdvancedMessageQueuing\Bunny\BunnyChannels;
 use Meteia\Bootstrap\ApplicationNamespace;
 use Meteia\Bootstrap\ApplicationPath;
 use Meteia\Bootstrap\ApplicationPublicDir;
@@ -129,11 +130,15 @@ final class RunWorker implements CLICommand, CommandSink
             /** @var Client $client */
             $client = $this->container->get(Client::class);
             \assert($client instanceof Client, 'command worker AMQP client must be available for app container');
+            /** @var BunnyChannels $channels */
+            $channels = $this->container->get(BunnyChannels::class);
+            \assert($channels instanceof BunnyChannels, 'command worker AMQP channels must be available for app container');
             $applicationDefinitions = [
                 ApplicationNamespace::class => $namespace,
                 ApplicationPath::class => $path,
                 ApplicationPublicDir::class => $publicDir,
                 Client::class => $client,
+                BunnyChannels::class => $channels,
             ];
             $this->appContainer = ContainerBuilder::build($path, $namespace, $applicationDefinitions);
         }

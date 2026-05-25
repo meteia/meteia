@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\AdvancedMessageQueuing\Bunny;
 
-use Bunny\Channel;
 use Meteia\AdvancedMessageQueuing\MessageContext;
 use Meteia\Events\PublishedEvent;
 use Meteia\Events\PublishedEvents;
@@ -16,7 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 final readonly class BunnyPublishedEvents implements PublishedEvents
 {
     public function __construct(
-        private Channel $channel,
+        private BunnyChannels $channels,
         private LoggerInterface $log,
         private SerializerInterface $serializer,
         private MessageScopeSource $scopeSource,
@@ -27,7 +26,8 @@ final readonly class BunnyPublishedEvents implements PublishedEvents
     {
         $domainEvent = $event->fact();
         $exchangeName = str_replace('\\', '.', $domainEvent::class);
-        $this->channel->exchangeDeclare($exchangeName, exchangeType: 'fanout', durable: true);
+        $channel = $this->channels->publishingChannel();
+        $channel->exchangeDeclare($exchangeName, exchangeType: 'fanout', durable: true);
 
         $payload = $this->serializer->serialize($domainEvent, 'json');
         $context = MessageContext::fromScope($this->scopeSource->current());
@@ -35,7 +35,7 @@ final readonly class BunnyPublishedEvents implements PublishedEvents
         $headers['stream-id'] = (string) $event->streamId();
         $headers['stream-version'] = (string) $event->version();
         $headers['occurred-at'] = $event->occurredAt()->format(DATE_ATOM);
-        $this->channel->publish($payload, $headers, $exchangeName);
+        $channel->publish($payload, $headers, $exchangeName);
         $this->log->info('Published Event', [
             'event' => $domainEvent::class,
             'exchange' => $exchangeName,

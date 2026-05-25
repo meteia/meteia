@@ -6,10 +6,11 @@ namespace Meteia\AdvancedMessageQueuing\Bunny;
 
 use Bunny\Channel;
 use Bunny\Client;
-use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
-use Meteia\Commands\CommandDelivery;
-use Meteia\Commands\CommandId;
-use Meteia\Commands\Fixtures\ExampleCommand;
+use DateTimeImmutable;
+use Meteia\EventSourcing\Fixtures\AggregateRecorded;
+use Meteia\EventSourcing\StreamId;
+use Meteia\EventSourcing\StreamVersion;
+use Meteia\Events\PublishedEvent;
 use Meteia\ValueObjects\Identity\CausationId;
 use Meteia\ValueObjects\Identity\CorrelationId;
 use Meteia\ValueObjects\Identity\MessageScope;
@@ -23,11 +24,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @internal
  */
-final class BunnyCommandOutboxTest extends TestCase
+final class BunnyPublishedEventsTest extends TestCase
 {
-    public function testPublishDeliveryUsesStoredCommandIdentityAndScope(): void
+    public function testPublishUsesAChannelFromTheSharedClient(): void
     {
-        /** @var list<array{0: string, 1: array<string, string>, 2: string, 3: string}> $published */
+        /** @var list<array{0: string, 1: array<string, string>, 2: string}> $published */
         $published = [];
         $channel = $this->createStub(Channel::class);
         $channel->method('publish')->willReturnCallback(
@@ -36,7 +37,6 @@ final class BunnyCommandOutboxTest extends TestCase
                     self::stringArgument($arguments, 0),
                     self::stringArrayArgument($arguments, 1),
                     self::stringArgument($arguments, 2),
-                    self::stringArgument($arguments, 3),
                 ];
 
                 return true;
@@ -46,26 +46,30 @@ final class BunnyCommandOutboxTest extends TestCase
         $client->expects($this->once())->method('channel')->willReturn($channel);
         $serializer = $this->createStub(SerializerInterface::class);
         $serializer->method('serialize')->willReturn('{}');
-        $commandId = CommandId::random();
-        $scope = new MessageScope(CorrelationId::random(), CausationId::random(), ProcessId::random());
 
-        new BunnyCommandOutbox(
+        $publishedEvent = PublishedEvent::fromMessage(
+            StreamId::random(),
+            StreamVersion::start(),
+            new AggregateRecorded(),
+            CausationId::random(),
+            CorrelationId::random(),
+            new DateTimeImmutable('2026-05-25T12:00:00+00:00'),
+        );
+
+        new BunnyPublishedEvents(
             new BunnyChannels($client, new NullLogger()),
             new NullLogger(),
-            new CommandsExchangeName('Meteia.Commands'),
             $serializer,
             self::scopeSource(),
-        )->publishDelivery(new CommandDelivery($commandId, new ExampleCommand(), $scope));
+        )->publish($publishedEvent);
 
         static::assertCount(1, $published);
-        $message = $this->publishedMessage($published);
+        $message = $published[0] ?? static::fail('expected a published event message');
         static::assertSame('{}', $message[0]);
-        static::assertSame('Meteia.Commands', $message[2]);
-        static::assertSame('Meteia.Commands.Fixtures.ExampleCommand', $message[3]);
-        static::assertSame((string) $commandId, $message[1]['message-id'] ?? null);
-        static::assertSame((string) $scope->causationId(), $message[1]['causation-id'] ?? null);
-        static::assertSame((string) $scope->correlationId(), $message[1]['correlation-id'] ?? null);
-        static::assertSame((string) $scope->processId(), $message[1]['process-id'] ?? null);
+        static::assertSame(AggregateRecorded::class, str_replace('.', '\\', $message[2]));
+        static::assertSame((string) $publishedEvent->messageId(), $message[1]['message-id'] ?? null);
+        static::assertSame((string) $publishedEvent->streamId(), $message[1]['stream-id'] ?? null);
+        static::assertSame((string) $publishedEvent->version(), $message[1]['stream-version'] ?? null);
     }
 
     private static function scopeSource(): MessageScopeSource
@@ -77,17 +81,6 @@ final class BunnyCommandOutboxTest extends TestCase
                 return new MessageScope(CorrelationId::random(), CausationId::random(), ProcessId::random());
             }
         };
-    }
-
-    /**
-     * @param list<array{0: string, 1: array<string, string>, 2: string, 3: string}> $published
-     * @return array{0: string, 1: array<string, string>, 2: string, 3: string}
-     */
-    private function publishedMessage(array $published): array
-    {
-        static::assertArrayHasKey(0, $published);
-
-        return $published[0] ?? static::fail('expected a published message');
     }
 
     /**

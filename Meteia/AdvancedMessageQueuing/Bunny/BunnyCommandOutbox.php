@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Meteia\AdvancedMessageQueuing\Bunny;
 
-use Bunny\Channel;
 use Meteia\AdvancedMessageQueuing\Configuration\CommandsExchangeName;
 use Meteia\AdvancedMessageQueuing\MessageContext;
 use Meteia\Commands\Command;
@@ -20,7 +19,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 final readonly class BunnyCommandOutbox implements CommandOutbox, CommandDeliveries
 {
     public function __construct(
-        private Channel $channel,
+        private BunnyChannels $channels,
         private LoggerInterface $log,
         private CommandsExchangeName $exchangeName,
         private SerializerInterface $serializer,
@@ -40,12 +39,13 @@ final readonly class BunnyCommandOutbox implements CommandOutbox, CommandDeliver
     #[Override]
     public function publishDelivery(CommandDelivery $delivery): void
     {
-        $this->channel->exchangeDeclare((string) $this->exchangeName, durable: true);
+        $channel = $this->channels->publishingChannel();
+        $channel->exchangeDeclare((string) $this->exchangeName, durable: true);
         $command = $delivery->command();
         $queueName = str_replace('\\', '.', $command::class);
         $payload = $this->serializer->serialize($command, 'json');
         $context = MessageContext::fromScope($delivery->scope());
-        $this->channel->publish(
+        $channel->publish(
             $payload,
             $context->headersWithMessageId((string) $delivery->commandId()),
             (string) $this->exchangeName,
