@@ -45,22 +45,40 @@ class ResponseCookies implements MiddlewareInterface
         bool $httpOnly = true,
         SameSite $sameSite = SameSite::Lax,
     ): void {
+        $this->queue($cookie->name, $cookie->value, $expiresAt, $httpOnly, $sameSite);
+    }
+
+    public function clear(string $name): void
+    {
+        $this->queue($name, '', new DateTimeImmutable('@0'));
+    }
+
+    private function queue(
+        string $name,
+        string $value,
+        ?DateTimeInterface $expiresAt = null,
+        bool $httpOnly = true,
+        SameSite $sameSite = SameSite::Lax,
+    ): void {
         $maxAge = $expiresAt ? $expiresAt->getTimestamp() - time() : null;
         $expiresGmt = $expiresAt
             ? DateTimeImmutable::createFromInterface($expiresAt)
                 ->setTimezone(new DateTimeZone('GMT'))
                 ->format('D, d M Y H:i:s \G\M\T')
             : null;
-        $kvParts = array_filter([
-            $cookie->name => $cookie->value,
-            'Expires' => $expiresGmt,
-            'Max-Age' => $maxAge,
-            'Domain' => $this->cookieHost,
-            'Path' => '/',
-            'SameSite' => $sameSite->value,
-            'Secure' => $this->host->getScheme() === 'https' ? true : null,
-            'HttpOnly' => $httpOnly ? true : null,
-        ]);
+        $kvParts = array_filter(
+            [
+                $name => $value,
+                'Expires' => $expiresGmt,
+                'Max-Age' => $maxAge,
+                'Domain' => $this->cookieHost,
+                'Path' => '/',
+                'SameSite' => $sameSite->value,
+                'Secure' => $this->host->getScheme() === 'https' ? true : null,
+                'HttpOnly' => $httpOnly ? true : null,
+            ],
+            static fn($v) => $v !== null,
+        );
 
         $parts = array_map(
             static fn($key, $val) => $val === true ? $key : $key . '=' . $val,
