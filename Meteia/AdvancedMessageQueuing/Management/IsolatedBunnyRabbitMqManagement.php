@@ -47,6 +47,31 @@ final readonly class IsolatedBunnyRabbitMqManagement implements RabbitMqManageme
         return new BindingAccepted($vhost, $queue, $exchange, $routingKey);
     }
 
+    #[Override]
+    public function unbindQueueFromExchange(
+        VHostName $vhost,
+        QueueName $queue,
+        ExchangeName $exchange,
+        RoutingKey $routingKey,
+    ): UnbindingResult {
+        $client = null;
+        try {
+            $client = $this->connectionOptions->client();
+            $channel = $client->channel();
+            $channel->queueUnbind(
+                queue: $queue->toNative(),
+                exchange: $exchange->toNative(),
+                routingKey: $routingKey->toNative(),
+            );
+        } catch (Throwable $e) {
+            return new UnbindingRejected($vhost, $queue, $exchange, $routingKey, $e->getMessage());
+        } finally {
+            $this->close($client);
+        }
+
+        return new UnbindingAccepted($vhost, $queue, $exchange, $routingKey);
+    }
+
     private function close(?Client $client): void
     {
         try {

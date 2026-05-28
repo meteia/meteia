@@ -15,4 +15,12 @@ interface RabbitMqManagement
         ExchangeName $exchange,
         RoutingKey $routingKey,
     ): BindingResult;
+
+    #[NoDiscard]
+    public function unbindQueueFromExchange(
+        VHostName $vhost,
+        QueueName $queue,
+        ExchangeName $exchange,
+        RoutingKey $routingKey,
+    ): UnbindingResult;
 }
