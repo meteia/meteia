@@ -16,6 +16,7 @@
       this.options = optionsFrom(url);
       this.subscriptionReceipt = 'meteia-live-view-subscribe';
       this.openReplyDestination = '/temp-queue/meteia-live-view-open';
+      this.bindings = new LiveBindings(this);
 
       const socketUrl = new URL(url, window.location.href);
       socketUrl.search = '';
@@ -25,6 +26,7 @@
       this.socket.onerror = () => console.error('Realtime connection failed.');
       this.socket.onclose = (event) => {
         this.stopHeartbeat();
+        this.bindings.stop();
         this.readyState = this.CLOSED;
         this.dispatch('close', closeEvent(event));
       };
@@ -47,6 +49,7 @@
 
     close(code, reason) {
       this.readyState = this.CLOSING;
+      this.bindings.stop();
       if (this.socket.readyState === WebSocket.OPEN) {
         this.socket.send(frame('DISCONNECT', {}, ''));
       }
@@ -104,6 +107,7 @@
         const receiptId = stompHeader(lines, 'receipt-id');
         if (receiptId === this.subscriptionReceipt) {
           this.readyState = this.OPEN;
+          this.bindings.start();
           this.dispatch('open', new Event('open'));
           return;
         }
@@ -189,12 +193,146 @@
       })));
     }
 
+    sendAdjust(add, remove) {
+      if (this.readyState !== this.OPEN || this.socket.readyState !== WebSocket.OPEN) {
+        return;
+      }
+      if (this.options.adjustDestination === '') {
+        return;
+      }
+      const payload = JSON.stringify({
+        token: this.options.token,
+        add: add,
+        remove: remove,
+      });
+      this.socket.send(frame('SEND', {
+        destination: this.options.adjustDestination,
+        'content-type': 'application/json',
+      }, payload));
+    }
+
     dispatch(type, event) {
       const wrapped = eventFor(type, event);
       this.events.dispatchEvent(wrapped);
       const handler = this['on' + type];
       if (typeof handler === 'function') {
         handler.call(this, eventFor(type, event));
+      }
+    }
+  }
+
+  class LiveBindings {
+    constructor(socket) {
+      this.socket = socket;
+      this.counts = new Map();
+      this.pendingAdd = new Set();
+      this.pendingRemove = new Set();
+      this.scheduled = false;
+      this.observer = null;
+      this.boundFlush = () => this.flush();
+    }
+
+    start() {
+      this.seed(document.body);
+      this.observer = new MutationObserver((records) => this.onMutations(records));
+      this.observer.observe(document.body, {childList: true, subtree: true});
+    }
+
+    stop() {
+      if (this.observer !== null) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+      this.counts.clear();
+      this.pendingAdd.clear();
+      this.pendingRemove.clear();
+      this.scheduled = false;
+    }
+
+    seed(root) {
+      this.forEachLiveNode(root, (topic) => {
+        const previous = this.counts.get(topic) || 0;
+        this.counts.set(topic, previous + 1);
+      });
+    }
+
+    onMutations(records) {
+      for (const record of records) {
+        record.addedNodes.forEach((node) => this.added(node));
+        record.removedNodes.forEach((node) => this.removed(node));
+      }
+    }
+
+    added(node) {
+      this.forEachLiveNode(node, (topic) => this.increment(topic));
+    }
+
+    removed(node) {
+      this.forEachLiveNode(node, (topic) => this.decrement(topic));
+    }
+
+    increment(topic) {
+      const previous = this.counts.get(topic) || 0;
+      this.counts.set(topic, previous + 1);
+      if (previous === 0) {
+        this.pendingRemove.delete(topic);
+        this.pendingAdd.add(topic);
+        this.schedule();
+      }
+    }
+
+    decrement(topic) {
+      const previous = this.counts.get(topic) || 0;
+      const next = previous > 0 ? previous - 1 : 0;
+      this.counts.set(topic, next);
+      if (previous > 0 && next === 0) {
+        this.pendingAdd.delete(topic);
+        this.pendingRemove.add(topic);
+        this.schedule();
+      }
+    }
+
+    schedule() {
+      if (this.scheduled) {
+        return;
+      }
+      this.scheduled = true;
+      window.requestAnimationFrame(this.boundFlush);
+    }
+
+    flush() {
+      this.scheduled = false;
+      if (this.pendingAdd.size === 0 && this.pendingRemove.size === 0) {
+        return;
+      }
+      const add = Array.from(this.pendingAdd);
+      const remove = Array.from(this.pendingRemove);
+      this.pendingAdd.clear();
+      this.pendingRemove.clear();
+      this.socket.sendAdjust(add, remove);
+    }
+
+    forEachLiveNode(node, fn) {
+      if (node === null || typeof node !== 'object') {
+        return;
+      }
+      if (node.nodeType !== 1) {
+        return;
+      }
+      if (node.hasAttribute && node.hasAttribute('data-live-bind')) {
+        const topic = node.getAttribute('data-live-bind');
+        if (topic !== null && topic !== '') {
+          fn(topic);
+        }
+      }
+      if (node.querySelectorAll) {
+        const descendants = node.querySelectorAll('[data-live-bind]');
+        for (const descendant of descendants) {
+          const topic = descendant.getAttribute('data-live-bind');
+          if (topic !== null && topic !== '') {
+            fn(topic);
+          }
+        }
       }
     }
   }
@@ -246,7 +384,9 @@
 
     return {
       token: required(params, 'token'),
+      tab: params.get('tab') || '',
       openDestination: required(params, 'open'),
+      adjustDestination: params.get('adjust') || '',
       username: required(params, 'stomp_user'),
       password: required(params, 'stomp_passcode'),
       vhost: required(params, 'stomp_vhost'),

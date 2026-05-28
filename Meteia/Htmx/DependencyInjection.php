@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Meteia\Configuration\Configuration;
+use Meteia\Htmx\Realtime\StompAdjustDestination;
 use Meteia\Htmx\Realtime\StompOpenDestination;
 use Meteia\Htmx\Realtime\StompPassword;
 use Meteia\Htmx\Realtime\StompUsername;
@@ -27,5 +28,9 @@ return [
     StompOpenDestination::class =>
         static fn(Configuration $configuration): StompOpenDestination => new StompOpenDestination(
             $configuration->string('METEIA_REALTIME_OPEN_DESTINATION', ''),
+        ),
+    StompAdjustDestination::class =>
+        static fn(Configuration $configuration): StompAdjustDestination => new StompAdjustDestination(
+            $configuration->string('METEIA_REALTIME_ADJUST_DESTINATION', ''),
         ),
 ];
