@@ -63,10 +63,25 @@ abstract readonly class UniqueId implements Identifier
     {
         // Discard any additional data on the token (e.g. a selector).
         $parts = explode('_', $token, 3);
-        assert(count($parts) >= 2, 'Expected token with prefix ' . static::prefix());
+        if (count($parts) < 2) {
+            throw new \InvalidArgumentException(sprintf(
+                'Expected token with prefix "%s_" (for %s) but the provided token had no underscore separator: %s',
+                static::prefix(),
+                static::class,
+                substr($token, 0, 20) . (strlen($token) > 20 ? '...' : ''),
+            ));
+        }
         $prefix = $parts[0];
         $tokenBody = $parts[1] ?? '';
-        assert($prefix === static::prefix(), 'Expected token with prefix ' . static::prefix());
+        if ($prefix !== static::prefix()) {
+            throw new \InvalidArgumentException(sprintf(
+                'Expected token with prefix "%s_" (for %s) but got prefix "%s" (full token starts with: %s)',
+                static::prefix(),
+                static::class,
+                $prefix,
+                substr($token, 0, 20) . (strlen($token) > 20 ? '...' : ''),
+            ));
+        }
         $tokenBody = ltrim($tokenBody, '0');
         $data = new Base62()->decode($tokenBody);
 
