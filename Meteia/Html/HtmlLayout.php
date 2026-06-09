@@ -10,11 +10,11 @@ use Override;
 
 use function Meteia\Html\Elements\el;
 
-class HtmlLayout implements Layout
+readonly class HtmlLayout implements Layout
 {
     public function __construct(
-        private readonly Head $head,
-        private readonly Body $body,
+        private Head $head,
+        private Body $body,
     ) {}
 
     #[Override]
