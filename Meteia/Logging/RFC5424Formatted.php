@@ -79,8 +79,10 @@ class RFC5424Formatted extends AbstractLogger
         foreach ($sources as $elementSourceId => $elementSourceParams) {
             $paramStrings = [];
             foreach ($elementSourceParams as $paramName => $paramValue) {
-                if (\is_object($paramValue) || \is_array($paramValue)) {
-                    $paramValue = '!' . \gettype($paramValue) . '!';
+                if (\is_array($paramValue)) {
+                    $paramValue = '!array!';
+                } elseif (\is_object($paramValue) && !$paramValue instanceof Stringable) {
+                    $paramValue = '!object!';
                 }
                 $paramStrings[] = sprintf(
                     '%s="%s"',
