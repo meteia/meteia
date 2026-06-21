@@ -2,7 +2,7 @@
 
 This project is still greenfield, so replace migrations when we change the meaning or naming of the consumers.
 
-This project uses jj, not git.
+This project uses jj, not git. After every logical set of related changes, commit with jj and a short description — no need to be verbose.
 
 The rules below describe how code should be shaped.
 
