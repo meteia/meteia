@@ -58,6 +58,6 @@ final class Head implements Component
     #[Override]
     public function render(): Node
     {
-        return el('head', [], $this->title, $this->metadata, $this->scripts, $this->stylesheets);
+        return el('head', [], $this->title, $this->metadata, $this->stylesheets, $this->scripts);
     }
 }

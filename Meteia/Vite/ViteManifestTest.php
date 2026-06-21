@@ -32,7 +32,7 @@ final class ViteManifestTest extends TestCase
         $head->addScripts($manifest->moduleScripts('/App/Pages/HomeEntry.ts'));
 
         static::assertSame(
-            "<head><title>Untitled</title>\n\n<script src=\"/dist/App/Pages/HomeEntry-abc123.js\" type=\"module\"></script>\n</head>",
+            "<head><title>Untitled</title>\n\n\n<script src=\"/dist/App/Pages/HomeEntry-abc123.js\" type=\"module\"></script></head>",
             new HtmlEncoder()->encode($head),
         );
     }
@@ -47,7 +47,7 @@ final class ViteManifestTest extends TestCase
         $head->addScripts($manifest->moduleScripts('/App/Pages/HomeEntry.ts'));
 
         static::assertSame(
-            "<head><title>Untitled</title>\n\n<script src=\"/dist/App/Pages/HomeEntry.ts\" type=\"module\"></script>\n</head>",
+            "<head><title>Untitled</title>\n\n\n<script src=\"/dist/App/Pages/HomeEntry.ts\" type=\"module\"></script></head>",
             new HtmlEncoder()->encode($head),
         );
     }
