@@ -76,6 +76,48 @@ class PdoEventStream implements EventStream
     }
 
     #[Override]
+    public function page(
+        StreamId $streamId,
+        FromVersion $from = new FromFirst(),
+        int $limit = EventStream::DEFAULT_PAGE_SIZE,
+    ): EventPage {
+        assert($limit >= 1, 'page limit must be at least 1');
+
+        // Fetch one extra row to detect whether a further page exists without a second query.
+        $rows = $this->db->fetchObjects('
+                SELECT aggregate_root_id, aggregate_sequence, event, causation_id, correlation_id, created
+                FROM domain_events
+                WHERE aggregate_root_id = :aggregateRootId
+                  AND aggregate_sequence > :lowerBound
+                ORDER BY aggregate_sequence
+                LIMIT :limit;
+            ', [
+            'aggregateRootId' => $streamId->bytes(),
+            'lowerBound' => $from->lowerBoundExclusive(),
+            'limit' => $limit + 1,
+        ]);
+
+        $hasMore = count($rows) > $limit;
+        if ($hasMore) {
+            array_pop($rows);
+        }
+
+        $events = new RecordedEvents(array_map(fn(stdClass $row): RecordedEvent => $this->hydrate(
+            $streamId,
+            $row,
+        ), $rows));
+
+        $nextCursor = null;
+        if ($hasMore) {
+            $last = $events[count($events) - 1];
+            assert($last instanceof RecordedEvent, 'a non-empty page always has a final recorded event');
+            $nextCursor = StreamCursor::after($last->version());
+        }
+
+        return new EventPage($events, $nextCursor);
+    }
+
+    #[Override]
     public function replay(StreamId $streamId, EventSourced $target): EventSourced
     {
         [$target, $fromVersion] = $this->loadLatestSnapshot($streamId, $target);

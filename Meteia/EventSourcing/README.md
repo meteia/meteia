@@ -77,6 +77,51 @@ final readonly class CounterOpened implements DomainEvent
 }
 ```
 
+## Inspecting an Event Stream
+
+`AggregateHistory` is the read-only, consumer-facing way to inspect the events
+recorded for an aggregate root. It never reconstitutes an aggregate; it exposes
+the `RecordedEvent` values as they were stored, which is what you want for audit
+trails, debugging, and admin tooling.
+
+Inspection is paginated with an opaque cursor so a long stream is never loaded
+into memory all at once. A page carries a `nextCursor()` whose token is opaque:
+hand it back to fetch the following page, or persist/transport it (it is also
+`Stringable` and `JsonSerializable`) without depending on its internal shape.
+
+```php
+final readonly class CounterAudit
+{
+    public function __construct(private AggregateHistory $history) {}
+
+    /** Fetch one page; pass the previous page's cursor token to continue. */
+    public function page(CounterId $id, ?string $cursor = null): EventPage
+    {
+        return $this->history->page($id, $cursor, limit: 50);
+    }
+}
+
+$page = $audit->page($counterId);
+foreach ($page->events() as $recorded) {
+    // $recorded->event(), $recorded->version(), $recorded->occurredAt(), ...
+}
+$nextToken = (string) $page->nextCursor(); // null once $page->hasMore() is false
+```
+
+When you simply want to walk the whole stream server-side, `events()` returns a
+generator that transparently fetches pages on demand:
+
+```php
+foreach ($history->events($counterId) as $recorded) {
+    // processed lazily, one page of events resident at a time
+}
+```
+
+Under the hood this is `EventStream::page(StreamId, FromVersion, int $limit)`,
+which keyset-paginates over the indexed `aggregate_sequence` column. The cursor
+(`StreamCursor`) is itself a `FromVersion`, so it slots into the same read range
+abstraction as `FromFirst` and `FromAfter`.
+
 ## Version Semantics
 
 `StreamVersion` is used for two closely related ideas:

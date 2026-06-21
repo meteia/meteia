@@ -115,6 +115,69 @@ final class PdoEventStreamTest extends TestCase
         PdoEventStreamTest::assertCount(2, $tail);
     }
 
+    public function testPageLimitsResultsAndExposesACursor(): void
+    {
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $stream->append(
+            $streamId,
+            new AnyVersion(),
+            $this->record($streamId, 0, new SomethingRecorded()),
+            $this->record($streamId, 1, new SomethingRecorded()),
+            $this->record($streamId, 2, new SomethingRecorded()),
+        );
+
+        $page = $stream->page($streamId, new FromFirst(), 2);
+
+        PdoEventStreamTest::assertCount(2, $page->events());
+        PdoEventStreamTest::assertTrue($page->hasMore());
+        PdoEventStreamTest::assertNotNull($page->nextCursor());
+        PdoEventStreamTest::assertSame(1, $page->nextCursor()->lowerBoundExclusive());
+    }
+
+    public function testPageFollowingCursorReturnsTheRemainder(): void
+    {
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $stream->append(
+            $streamId,
+            new AnyVersion(),
+            $this->record($streamId, 0, new SomethingRecorded()),
+            $this->record($streamId, 1, new SomethingRecorded()),
+            $this->record($streamId, 2, new SomethingRecorded()),
+        );
+
+        $first = $stream->page($streamId, new FromFirst(), 2);
+        $cursor = $first->nextCursor();
+        assert($cursor !== null, 'a page with more events exposes a cursor');
+        $second = $stream->page($streamId, $cursor, 2);
+
+        PdoEventStreamTest::assertCount(1, $second->events());
+        PdoEventStreamTest::assertFalse($second->hasMore());
+        PdoEventStreamTest::assertNull($second->nextCursor());
+        $last = $second->events()[0];
+        assert($last instanceof RecordedEvent, 'recorded events collection only yields recorded events');
+        PdoEventStreamTest::assertSame(2, $last->version()->asInt());
+    }
+
+    public function testPageWithRoomToSpareHasNoCursor(): void
+    {
+        $stream = $this->stream();
+        $streamId = StreamId::random();
+        $stream->append(
+            $streamId,
+            new AnyVersion(),
+            $this->record($streamId, 0, new SomethingRecorded()),
+            $this->record($streamId, 1, new SomethingRecorded()),
+        );
+
+        $page = $stream->page($streamId, new FromFirst(), 100);
+
+        PdoEventStreamTest::assertCount(2, $page->events());
+        PdoEventStreamTest::assertFalse($page->hasMore());
+        PdoEventStreamTest::assertNull($page->nextCursor());
+    }
+
     private function record(StreamId $streamId, int $version, DomainEvent $event): RecordedEvent
     {
         $pending = new PendingEvent($streamId, new StreamVersion($version), $event);
