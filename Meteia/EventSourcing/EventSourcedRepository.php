@@ -93,6 +93,25 @@ final readonly class EventSourcedRepository
     }
 
     /**
+     * Reconstitute the aggregate, or return a blank one when it does not exist yet, for aggregates
+     * whose first domain event also creates them. See {@see EventSourcedAggregates::draft()}.
+     *
+     * @param TId $id
+     * @return TAggregate
+     */
+    /**
+     * @mago-expect analyze:invalid-return-statement -- The analyzer does not yet fully propagate the generic through EventSourcedAggregates; the runtime contract is correct.
+     */
+    public function draft(AggregateRootId $id): EventSourced
+    {
+        $aggregate = $this->aggregates->draft($id);
+
+        assert($aggregate instanceof EventSourced, 'EventSourcedAggregates must return an instance of EventSourced');
+
+        return $aggregate;
+    }
+
+    /**
      * @param TAggregate $aggregate
      */
     public function commit(EventSourced $aggregate): void

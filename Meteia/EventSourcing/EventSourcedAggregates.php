@@ -45,6 +45,22 @@ final readonly class EventSourcedAggregates
     }
 
     /**
+     * Like {@see reconstituted()} but returns a blank aggregate instead of throwing when the stream
+     * has no events yet. Use for aggregates whose first domain event is also their creation (an
+     * upsert), so a command can load-or-create without a separate create step.
+     *
+     * @param TAggregateRootId $id
+     * @return TAggregate
+     */
+    public function draft(AggregateRootId $id): EventSourced
+    {
+        $aggregate = $this->blank->of($id);
+        $this->events->replay(new StreamId($id->bytes()), $aggregate);
+
+        return $aggregate;
+    }
+
+    /**
      * @param TAggregate $aggregate
      */
     public function commit(EventSourced $aggregate): void
