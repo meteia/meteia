@@ -139,7 +139,15 @@ class Uri implements UriContract, Comparable
     #[Override]
     public function withPath(string $path): self
     {
-        return new self($this->parsed()->withPath($path)->toString());
+        $parsed = $this->parsed();
+        // RFC 3986 §3.3: when an authority is present the path must be empty or
+        // begin with "/". The Rfc3986 extension rejects a rootless path outright,
+        // so normalize it the way PSR-7 implementations do rather than throwing.
+        if ($path !== '' && !str_starts_with($path, '/') && $parsed->getHost() !== null) {
+            $path = '/' . $path;
+        }
+
+        return new self($parsed->withPath($path)->toString());
     }
 
     #[NoDiscard]
