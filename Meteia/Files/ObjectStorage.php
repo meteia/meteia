@@ -98,7 +98,7 @@ class ObjectStorage implements Storage
 
         $canonicalHeaders = [
             'host' => $this->endpoint->getHost(),
-            'content-length' => $contentLength,
+            'content-length' => (string) $contentLength,
             'content-type' => $contentType,
             'cache-control' => 'public, max-age=31536000, immutable',
             'x-amz-content-sha256' => $hashedPayload,
