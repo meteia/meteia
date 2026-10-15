@@ -20,8 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-use function Meteia\Http\Functions\send;
-
 /**
  * @implements IteratorAggregate<array-key, SymfonyCommand>
  */
@@ -52,7 +50,7 @@ final readonly class Commands implements IteratorAggregate
             $command->setDefinition($commandClassname::inputDefinition());
             $command->ignoreValidationErrors();
             $command->setDescription($commandClassname::description());
-            $command->setCode(function (InputInterface $input, OutputInterface $output) use ($commandClassname): void {
+            $command->setCode(function (InputInterface $input, OutputInterface $output) use ($commandClassname): int {
                 try {
                     $this->container->set(InputInterface::class, $input);
                     $this->container->set(OutputInterface::class, $output);
@@ -62,6 +60,8 @@ final readonly class Commands implements IteratorAggregate
                         throw new Exception('Command is missing required execute() method');
                     }
                     $this->container->call([$command, 'execute']);
+
+                    return SymfonyCommand::SUCCESS;
                 } catch (Throwable $throwable) {
                     $this->container->set(Throwable::class, $throwable);
                     $errorEndpoint = $this->container->get(ConsoleErrorEndpoint::class);
@@ -71,7 +71,9 @@ final readonly class Commands implements IteratorAggregate
                         $errorEndpoint,
                         'response',
                     ], [$throwable]);
-                    send($response);
+                    $output->write((string) $response->getBody());
+
+                    return SymfonyCommand::FAILURE;
                 }
             });
 
