@@ -25,6 +25,11 @@ final readonly class PsrClasses implements Classes
     {
         $searchRoot = $this->baseDirectory->join($this->namespacePrefix)->realpath();
         foreach ($searchRoot->find(...$this->regex) as $file) {
+            // Tests are colocated with runtime classes, but require development dependencies.
+            if (str_ends_with((string) $file, 'Test.php')) {
+                continue;
+            }
+
             $file = new FilesystemPath($file);
             $withoutPrefix = (string) $file->withoutPrefix($searchRoot);
             $className = $this->fileToClassName($withoutPrefix);
