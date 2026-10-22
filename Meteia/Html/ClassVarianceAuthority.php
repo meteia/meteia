@@ -10,7 +10,7 @@ class ClassVarianceAuthority implements ClassName
 {
     /**
      * @param string $class Base class names
-     * @param array<string, array<string, array<int, string>|string>> $variants Variant definitions
+     * @param array<string, array<string|int, array<int, string>|string>> $variants Variant definitions
      * @param list<array<string, mixed>> $compoundVariants Compound variant definitions
      * @param array<string, mixed> $defaultVariants Default variant values
      */
@@ -34,7 +34,9 @@ class ClassVarianceAuthority implements ClassName
                 continue;
             }
             $selector = $props[$variantName];
-            \assert(\is_string($selector) || \is_int($selector));
+            \assert(\is_string($selector) || \is_int($selector) || \is_bool($selector));
+            // PHP stores boolean array keys as integers; preserve the original props for compound matching.
+            $selector = \is_bool($selector) ? (int) $selector : $selector;
             if (!isset($variantOptions[$selector])) {
                 continue;
             }
